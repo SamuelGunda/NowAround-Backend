@@ -57,4 +57,4 @@ jobs:
       with:
         app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
         slot-name: 'production'
-        package: ${{ github.workspace }}/publish
+        package: ./publish
