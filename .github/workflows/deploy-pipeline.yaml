@@ -50,11 +50,11 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: dotnet-app
-        path: publish
+        path: ${{ github.workspace }}/publish
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
         slot-name: 'production'
-        package: ./publish
+        package: ${{ github.workspace }}/publish
