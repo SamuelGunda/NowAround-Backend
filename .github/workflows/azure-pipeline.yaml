@@ -22,8 +22,17 @@ jobs:
         run: |
           az group create --name ${{ secrets.AZURE_RESOURCE_GROUP }} --location ${{ secrets.AZURE_LOCATION }}
 
+      # Check if the App Service Plan exists and create it if not
+      - name: 'Check if Azure App Service Plan exists'
+        id: check_plan
+        run: |
+          az appservice plan show --name "${{ secrets.AZURE_APPSERVICE_PLAN }}" \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --query "name" || echo "not_found"
+
       # Create the Web App Service Plan (if it doesn't exist)
       - name: 'Create Azure App Service Plan'
+        if: steps.check_plan.outputs == 'not_found'
         run: |
           az appservice plan create --name "${{ secrets.AZURE_APPSERVICE_PLAN }}" \
           --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
