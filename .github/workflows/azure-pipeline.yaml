@@ -21,3 +21,11 @@ jobs:
       - name: 'Create Azure Resource Group'
         run: |
           az group create --name ${{ secrets.AZURE_RESOURCE_GROUP }} --location ${{ secrets.AZURE_LOCATION }}
+
+      # Create the Web App Service Plan (if it doesn't exist)
+      - name: 'Create Azure App Service Plan'
+        run: |
+          az appservice plan create --name "${{ secrets.AZURE_WEBAPP_NAME }}" \
+          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --location ${{ secrets.AZURE_LOCATION }} \
+          --sku F1
