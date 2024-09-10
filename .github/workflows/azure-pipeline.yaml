@@ -25,7 +25,15 @@ jobs:
       # Create the Web App Service Plan (if it doesn't exist)
       - name: 'Create Azure App Service Plan'
         run: |
-          az appservice plan create --name "${{ secrets.AZURE_WEBAPP_NAME }}" \
+          az appservice plan create --name "${{ secrets.AZURE_APPSERVICE_PLAN }}" \
           --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
           --location ${{ secrets.AZURE_LOCATION }} \
           --sku F1
+
+      # Create the Azure Web App (if it doesn't exist)
+      - name: 'Create Azure Web App'
+        run: |
+          az webapp create --name ${{ secrets.AZURE_WEBAPP_NAME }} \
+          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --plan "${{ secrets.AZURE_APPSERVICE_PLAN }}" \
+          --runtime ${{ secrets.AZURE_WEBAPP_RUNTIME }}
