@@ -36,4 +36,4 @@ jobs:
           az webapp create --name ${{ secrets.AZURE_WEBAPP_NAME }} \
           --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
           --plan "${{ secrets.AZURE_APPSERVICE_PLAN }}" \
-          --runtime "dotnet:8"
+          --runtime "${{ secrets.AZURE_WEBAPP_RUNTIME }}"
