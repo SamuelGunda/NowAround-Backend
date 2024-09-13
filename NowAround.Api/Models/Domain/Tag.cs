@@ -1,6 +1,6 @@
 ﻿namespace NowAround.Api.Models.Domain;
 
-public class Category
+public class Tag
 {
     public int Id { get; set; }
     
@@ -8,5 +8,5 @@ public class Category
     public required string SkName { get; set; }
     public string Icon { get; set; }
     
-    public virtual ICollection<EstDetailsCategory> EstDetailsCategories { get; set; } = new List<EstDetailsCategory>();
+    public virtual ICollection<EstDetailsTag> EstDetailsTags { get; set; } = new List<EstDetailsTag>();
 }
