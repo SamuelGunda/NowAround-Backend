@@ -8,5 +8,5 @@ public class Category
     public required string SkName { get; set; }
     public string Icon { get; set; }
     
-    public virtual ICollection<EstDetailsCategory> EstDetailsCategories { get; set; } = new List<EstDetailsCategory>();
+    public virtual ICollection<EstablishmentCategory> EstDetailsCategories { get; set; } = new List<EstablishmentCategory>();
 }

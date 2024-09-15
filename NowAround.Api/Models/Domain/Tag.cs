@@ -8,5 +8,5 @@ public class Tag
     public required string SkName { get; set; }
     public string Icon { get; set; }
     
-    public virtual ICollection<EstDetailsTag> EstDetailsTags { get; set; } = new List<EstDetailsTag>();
+    public virtual ICollection<EstablishmentTag> EstDetailsTags { get; set; } = new List<EstablishmentTag>();
 }
