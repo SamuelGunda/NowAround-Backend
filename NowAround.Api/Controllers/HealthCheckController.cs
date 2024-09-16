@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace NowAround.Api.Controllers;
 
@@ -10,5 +11,12 @@ public class HealthCheckController : ControllerBase
     public IActionResult Get()
     {
         return Ok("Healthy");
+    }
+    
+    [Authorize]
+    [HttpGet("secure")]
+    public IActionResult GetSecure()
+    {
+        return Ok("Secure");
     }
 }

@@ -9,6 +9,7 @@
     <ItemGroup>
         <PackageReference Include="Auth0.AspNetCore.Authentication" Version="1.4.1" />
         <PackageReference Include="Auth0.ManagementApi" Version="7.26.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.4" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
           <PrivateAssets>all</PrivateAssets>
@@ -19,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Models\Dtos\" />
+      <Folder Include="Authorization\" />
       <Folder Include="Models\Entities\" />
     </ItemGroup>
 
