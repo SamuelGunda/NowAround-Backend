@@ -1,9 +1,7 @@
-using Auth0.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using NowAround.Api.Authorization.Interfaces;
+using NowAround.Api.Authorization.Service;
 using NowAround.Api.Database;
-using NowAround.Api.Interfaces;
-using NowAround.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,18 +10,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<IAuth0Service, Auth0Service>();
+builder.Services.AddMemoryCache();
+
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetSection("ConnectionStrings").GetValue<string>("default"));
-});
-
-builder.Services.AddAuth0WebAppAuthentication(options =>
-{
-    options.Domain = builder.Configuration["Auth0:Domain"];
-    options.ClientId = builder.Configuration["Auth0:ClientId"];
-    options.ClientSecret = builder.Configuration["Auth0:ClientSecret"];
 });
 
 var app = builder.Build();
