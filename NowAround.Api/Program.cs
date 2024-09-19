@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using NowAround.Api.Authorization.Interfaces;
-using NowAround.Api.Authorization.Service;
+using NowAround.Api.Authentication.Interfaces;
+using NowAround.Api.Authentication.Service;
 using NowAround.Api.Database;
 
 var builder = WebApplication.CreateBuilder(args);

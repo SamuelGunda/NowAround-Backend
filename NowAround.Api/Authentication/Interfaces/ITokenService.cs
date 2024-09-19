@@ -1,4 +1,4 @@
-﻿namespace NowAround.Api.Authorization.Interfaces;
+﻿namespace NowAround.Api.Authentication.Interfaces;
 
 public interface ITokenService
 {

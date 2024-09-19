@@ -1,4 +1,4 @@
-﻿namespace NowAround.Api.Authorization.Controllers;
+﻿namespace NowAround.Api.Authentication.Controllers;
 
 public class UserController
 {

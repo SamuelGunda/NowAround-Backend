@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace NowAround.Api.Authorization.Models;
+namespace NowAround.Api.Authentication.Models;
 
 public class ManagementTokenResponse
 {
