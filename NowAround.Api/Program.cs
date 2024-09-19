@@ -12,6 +12,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
 
+builder.Configuration.AddEnvironmentVariables();
+
+var auth0ClientId = builder.Configuration["Auth0:ClientId"];
+var auth0ClientSecret = builder.Configuration["Auth0:ClientSecret"];
+var auth0Domain = builder.Configuration["Auth0:Domain"];
+
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
