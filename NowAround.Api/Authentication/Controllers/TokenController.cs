@@ -7,7 +7,12 @@ namespace NowAround.Api.Authentication.Controllers;
 [Route("api/[controller]")]
 public class TokenController(ITokenService tokenService) : ControllerBase
 {
-    [HttpGet]
+    
+    /*
+     * This method is just for testing purposes
+     */
+    
+    /*[HttpGet]
     public async Task<IActionResult> GetManagementToken()
     {
         try
@@ -19,5 +24,5 @@ public class TokenController(ITokenService tokenService) : ControllerBase
         {
             return BadRequest(e.Message);
         }
-    }
+    }*/
 }

@@ -22,8 +22,6 @@ public class TokenService : ITokenService
     {
         _httpClient = httpClient;
         _memoryCache = memoryCache;
-        
-        //TODO: add secrets to azure key vault
 
         _domain = configuration["Auth0:Domain"] ?? throw new ArgumentNullException(configuration["Auth0:Domain"]);
         _clientId = configuration["Auth0:ClientId"] ?? throw new ArgumentNullException(configuration["Auth0:ClientId"]);

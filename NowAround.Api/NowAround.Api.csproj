@@ -22,6 +22,7 @@
 
     <ItemGroup>
       <Folder Include="Interfaces\" />
+      <Folder Include="Models\Dtos\" />
       <Folder Include="Models\Entities\" />
       <Folder Include="Services\" />
     </ItemGroup>
