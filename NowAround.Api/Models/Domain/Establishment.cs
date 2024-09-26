@@ -3,9 +3,7 @@
 public class Establishment
 {
     public int Id { get; set; }
-    
-    public required int AccountId { get; set; }
-    public virtual required  Account Account { get; set; }
+    public string Auth0Id { get; set; }
     
     public required string Name { get; set; }
     public string Description { get; set; }
@@ -14,6 +12,6 @@ public class Establishment
     public double Latitude { get; set; }
     public double Longitude { get; set; }
     
-    public virtual ICollection<EstablishmentCategory> EstDetailsCategories { get; set; } = new List<EstablishmentCategory>();
-    public virtual ICollection<EstablishmentTag> EstDetailsTags { get; set; } = new List<EstablishmentTag>();
+    public virtual ICollection<EstablishmentCategory> EstablishmentCategories { get; } = new List<EstablishmentCategory>();
+    public virtual ICollection<EstablishmentTag> EstablishmentTags { get; } = new List<EstablishmentTag>();
 }

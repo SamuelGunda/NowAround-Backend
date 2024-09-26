@@ -8,8 +8,14 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
     public void Configure(EntityTypeBuilder<Category> builder)
     {
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Name).IsRequired();
-        builder.Property(e => e.Icon).IsRequired();
+        builder.HasKey(c => c.Id);
+        builder.Property(c => c.Name).IsRequired();
+        builder.Property(c => c.SkName).IsRequired();
+        builder.Property(c => c.Icon).IsRequired();
+        
+        builder.HasMany(c => c.EstablishmentCategories)
+            .WithOne(ec => ec.Category)
+            .HasForeignKey(ec => ec.CategoryId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
