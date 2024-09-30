@@ -52,8 +52,6 @@ public class TokenService : ITokenService
         };
         
         var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
-        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-    
         var response = await _httpClient.PostAsync($"https://{_domain}/oauth/token", content);
         
         /*

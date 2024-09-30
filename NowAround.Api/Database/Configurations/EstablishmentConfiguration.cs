@@ -13,6 +13,7 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
         builder.Property(e => e.Name).IsRequired();
         builder.Property(e => e.Description);
         builder.Property(e => e.Address).IsRequired();
+        builder.Property(e => e.City).IsRequired();
         builder.Property(e => e.Website);
         builder.Property(e => e.Latitude).IsRequired();
         builder.Property(e => e.Longitude).IsRequired();

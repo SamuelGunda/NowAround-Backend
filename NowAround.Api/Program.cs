@@ -1,13 +1,22 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Serialization;
 using NowAround.Api.Authentication.Interfaces;
 using NowAround.Api.Authentication.Service;
 using NowAround.Api.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ContractResolver = new DefaultContractResolver
+        {
+            NamingStrategy = new CamelCaseNamingStrategy()
+        };
+    });
+    
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -58,8 +67,9 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ITokenService, TokenService>();  
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEstablishmentService, EstablishmentService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

@@ -19,7 +19,7 @@ public class UserService(AppDbContext context) : IUserService
         {
             await context.Users.AddAsync(user);
             await context.SaveChangesAsync();
-            return 1;
+            return user.Id;
         }
         catch (Exception e)
         {
