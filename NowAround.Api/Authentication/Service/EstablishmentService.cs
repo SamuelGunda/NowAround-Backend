@@ -4,6 +4,7 @@ using NowAround.Api.Authentication.Interfaces;
 using NowAround.Api.Authentication.Models;
 using NowAround.Api.Authentication.Utilities;
 using NowAround.Api.Database;
+using NowAround.Api.Interfaces;
 using NowAround.Api.Models.Domain;
 using User = Auth0.ManagementApi.Models.User;
 
@@ -15,11 +16,11 @@ public class EstablishmentService : IEstablishmentService
     private readonly HttpClient _httpClient;
     private readonly AppDbContext _context;
     private readonly ITokenService _tokenService;
-    private readonly MapboxService _mapboxService;
+    private readonly IMapboxService _mapboxService;
     
     private readonly string _domain;
 
-    public EstablishmentService(HttpClient httpClient, AppDbContext context, ITokenService tokenService, IConfiguration configuration, MapboxService mapboxService)
+    public EstablishmentService(HttpClient httpClient, AppDbContext context, ITokenService tokenService, IConfiguration configuration, IMapboxService mapboxService)
     {
         _httpClient = httpClient;
         _context = context;
@@ -29,49 +30,19 @@ public class EstablishmentService : IEstablishmentService
         _domain = configuration["Auth0:Domain"] ?? throw new ArgumentNullException(configuration["Auth0:Domain"]);
     }
     
-    public async Task<int> CreateEstablishmentAsync(EstablishmentRegisterRequest establishmentRequest)
+    public async Task<int> RegisterEstablishmentAsync(EstablishmentRegisterRequest establishmentRequest)
     {
-        var requestBody = new
-        {
-            email = establishmentRequest.PersonalInfo.Email,
-            password = PasswordUtils.Generate(),
-            name = establishmentRequest.Name,
-            given_name = establishmentRequest.PersonalInfo.FName,
-            family_name = establishmentRequest.PersonalInfo.LName,
-            connection = "Username-Password-Authentication",
-        };
+        ArgumentNullException.ThrowIfNull(establishmentRequest);
         
-        var accessToken = _tokenService.GetManagementAccessTokenAsync().Result;
+        var personalInfo = establishmentRequest.PersonalInfo;
+        var auth0Id = await RegisterEstablishmentOnAuth0(establishmentRequest.Name, personalInfo);
         
-        var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
-        
-        var request = new HttpRequestMessage(HttpMethod.Post, $"https://{_domain}/api/v2/users");
-        request.Headers.Add("Authorization" , $"Bearer {accessToken}");
-        request.Content = content;
-        
-        var response = _httpClient.SendAsync(request).Result;
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var errorResponse = await response.Content.ReadAsStringAsync();
-            throw new Exception("Failed to create establishment:" + errorResponse);
-        }
-        
-        var responseBody = await response.Content.ReadAsStringAsync();
-        var user = JsonConvert.DeserializeObject<User>(responseBody);
-        
-        if (user == null)
-        {
-            throw new Exception("Failed to create establishment: User is null");
-        }
-        
-        var fullAdress = establishmentRequest.Adress + ", " + establishmentRequest.City + ", Slovakia";
-        
-        var coordinates = await _mapboxService.GetCoordinatesFromAddress(fullAdress);
+        var fullAddress = establishmentRequest.Adress + ", " + establishmentRequest.City;
+        var coordinates = await _mapboxService.GetCoordinatesFromAddressAsync(fullAddress);
         
         var establishmentEntity = new Establishment()
         {
-            Auth0Id = user.UserId,
+            Auth0Id = auth0Id,
             Name = establishmentRequest.Name,
             Latitude = coordinates.lat,
             Longitude = coordinates.lng,
@@ -88,8 +59,52 @@ public class EstablishmentService : IEstablishmentService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
             throw new Exception("Failed to create establishment", e);
+        }
+    }
+    
+    private async Task<string> RegisterEstablishmentOnAuth0(string establishmentName, PersonalInfo personalInfo)
+    {
+        ArgumentNullException.ThrowIfNull(personalInfo);
+
+        var requestBody = new
+        {
+            email = personalInfo.Email,
+            password = PasswordUtils.Generate(),
+            name = establishmentName,
+            given_name = personalInfo.FName,
+            family_name = personalInfo.LName,
+            connection = "Username-Password-Authentication"
+        };
+        
+        var accessToken = await _tokenService.GetManagementAccessTokenAsync();
+        
+        var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"https://{_domain}/api/v2/users");
+        request.Headers.Add("Authorization" , $"Bearer {accessToken}");
+        request.Content = content;
+        
+        var response = await _httpClient.SendAsync(request);
+        var responseBody = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception("Failed to create establishment:" + responseBody);
+        }
+        
+        try
+        {
+            var user = JsonConvert.DeserializeObject<User>(responseBody);
+            if (user == null)
+            {
+                throw new Exception("Failed to create establishment: User is null");
+            }
+            
+            return user.UserId;
+        }
+        catch (JsonException ex)
+        {
+            throw new Exception("Failed to deserialize Auth0 response", ex);
         }
     }
 }

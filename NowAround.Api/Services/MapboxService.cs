@@ -1,10 +1,11 @@
 ﻿
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NowAround.Api.Interfaces;
 
-namespace NowAround.Api.Authentication.Utilities;
+namespace NowAround.Api.Services;
 
-public class MapboxService
+public class MapboxService : IMapboxService
 {
 
     private readonly HttpClient _httpClient;
@@ -22,8 +23,15 @@ public class MapboxService
      * address example: "Sládkovičova 1532, Žiar nad Hronom, Slovakia"
      */
     
-    public async Task<(double lat, double lng)> GetCoordinatesFromAddress(string address)
+    public async Task<(double lat, double lng)> GetCoordinatesFromAddressAsync(string address)
     {
+        
+        // Hard coded country for time being as the main focus is on the Slovakia
+         
+        address += ", Slovakia";
+        
+        // The API request URL, the address is encoded to be URL safe
+        
         var url = $"https://api.mapbox.com/geocoding/v5/mapbox.places/{Uri.EscapeDataString(address)}.json?access_token={_mapboxAccessToken}";
         var response = await _httpClient.GetStringAsync(url);
         

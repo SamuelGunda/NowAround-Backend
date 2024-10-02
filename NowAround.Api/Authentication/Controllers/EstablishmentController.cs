@@ -13,7 +13,7 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     {
         try
         {
-            var establishmentId = await establishmentService.CreateEstablishmentAsync(establishment);
+            var establishmentId = await establishmentService.RegisterEstablishmentAsync(establishment);
             return Ok(establishmentId);
         }
         catch (Exception e)

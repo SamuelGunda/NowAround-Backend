@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NowAround.Api.Models.Domain;
+using NowAround.Api.Models.Enum;
 
 namespace NowAround.Api.Database.Configurations;
 
@@ -17,6 +18,7 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
         builder.Property(e => e.Website);
         builder.Property(e => e.Latitude).IsRequired();
         builder.Property(e => e.Longitude).IsRequired();
+        builder.Property(e => e.PriceCategory).IsRequired();
         
         builder.HasMany(e => e.EstablishmentCategories)
             .WithOne(ec => ec.Establishment)
@@ -27,5 +29,8 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
             .WithOne(et => et.Establishment)
             .HasForeignKey(et => et.EstablishmentId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property(e => e.RequestStatus)
+            .HasDefaultValue(RequestStatus.Pending);
     }
 }

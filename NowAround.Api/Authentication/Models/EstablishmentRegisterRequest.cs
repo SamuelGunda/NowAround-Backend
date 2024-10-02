@@ -33,14 +33,14 @@ public class EstablishmentRegisterRequest
 public class PersonalInfo
 {
     [JsonProperty("firstName")]
-    public string? FName { get; set; }
+    public string FName { get; set; }
     
     [JsonProperty("lastName")]
-    public string? LName { get; set; }
+    public string LName { get; set; }
     
     /*
     [JsonProperty("phoneNumber")]
-    public string? PhoneNumber { get; set; }
+    public string? PhoneNumber { get; set; } //TODO: add phone number
     */
     
     [JsonProperty("email")]

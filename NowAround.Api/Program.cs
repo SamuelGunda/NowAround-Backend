@@ -5,6 +5,8 @@ using Newtonsoft.Json.Serialization;
 using NowAround.Api.Authentication.Interfaces;
 using NowAround.Api.Authentication.Service;
 using NowAround.Api.Database;
+using NowAround.Api.Interfaces;
+using NowAround.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,10 +72,19 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<ITokenService, TokenService>();  
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEstablishmentService, EstablishmentService>();
+builder.Services.AddScoped<IMapboxService, MapboxService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetSection("ConnectionStrings").GetValue<string>("default"));
+    options.UseSqlServer(builder.Configuration
+        .GetSection("ConnectionStrings")
+        .GetValue<string>("default"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 3, 
+            maxRetryDelay: TimeSpan.FromSeconds(10), 
+            errorNumbersToAdd: null
+        )
+    );
 });
 
 var app = builder.Build();
