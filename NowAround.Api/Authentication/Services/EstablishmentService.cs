@@ -1,18 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NowAround.Api.Authentication.Interfaces;
+﻿using NowAround.Api.Authentication.Interfaces;
 using NowAround.Api.Authentication.Models;
-using NowAround.Api.Database;
 using NowAround.Api.Interfaces;
 using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
 
-namespace NowAround.Api.Authentication.Service;
+namespace NowAround.Api.Authentication.Services;
 
 public class EstablishmentService : IEstablishmentService
 {
     
-    private readonly AppDbContext _context;
     private readonly IAccountManagementService _accountManagementService;
     private readonly IMapboxService _mapboxService;
     private readonly IEstablishmentRepository _establishmentRepository;
@@ -20,14 +17,12 @@ public class EstablishmentService : IEstablishmentService
     private readonly ITagRepository _tagRepository;
 
     public EstablishmentService(
-        AppDbContext context, 
         IAccountManagementService accountManagementService, 
         IMapboxService mapboxService,
         IEstablishmentRepository establishmentRepository,
         ICategoryRepository categoryRepository,
         ITagRepository tagRepository)
     {
-        _context = context;
         _accountManagementService = accountManagementService;
         _mapboxService = mapboxService;
         _establishmentRepository = establishmentRepository;
@@ -93,7 +88,7 @@ public class EstablishmentService : IEstablishmentService
     
     public async Task<EstablishmentDto> GetEstablishmentAsync(string auth0Id)
     {
-        var establishment = await _context.Establishments.FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
+        var establishment = await _establishmentRepository.GetEstablishmentByAuth0IdAsync(auth0Id);
         if (establishment == null)
         {
             throw new Exception("Establishment not found");
@@ -106,19 +101,11 @@ public class EstablishmentService : IEstablishmentService
     {
         ArgumentNullException.ThrowIfNull(auth0Id);
         
-        var establishment = await _context.Establishments.FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
-        if (establishment == null)
-        {
-            throw new KeyNotFoundException("Establishment not found");
-        }
-        
         await _accountManagementService.DeleteAccountAsync(auth0Id);
         
         try
         {
-            _context.Establishments.Remove(establishment);
-            await _context.SaveChangesAsync();
-            return true;
+            return await _establishmentRepository.DeleteEstablishmentByAuth0IdAsync(auth0Id);
         }
         catch (Exception e)
         {

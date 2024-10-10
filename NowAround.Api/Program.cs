@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using NowAround.Api.Authentication.Interfaces;
 using NowAround.Api.Authentication.Repositories;
-using NowAround.Api.Authentication.Service;
+using NowAround.Api.Authentication.Services;
 using NowAround.Api.Database;
 using NowAround.Api.Interfaces;
 using NowAround.Api.Interfaces.Repositories;

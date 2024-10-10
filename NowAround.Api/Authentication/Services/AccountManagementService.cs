@@ -6,7 +6,7 @@ using NowAround.Api.Authentication.Interfaces;
 using NowAround.Api.Authentication.Models;
 using NowAround.Api.Authentication.Utilities;
 
-namespace NowAround.Api.Authentication.Service;
+namespace NowAround.Api.Authentication.Services;
 
 public class AccountManagementService : IAccountManagementService
 {

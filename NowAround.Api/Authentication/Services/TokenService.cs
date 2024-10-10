@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using NowAround.Api.Authentication.Interfaces;
 using NowAround.Api.Authentication.Models;
 
-namespace NowAround.Api.Authentication.Service;
+namespace NowAround.Api.Authentication.Services;
 
 
 public class TokenService : ITokenService

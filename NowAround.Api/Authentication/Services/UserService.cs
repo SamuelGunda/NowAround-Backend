@@ -3,7 +3,7 @@ using NowAround.Api.Database;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Enum;
 
-namespace NowAround.Api.Authentication.Service;
+namespace NowAround.Api.Authentication.Services;
 
 public class UserService(AppDbContext context) : IUserService
 {
