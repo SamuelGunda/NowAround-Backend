@@ -3,9 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using NowAround.Api.Authentication.Interfaces;
+using NowAround.Api.Authentication.Repositories;
 using NowAround.Api.Authentication.Service;
 using NowAround.Api.Database;
 using NowAround.Api.Interfaces;
+using NowAround.Api.Interfaces.Repositories;
+using NowAround.Api.Repositories;
 using NowAround.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -73,6 +76,11 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEstablishmentService, EstablishmentService>();
 builder.Services.AddScoped<IMapboxService, MapboxService>();
+builder.Services.AddScoped<IAccountManagementService, AccountManagementService>();
+
+builder.Services.AddScoped<IEstablishmentRepository, EstablishmentRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ITagRepository, TagRepository>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -80,8 +88,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         .GetSection("ConnectionStrings")
         .GetValue<string>("default"),
         sqlOptions => sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 3, 
-            maxRetryDelay: TimeSpan.FromSeconds(10), 
+            maxRetryCount: 5, 
+            maxRetryDelay: TimeSpan.FromSeconds(30), 
             errorNumbersToAdd: null
         )
     );
@@ -102,5 +110,19 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Wake up the database on startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        dbContext.Database.ExecuteSqlRaw("SELECT 1");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error waking up the database: {ex.Message}");
+    }
+}
 
 app.Run();

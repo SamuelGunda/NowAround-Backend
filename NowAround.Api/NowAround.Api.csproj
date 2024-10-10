@@ -22,7 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Models\Dtos\" />
       <Folder Include="Models\Entities\" />
     </ItemGroup>
 

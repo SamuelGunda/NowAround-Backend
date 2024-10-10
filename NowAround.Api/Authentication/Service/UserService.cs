@@ -7,6 +7,7 @@ namespace NowAround.Api.Authentication.Service;
 
 public class UserService(AppDbContext context) : IUserService
 {
+    
     public async Task<int> CreateUserAsync(string auth0Id)
     {
         var user = new User()

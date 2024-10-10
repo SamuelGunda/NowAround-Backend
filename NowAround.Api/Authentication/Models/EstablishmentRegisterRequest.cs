@@ -5,6 +5,31 @@ namespace NowAround.Api.Authentication.Models;
 
 public class EstablishmentRegisterRequest
 {
+    [JsonProperty("establishmentInfo")]
+    public EstablishmentInfo EstablishmentInfo { get; set; }
+    
+    [JsonProperty("personalInfo")]
+    public PersonalInfo PersonalInfo { get; set; }
+    
+    public void ValidateProperties()
+    {
+        if (EstablishmentInfo == null)
+        {
+            throw new ArgumentNullException(nameof(EstablishmentInfo));
+        }
+        
+        if (PersonalInfo == null)
+        {
+            throw new ArgumentNullException(nameof(PersonalInfo));
+        }
+        
+        EstablishmentInfo.ValidateProperties();
+        PersonalInfo.ValidateProperties();
+    }
+}
+
+public class EstablishmentInfo
+{
     [JsonProperty("establishmentName")]
     public string Name { get; set; }
     
@@ -21,13 +46,22 @@ public class EstablishmentRegisterRequest
     public int PriceCategory { get; set; }
     
     [JsonProperty("establishmentCategory")]
-    public ICollection<string> CategoryNames { get; set; } = new List<string>();
+    public ICollection<string> CategoryNames { get; set; }
     
     [JsonProperty("establishmentTags")]
-    public ICollection<string> TagNames { get; set; } = new List<string>();
+    public ICollection<string>? TagNames { get; set; }
     
-    [JsonProperty("personalInfo")]
-    public PersonalInfo PersonalInfo { get; set; }
+    public void ValidateProperties()
+    {
+        if (string.IsNullOrEmpty(Name) 
+            || string.IsNullOrEmpty(Adress) 
+            || string.IsNullOrEmpty(City) 
+            || PriceCategory < 0 || PriceCategory >= 3 
+            || CategoryNames == null || CategoryNames.Count == 0)
+        {
+            throw new ArgumentNullException();
+        }
+    }
 }
 
 public class PersonalInfo
@@ -45,4 +79,14 @@ public class PersonalInfo
     
     [JsonProperty("email")]
     public string Email { get; set; }
+    
+    public void ValidateProperties()
+    {
+        if (string.IsNullOrEmpty(FName) 
+            || string.IsNullOrEmpty(LName) 
+            || string.IsNullOrEmpty(Email))
+        {
+            throw new ArgumentNullException();
+        }
+    }
 }

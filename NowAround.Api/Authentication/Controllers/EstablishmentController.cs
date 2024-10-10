@@ -22,4 +22,34 @@ public class EstablishmentController(IEstablishmentService establishmentService)
             throw;
         }
     }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetEstablishmentAsync(string auth0Id)
+    {
+        try
+        {
+            var establishment = await establishmentService.GetEstablishmentAsync(auth0Id);
+            return Ok(establishment);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+    
+    [HttpDelete]
+    public async Task<IActionResult> DeleteEstablishmentAsync(string auth0Id)
+    {
+        try
+        {
+            await establishmentService.DeleteEstablishmentAsync(auth0Id);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }

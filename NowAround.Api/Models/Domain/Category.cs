@@ -9,4 +9,5 @@ public class Category
     public string Icon { get; set; }
     
     public virtual ICollection<EstablishmentCategory> EstablishmentCategories { get; } = new List<EstablishmentCategory>();
+    public virtual ICollection<Tag> Tags { get; } = new List<Tag>();
 }

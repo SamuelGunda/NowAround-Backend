@@ -19,18 +19,26 @@ public class MapboxService : IMapboxService
     }
     
     /*
-     * Get the longitude and latitude of a given address,
-     * address example: "Sládkovičova 1532, Žiar nad Hronom, Slovakia"
+     * Get coordinates from address
+     *
+     * 1. Send request to Mapbox API
+     * 2. Deserialize response
+     * 3. Check if response is valid
+     * 4. Get coordinates from response
+     * 5. Return coordinates
+     *
+     * Example address: "Sládkovičova 1532, Žiar nad Hronom, Slovakia"
      */
     
     public async Task<(double lat, double lng)> GetCoordinatesFromAddressAsync(string address)
     {
         
-        // Hard coded country for time being as the main focus is on the Slovakia
+        /*
+         * The address is hard coded for the time being as the main focus is on the Slovakia
+         * TODO: In future, the country should be passed as a parameter
+         */
          
         address += ", Slovakia";
-        
-        // The API request URL, the address is encoded to be URL safe
         
         var url = $"https://api.mapbox.com/geocoding/v5/mapbox.places/{Uri.EscapeDataString(address)}.json?access_token={_mapboxAccessToken}";
         var response = await _httpClient.GetStringAsync(url);

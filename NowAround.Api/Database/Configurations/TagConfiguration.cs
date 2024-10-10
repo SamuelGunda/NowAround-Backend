@@ -4,7 +4,7 @@ using NowAround.Api.Models.Domain;
 
 namespace NowAround.Api.Database.Configurations;
 
-public class TagsConfiguration : IEntityTypeConfiguration<Tag>
+public class TagConfiguration : IEntityTypeConfiguration<Tag>
 {
     public void Configure(EntityTypeBuilder<Tag> builder)
     {
@@ -17,5 +17,10 @@ public class TagsConfiguration : IEntityTypeConfiguration<Tag>
             .WithOne(et => et.Tag)
             .HasForeignKey(et => et.TagId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasOne(c => c.Category)
+            .WithMany(c => c.Tags)
+            .HasForeignKey(t => t.CategoryId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

@@ -17,6 +17,7 @@ public class TokenService : ITokenService
     private readonly string _domain;
     private readonly string _clientId;
     private readonly string _clientSecret;
+    private readonly string _managementScopes;
     
     public TokenService(HttpClient httpClient, IConfiguration configuration, IMemoryCache memoryCache)
     {
@@ -26,8 +27,9 @@ public class TokenService : ITokenService
         _domain = configuration["Auth0:Domain"] ?? throw new ArgumentNullException(configuration["Auth0:Domain"]);
         _clientId = configuration["Auth0:ClientId"] ?? throw new ArgumentNullException(configuration["Auth0:ClientId"]);
         _clientSecret = configuration["Auth0:ClientSecret"] ?? throw new ArgumentNullException(configuration["Auth0:ClientSecret"]);
+        _managementScopes = configuration["Auth0:ManagementScopes"] ?? throw new ArgumentNullException(configuration["Auth0:ManagementScopes"]);
     }
-
+    
     public async Task<string> GetManagementAccessTokenAsync()
     {
         /*
@@ -48,7 +50,8 @@ public class TokenService : ITokenService
             client_id = _clientId,
             client_secret = _clientSecret,
             audience = $"https://{_domain}/api/v2/",
-            grant_type = "client_credentials"
+            grant_type = "client_credentials",
+            scope =  _managementScopes
         };
         
         var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
