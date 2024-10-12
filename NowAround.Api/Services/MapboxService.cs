@@ -9,46 +9,39 @@ public class MapboxService : IMapboxService
 {
 
     private readonly HttpClient _httpClient;
+    private readonly ILogger<MapboxService> _logger;
     
     private readonly string _mapboxAccessToken;
     
-    public MapboxService(HttpClient httpClient, IConfiguration configuration)
+    public MapboxService(HttpClient httpClient, IConfiguration configuration, ILogger<MapboxService> logger)
     {
+        _logger = logger;
         _httpClient = httpClient;
         _mapboxAccessToken = configuration["Mapbox:AccessToken"] ?? throw new ArgumentNullException(configuration["Mapbox:AccessToken"]);
     }
     
-    /*
-     * Get coordinates from address
-     *
-     * 1. Send request to Mapbox API
-     * 2. Deserialize response
-     * 3. Check if response is valid
-     * 4. Get coordinates from response
-     * 5. Return coordinates
-     *
-     * Example address: "Sládkovičova 1532, Žiar nad Hronom, Slovakia"
-     */
+    /// <summary>
+    /// Get coordinates from address asynchronously.
+    /// Mapbox API is called to get coordinates from the address.
+    /// The country is hard coded for the time being (Slovakia).
+    /// TODO: In future, the country should be passed as a parameter
+    /// </summary>
     
     public async Task<(double lat, double lng)> GetCoordinatesFromAddressAsync(string address)
     {
-        
-        /*
-         * The address is hard coded for the time being as the main focus is on the Slovakia
-         * TODO: In future, the country should be passed as a parameter
-         */
-         
         address += ", Slovakia";
         
+        // Call Mapbox API to get coordinates from address
         var url = $"https://api.mapbox.com/geocoding/v5/mapbox.places/{Uri.EscapeDataString(address)}.json?access_token={_mapboxAccessToken}";
         var response = await _httpClient.GetStringAsync(url);
-        
         var responseJson = JsonConvert.DeserializeObject<JObject>(response) ?? throw new ArgumentNullException(response);
         
+        // Get coordinates from the API response, if they are valid
         var coordinates = responseJson["features"]?[0]?["geometry"]?["coordinates"];
         
         if (coordinates == null || coordinates.Count() < 2)
         {
+            _logger.LogError("Unable to retrieve valid coordinates from the API response.");
             throw new InvalidOperationException("Unable to retrieve valid coordinates from the API response.");
         }
         

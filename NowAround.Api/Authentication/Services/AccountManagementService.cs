@@ -1,10 +1,11 @@
 ﻿using System.Text;
 using Auth0.ManagementApi.Models;
-using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Newtonsoft.Json;
 using NowAround.Api.Authentication.Interfaces;
 using NowAround.Api.Authentication.Models;
 using NowAround.Api.Authentication.Utilities;
+using System.Net;
+using Microsoft.IdentityModel.Tokens;
 
 namespace NowAround.Api.Authentication.Services;
 
@@ -13,21 +14,33 @@ public class AccountManagementService : IAccountManagementService
     
     private readonly HttpClient _httpClient;
     private readonly ITokenService _tokenService;
+    private readonly ILogger<AccountManagementService> _logger;
     
     private readonly string _domain;
     
-    public AccountManagementService(HttpClient httpClient, ITokenService tokenService, IConfiguration configuration)
+    public AccountManagementService(
+        HttpClient httpClient, 
+        ITokenService tokenService, 
+        IConfiguration configuration, 
+        ILogger<AccountManagementService> logger)
     {
         _httpClient = httpClient;
         _tokenService = tokenService;
+        _logger = logger;
         
         _domain = configuration["Auth0:Domain"] ?? throw new ArgumentNullException(configuration["Auth0:Domain"]);
     }
     
+    /// <summary>
+    /// Registers a new establishment account asynchronously.
+    /// PersonalInfo is validated.
+    /// Management API is called to create a new user.
+    /// </summary>
+    
     public async Task<string> RegisterEstablishmentAccountAsync(string establishmentName, PersonalInfo personalInfo)
     {
-        ArgumentNullException.ThrowIfNull(personalInfo);
-
+        personalInfo.ValidateProperties();
+        
         var requestBody = new
         {
             email = personalInfo.Email,
@@ -38,16 +51,10 @@ public class AccountManagementService : IAccountManagementService
             connection = "Username-Password-Authentication"
         };
         
-        /*
-         * Get token to access Auth0 Management API
-         */
-        
+        // Get access token for Auth0 Management API
         var accessToken = await _tokenService.GetManagementAccessTokenAsync();
         
-        /*
-         * Send request to create user
-         */
-        
+        // Send request to Auth0 API to create a new user
         using var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
         using var request = new HttpRequestMessage(HttpMethod.Post, $"https://{_domain}/api/v2/users");
         request.Headers.Add("Authorization" , $"Bearer {accessToken}");
@@ -56,27 +63,31 @@ public class AccountManagementService : IAccountManagementService
         var response = await _httpClient.SendAsync(request);
         var responseBody = await response.Content.ReadAsStringAsync();
         
-        /*
-         * Check if request was successful
-         */
-
+        
         if (!response.IsSuccessStatusCode)
         {
-            //TODO: Add custom exception for email already in use
-            throw new HttpRequestException($"Failed to create establishment. Status Code: {response.StatusCode}, Response: {responseBody}");        
+            // If email is already in use, throw an exception
+            if (response is {StatusCode: HttpStatusCode.Conflict})
+            {
+                _logger.LogWarning("Failed to create establishment. Email already in use. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
+                throw new InvalidOperationException("Email already in use");
+            }
+            
+            // If request failed, throw an exception
+            _logger.LogError("Failed to create establishment. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
+            throw new HttpRequestException($"Failed to create establishment. Status Code: {response.StatusCode}, Response: {responseBody}");
         }
         
         /*
          * Deserialize response and return user id
-         * If deserialization fails, throw an exception
-         * If user is null, throw an exception
+         * If deserialization fails or user is null, throw an exception
          */
-        
         try
         {
             var user = JsonConvert.DeserializeObject<User>(responseBody);
             if (user == null)
             {
+                _logger.LogError("Failed to create establishment: User is null");
                 throw new InvalidOperationException("Failed to create establishment: User is null");
             }
             
@@ -84,16 +95,23 @@ public class AccountManagementService : IAccountManagementService
         }
         catch (JsonException ex)
         {
+            _logger.LogError(ex, "Failed to deserialize Auth0 response");
             throw new InvalidOperationException("Failed to deserialize Auth0 response", ex);
         }
     }
 
     public async Task<bool> DeleteAccountAsync(string auth0Id)
     {
-        ArgumentNullException.ThrowIfNull(auth0Id);
+        if (auth0Id.IsNullOrEmpty())
+        {
+            _logger.LogWarning("auth0Id is null");
+            throw new ArgumentNullException(nameof(auth0Id));
+        }
         
+        // Get access token for Auth0 Management API
         var accessToken = await _tokenService.GetManagementAccessTokenAsync();
         
+        // Send request to Auth0 API to delete user
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"https://{_domain}/api/v2/users/{Uri.EscapeDataString(auth0Id)}");
         request.Headers.Add("Authorization" , $"Bearer {accessToken}");
         
@@ -102,6 +120,7 @@ public class AccountManagementService : IAccountManagementService
         
         if (!response.IsSuccessStatusCode)
         {
+            _logger.LogError("Failed to delete account. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
             throw new HttpRequestException($"Failed to delete account. Status Code: {response.StatusCode}, Response: {responseBody}");
         }
 

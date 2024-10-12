@@ -5,17 +5,11 @@ namespace NowAround.Api.Authentication.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(IUserService userService) : ControllerBase
+public class UserController(IUserService userService, ILogger<UserController> logger) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> CreateUserAsync(string auth0Id)
     {
-        
-        if (string.IsNullOrEmpty(auth0Id))
-        {
-            return BadRequest("Auth0Id is required");
-        }
-        
         try
         {
             await userService.CreateUserAsync(auth0Id);
@@ -23,6 +17,7 @@ public class UserController(IUserService userService) : ControllerBase
         }
         catch (Exception e)
         {
+            logger.LogError(e, "Error creating user");
             return BadRequest(e.Message);
         }
     }

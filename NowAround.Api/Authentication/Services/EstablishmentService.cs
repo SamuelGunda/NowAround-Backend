@@ -1,4 +1,5 @@
-﻿using NowAround.Api.Authentication.Interfaces;
+﻿using Microsoft.IdentityModel.Tokens;
+using NowAround.Api.Authentication.Interfaces;
 using NowAround.Api.Authentication.Models;
 using NowAround.Api.Interfaces;
 using NowAround.Api.Interfaces.Repositories;
@@ -15,27 +16,31 @@ public class EstablishmentService : IEstablishmentService
     private readonly IEstablishmentRepository _establishmentRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly ITagRepository _tagRepository;
+    private readonly ILogger<EstablishmentService> _logger;
 
     public EstablishmentService(
         IAccountManagementService accountManagementService, 
         IMapboxService mapboxService,
         IEstablishmentRepository establishmentRepository,
         ICategoryRepository categoryRepository,
-        ITagRepository tagRepository)
+        ITagRepository tagRepository,
+        ILogger<EstablishmentService> logger)
     {
         _accountManagementService = accountManagementService;
         _mapboxService = mapboxService;
         _establishmentRepository = establishmentRepository;
         _categoryRepository = categoryRepository;
         _tagRepository = tagRepository;
+        _logger = logger;
     }
     
     /// <summary>
     /// Registers a new establishment asynchronously.
-    /// Registration process includes:
-    /// Name validation, address validation category and tag validation.
+    /// Establishment Request is validated.
+    /// Categories and tags are validated and fetched from the database.
+    /// Coordinates are fetched from the address using Mapbox API.
     /// Establishment is registered on Auth0 and saved to the database on success.
-    /// If database operation fails, the establishment account is deleted from Auth0.
+    /// If database operation fails, the establishment account gets deleted from Auth0.
     /// </summary>
     
     public async Task<int> RegisterEstablishmentAsync(EstablishmentRegisterRequest establishmentRequest)
@@ -48,6 +53,7 @@ public class EstablishmentService : IEstablishmentService
         // Check if establishment with this name already exists
         if (await _establishmentRepository.CheckIfEstablishmentExistsByNameAsync(establishmentInfo.Name))
         {
+            _logger.LogWarning("An establishment with the name {Name} already exists.", establishmentInfo.Name);
             throw new InvalidOperationException("An establishment with this name already exists.");
         }
         
@@ -81,6 +87,7 @@ public class EstablishmentService : IEstablishmentService
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Failed to create establishment: {Message}", e.Message);
             await _accountManagementService.DeleteAccountAsync(auth0Id);
             throw new Exception($"Failed to create establishment: {e.Message}", e);
         }
@@ -91,6 +98,7 @@ public class EstablishmentService : IEstablishmentService
         var establishment = await _establishmentRepository.GetEstablishmentByAuth0IdAsync(auth0Id);
         if (establishment == null)
         {
+            _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
             throw new Exception("Establishment not found");
         }
 
@@ -99,8 +107,13 @@ public class EstablishmentService : IEstablishmentService
     
     public async Task<bool> DeleteEstablishmentAsync(string auth0Id)
     {
-        ArgumentNullException.ThrowIfNull(auth0Id);
+        if (auth0Id.IsNullOrEmpty())
+        {
+            _logger.LogWarning("auth0Id is null");
+            throw new ArgumentNullException(nameof(auth0Id));
+        }
         
+        // Delete establishment account from Auth0
         await _accountManagementService.DeleteAccountAsync(auth0Id);
         
         try
@@ -109,9 +122,18 @@ public class EstablishmentService : IEstablishmentService
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Failed to delete establishment: {Message}", e.Message);
             throw new InvalidOperationException("Failed to delete establishment", e);
         }
     }
+    
+    /// <summary>
+    /// Sets categories and tags for the establishment.
+    /// Categories are validated and fetched from the database.
+    /// Tags are fetched from the categories list,
+    /// if they don't belong to any category (they have null Category in DB),
+    /// they are fetched from the database.
+    /// </summary>
     
     private async Task<(Category[] categories, Tag[] tags)> SetCategoriesAndTagsAsync(EstablishmentInfo establishmentInfo)
     {
@@ -120,10 +142,12 @@ public class EstablishmentService : IEstablishmentService
         
         foreach (var categoryName in establishmentInfo.CategoryNames)
         {
+            // Get category from database by name, including tags
             var categoryEntity = await _categoryRepository.GetCategoryByNameWithTagsAsync(categoryName);
                 
             if (categoryEntity == null)
             {
+                _logger.LogWarning("Category {CategoryName} not found", categoryName);
                 throw new Exception("Category not found");
             }
             
@@ -134,6 +158,7 @@ public class EstablishmentService : IEstablishmentService
         {
             foreach (var tag in establishmentInfo.TagNames)
             {
+                // Check if tag belongs to any of the categories, if not, get it from the database
                 var tagEntity = categories
                                     .SelectMany(c => c.Tags)
                                     .FirstOrDefault(t => t.Name == tag) 
@@ -141,6 +166,7 @@ public class EstablishmentService : IEstablishmentService
 
                 if (tagEntity == null)
                 {
+                    _logger.LogWarning("Tag {TagName} not found", tag);
                     throw new Exception("Tag not found");
                 }
                 

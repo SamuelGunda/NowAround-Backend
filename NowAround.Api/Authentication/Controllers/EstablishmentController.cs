@@ -6,7 +6,7 @@ namespace NowAround.Api.Authentication.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class EstablishmentController(IEstablishmentService establishmentService) : ControllerBase
+public class EstablishmentController(IEstablishmentService establishmentService, ILogger<EstablishmentController> logger) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> CreateEstablishmentAsync(EstablishmentRegisterRequest establishment)
@@ -14,11 +14,11 @@ public class EstablishmentController(IEstablishmentService establishmentService)
         try
         {
             var establishmentId = await establishmentService.RegisterEstablishmentAsync(establishment);
-            return Ok(establishmentId);
+            return StatusCode(201);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.LogError(e, "Error creating establishment");
             throw;
         }
     }
@@ -33,7 +33,7 @@ public class EstablishmentController(IEstablishmentService establishmentService)
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.LogError(e, "Error getting establishment");
             throw;
         }
     }
@@ -48,7 +48,7 @@ public class EstablishmentController(IEstablishmentService establishmentService)
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.LogError(e, "Error deleting establishment");
             throw;
         }
     }
