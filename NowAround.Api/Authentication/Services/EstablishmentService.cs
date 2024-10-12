@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using NowAround.Api.Authentication.Exceptions;
 using NowAround.Api.Authentication.Interfaces;
 using NowAround.Api.Authentication.Models;
 using NowAround.Api.Interfaces;
@@ -54,7 +55,7 @@ public class EstablishmentService : IEstablishmentService
         if (await _establishmentRepository.CheckIfEstablishmentExistsByNameAsync(establishmentInfo.Name))
         {
             _logger.LogWarning("An establishment with the name {Name} already exists.", establishmentInfo.Name);
-            throw new InvalidOperationException("An establishment with this name already exists.");
+            throw new EstablishmentAlreadyExistsException(establishmentInfo.Name);
         }
         
         // Get coordinates from address using Mapbox API and set them to variable

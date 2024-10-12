@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
 using NowAround.Api.Database;
 using NowAround.Api.Extensions;
+using NowAround.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,10 +15,12 @@ builder.Services.AddControllers()
         };
     });
     
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
+builder.Services.AddProblemDetails();
 
 builder.Configuration.AddEnvironmentVariables();
 
@@ -30,6 +33,8 @@ builder.Services.AddApplicationInsightsTelemetry();
 builder.Logging.ConfigureLogging();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {

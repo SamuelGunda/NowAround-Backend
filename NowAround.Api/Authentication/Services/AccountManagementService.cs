@@ -6,6 +6,7 @@ using NowAround.Api.Authentication.Models;
 using NowAround.Api.Authentication.Utilities;
 using System.Net;
 using Microsoft.IdentityModel.Tokens;
+using NowAround.Api.Authentication.Exceptions;
 
 namespace NowAround.Api.Authentication.Services;
 
@@ -70,7 +71,7 @@ public class AccountManagementService : IAccountManagementService
             if (response is {StatusCode: HttpStatusCode.Conflict})
             {
                 _logger.LogWarning("Failed to create establishment. Email already in use. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
-                throw new InvalidOperationException("Email already in use");
+                throw new EmailAlreadyInUseException(personalInfo.Email);
             }
             
             // If request failed, throw an exception
