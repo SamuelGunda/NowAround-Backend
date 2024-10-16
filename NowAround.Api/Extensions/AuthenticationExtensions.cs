@@ -5,7 +5,7 @@ namespace NowAround.Api.Extensions;
 
 public static class AuthenticationExtensions
 {
-    public static void ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         var auth0Domain = configuration["Auth0:Domain"] ?? throw new InvalidOperationException("Auth0 Domain is missing");
 

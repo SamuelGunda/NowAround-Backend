@@ -2,7 +2,7 @@
 
 public static class LoggingExtensions
 {
-    public static void ConfigureLogging(this ILoggingBuilder logging)
+    public static void AddLogging(this ILoggingBuilder logging)
     {
         logging.ClearProviders();
         logging.AddConsole();

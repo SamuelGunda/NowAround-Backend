@@ -79,26 +79,10 @@ public class AccountManagementService : IAccountManagementService
             throw new HttpRequestException($"Failed to create establishment. Status Code: {response.StatusCode}, Response: {responseBody}");
         }
         
-        /*
-         * Deserialize response and return user id
-         * If deserialization fails or user is null, throw an exception
-         */
-        try
-        {
-            var user = JsonConvert.DeserializeObject<User>(responseBody);
-            if (user == null)
-            {
-                _logger.LogError("Failed to create establishment: User is null");
-                throw new InvalidOperationException("Failed to create establishment: User is null");
-            }
-            
-            return user.UserId;
-        }
-        catch (JsonException ex)
-        {
-            _logger.LogError(ex, "Failed to deserialize Auth0 response");
-            throw new InvalidOperationException("Failed to deserialize Auth0 response", ex);
-        }
+        // Deserialize response to get Auth0 user ID
+        var user = JsonConvert.DeserializeObject<User>(responseBody) ?? throw new JsonException("Failed to deserialize Auth0 response");
+        
+        return user.UserId;
     }
 
     public async Task<bool> DeleteAccountAsync(string auth0Id)

@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
+﻿using System.Text;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using NowAround.Api.Authentication.Interfaces;

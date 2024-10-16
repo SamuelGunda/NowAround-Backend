@@ -18,19 +18,21 @@ builder.Services.AddControllers()
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerSecurity();
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
 builder.Services.AddProblemDetails();
 
-builder.Configuration.AddEnvironmentVariables();
+// builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddCustomServices();
-builder.Services.ConfigureAuthentication(builder.Configuration);
-builder.Services.ConfigureDatabase(builder.Configuration);
-builder.Services.ConfigureCors();
+builder.Services.AddAuthentication(builder.Configuration);
+builder.Services.AddDatabase(builder.Configuration);
+builder.Services.AddCustomCors();
 builder.Services.AddApplicationInsightsTelemetry();
 
-builder.Logging.ConfigureLogging();
+builder.Logging.AddLogging();
+
 
 var app = builder.Build();
 

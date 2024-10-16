@@ -12,12 +12,14 @@ public static class ServiceExtensions
 {
     public static void AddCustomServices(this IServiceCollection services)
     {
+        // Services
         services.AddScoped<ITokenService, TokenService>();  
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IEstablishmentService, EstablishmentService>();
         services.AddScoped<IMapboxService, MapboxService>();
         services.AddScoped<IAccountManagementService, AccountManagementService>();
 
+        // Repositories
         services.AddScoped<IEstablishmentRepository, EstablishmentRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ITagRepository, TagRepository>();

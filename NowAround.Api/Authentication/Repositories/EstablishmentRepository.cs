@@ -9,10 +9,12 @@ public class EstablishmentRepository : IEstablishmentRepository
 {
     
     private readonly AppDbContext _context;
+    private readonly ILogger<EstablishmentRepository> _logger;
     
-    public EstablishmentRepository(AppDbContext context)
+    public EstablishmentRepository(AppDbContext context, ILogger<EstablishmentRepository> logger)
     {
         _context = context;
+        _logger = logger;
     }
     
     public async Task<bool> CheckIfEstablishmentExistsByNameAsync(string name)
@@ -30,6 +32,7 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
         catch (Exception e)
         {
+            _logger.LogError("Failed to create establishment: {Message}", e.Message);
             throw new Exception("Failed to create establishment", e);
         }
     }
@@ -42,8 +45,8 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            _logger.LogError("Failed to get establishment by Auth0 ID: {Message}", e.Message);
+            throw new Exception("Failed to get establishment by Auth0 ID", e);
         }
     }
     
@@ -63,6 +66,7 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
         catch (Exception e)
         {
+            _logger.LogError("Failed to delete establishment: {Message}", e.Message);
             throw new InvalidOperationException("Failed to delete establishment", e);
         }
     }

@@ -5,7 +5,7 @@ namespace NowAround.Api.Extensions;
 
 public static class DbContextExtensions
 {
-    public static void ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
+    public static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<AppDbContext>(options =>
         {

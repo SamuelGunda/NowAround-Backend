@@ -6,6 +6,7 @@ using NowAround.Api.Interfaces;
 using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
+// ReSharper disable InvertIf
 
 namespace NowAround.Api.Authentication.Services;
 
@@ -68,30 +69,30 @@ public class EstablishmentService : IEstablishmentService
         // Register establishment on Auth0
         var auth0Id = await _accountManagementService.RegisterEstablishmentAccountAsync(establishmentInfo.Name, personalInfo);
         
-        try 
+        var establishmentEntity = new Establishment()
         {
-            var establishmentEntity = new Establishment()
-            {
-                Auth0Id = auth0Id,
-                Name = establishmentInfo.Name,
-                Latitude = coordinates.lat,
-                Longitude = coordinates.lng,
-                Address = establishmentInfo.Adress,
-                City = establishmentInfo.City,
-                PriceCategory = establishmentInfo.PriceCategory,
-                EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory() { Category = c }).ToList(),
-                EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag() { Tag = t }).ToList()
-            };
+            Auth0Id = auth0Id,
+            Name = establishmentInfo.Name,
+            Latitude = coordinates.lat,
+            Longitude = coordinates.lng,
+            Address = establishmentInfo.Adress,
+            City = establishmentInfo.City,
+            PriceCategory = establishmentInfo.PriceCategory,
+            EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory() { Category = c }).ToList(),
+            EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag() { Tag = t }).ToList()
+        };
             
-            // Save establishment to database    
-            return await _establishmentRepository.CreateEstablishmentAsync(establishmentEntity);
-        }
-        catch (Exception e)
+        // Save establishment to the database
+        var result =  await _establishmentRepository.CreateEstablishmentAsync(establishmentEntity);
+        
+        if (result == 0)
         {
-            _logger.LogError(e, "Failed to create establishment: {Message}", e.Message);
+            _logger.LogWarning("Failed to create establishment in the database");
             await _accountManagementService.DeleteAccountAsync(auth0Id);
-            throw new Exception($"Failed to create establishment: {e.Message}", e);
+            throw new Exception("Failed to create establishment in the database");
         }
+        
+        return result;
     }
     
     public async Task<EstablishmentDto> GetEstablishmentAsync(string auth0Id)
@@ -117,15 +118,15 @@ public class EstablishmentService : IEstablishmentService
         // Delete establishment account from Auth0
         await _accountManagementService.DeleteAccountAsync(auth0Id);
         
-        try
+        var result = await _establishmentRepository.DeleteEstablishmentByAuth0IdAsync(auth0Id);
+        
+        if (!result)
         {
-            return await _establishmentRepository.DeleteEstablishmentByAuth0IdAsync(auth0Id);
+            _logger.LogWarning("Failed to delete establishment");
+            throw new Exception("Failed to delete establishment");
         }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to delete establishment: {Message}", e.Message);
-            throw new InvalidOperationException("Failed to delete establishment", e);
-        }
+        
+        return true;
     }
     
     /// <summary>
