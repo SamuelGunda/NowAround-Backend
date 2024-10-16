@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NowAround.Api.Authentication.Interfaces;
-using NowAround.Api.Authentication.Models;
+using NowAround.Api.Apis.Auth0.Models;
+using NowAround.Api.Interfaces;
 
-namespace NowAround.Api.Authentication.Controllers;
+namespace NowAround.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

@@ -1,10 +1,10 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
-using NowAround.Api.Authentication.Interfaces;
-using NowAround.Api.Authentication.Models;
+using NowAround.Api.Apis.Auth0.Interfaces;
+using NowAround.Api.Apis.Auth0.Models;
 
-namespace NowAround.Api.Authentication.Services;
+namespace NowAround.Api.Apis.Auth0.Services;
 
 
 public class TokenService : ITokenService

@@ -1,4 +1,4 @@
-﻿namespace NowAround.Api.Authentication.Exceptions;
+﻿namespace NowAround.Api.Apis.Auth0.Exceptions;
 
 public class EmailAlreadyInUseException : Exception
 {

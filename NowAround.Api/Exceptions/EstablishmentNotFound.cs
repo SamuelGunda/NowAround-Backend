@@ -1,4 +1,4 @@
-﻿namespace NowAround.Api.Authentication.Exceptions;
+﻿namespace NowAround.Api.Exceptions;
 
 public class EstablishmentNotFound : Exception
 {

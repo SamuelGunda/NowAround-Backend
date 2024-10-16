@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace NowAround.Api.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 public class HealthCheckController : ControllerBase
 {
     [HttpGet]

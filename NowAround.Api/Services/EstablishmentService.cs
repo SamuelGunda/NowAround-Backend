@@ -1,19 +1,20 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using NowAround.Api.Authentication.Exceptions;
-using NowAround.Api.Authentication.Interfaces;
-using NowAround.Api.Authentication.Models;
+using NowAround.Api.Apis.Auth0.Exceptions;
+using NowAround.Api.Apis.Auth0.Interfaces;
+using NowAround.Api.Apis.Auth0.Models;
+using NowAround.Api.Apis.Mapbox.Interfaces;
 using NowAround.Api.Interfaces;
 using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
 // ReSharper disable InvertIf
 
-namespace NowAround.Api.Authentication.Services;
+namespace NowAround.Api.Services;
 
 public class EstablishmentService : IEstablishmentService
 {
     
-    private readonly IAccountManagementService _accountManagementService;
+    private readonly IAuth0Service _auth0Service;
     private readonly IMapboxService _mapboxService;
     private readonly IEstablishmentRepository _establishmentRepository;
     private readonly ICategoryRepository _categoryRepository;
@@ -21,14 +22,14 @@ public class EstablishmentService : IEstablishmentService
     private readonly ILogger<EstablishmentService> _logger;
 
     public EstablishmentService(
-        IAccountManagementService accountManagementService, 
+        IAuth0Service auth0Service, 
         IMapboxService mapboxService,
         IEstablishmentRepository establishmentRepository,
         ICategoryRepository categoryRepository,
         ITagRepository tagRepository,
         ILogger<EstablishmentService> logger)
     {
-        _accountManagementService = accountManagementService;
+        _auth0Service = auth0Service;
         _mapboxService = mapboxService;
         _establishmentRepository = establishmentRepository;
         _categoryRepository = categoryRepository;
@@ -67,7 +68,7 @@ public class EstablishmentService : IEstablishmentService
         var catsAndTags = await SetCategoriesAndTagsAsync(establishmentInfo);
         
         // Register establishment on Auth0
-        var auth0Id = await _accountManagementService.RegisterEstablishmentAccountAsync(establishmentInfo.Name, personalInfo);
+        var auth0Id = await _auth0Service.RegisterEstablishmentAccountAsync(establishmentInfo.Name, personalInfo);
         
         var establishmentEntity = new Establishment()
         {
@@ -88,7 +89,7 @@ public class EstablishmentService : IEstablishmentService
         if (result == 0)
         {
             _logger.LogWarning("Failed to create establishment in the database");
-            await _accountManagementService.DeleteAccountAsync(auth0Id);
+            await _auth0Service.DeleteAccountAsync(auth0Id);
             throw new Exception("Failed to create establishment in the database");
         }
         
@@ -116,7 +117,7 @@ public class EstablishmentService : IEstablishmentService
         }
         
         // Delete establishment account from Auth0
-        await _accountManagementService.DeleteAccountAsync(auth0Id);
+        await _auth0Service.DeleteAccountAsync(auth0Id);
         
         var result = await _establishmentRepository.DeleteEstablishmentByAuth0IdAsync(auth0Id);
         

@@ -1,8 +1,8 @@
-﻿using NowAround.Api.Authentication.Models;
+﻿using NowAround.Api.Apis.Auth0.Models;
 
-namespace NowAround.Api.Authentication.Interfaces;
+namespace NowAround.Api.Apis.Auth0.Interfaces;
 
-public interface IAccountManagementService
+public interface IAuth0Service
 {
     Task<string> RegisterEstablishmentAccountAsync(string establishmentName, PersonalInfo personalInfo);
     Task<bool> DeleteAccountAsync(string auth0Id);

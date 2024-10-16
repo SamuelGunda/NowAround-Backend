@@ -1,9 +1,8 @@
-﻿
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NowAround.Api.Interfaces;
+using NowAround.Api.Apis.Mapbox.Interfaces;
 
-namespace NowAround.Api.Services;
+namespace NowAround.Api.Apis.Mapbox.Services;
 
 public class MapboxService : IMapboxService
 {

@@ -1,4 +1,4 @@
-﻿namespace NowAround.Api.Authentication.Interfaces;
+﻿namespace NowAround.Api.Interfaces;
 
 public interface IUserService
 {

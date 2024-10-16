@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
-using NowAround.Api.Models.Domain;
 
-namespace NowAround.Api.Authentication.Models;
+namespace NowAround.Api.Apis.Auth0.Models;
 
 public class EstablishmentRegisterRequest
 {

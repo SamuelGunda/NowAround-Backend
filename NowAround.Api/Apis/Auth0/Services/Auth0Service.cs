@@ -1,29 +1,29 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using Auth0.ManagementApi.Models;
-using Newtonsoft.Json;
-using NowAround.Api.Authentication.Interfaces;
-using NowAround.Api.Authentication.Models;
-using NowAround.Api.Authentication.Utilities;
-using System.Net;
 using Microsoft.IdentityModel.Tokens;
-using NowAround.Api.Authentication.Exceptions;
+using Newtonsoft.Json;
+using NowAround.Api.Apis.Auth0.Exceptions;
+using NowAround.Api.Apis.Auth0.Interfaces;
+using NowAround.Api.Apis.Auth0.Models;
+using NowAround.Api.Apis.Auth0.Utilities;
 
-namespace NowAround.Api.Authentication.Services;
+namespace NowAround.Api.Apis.Auth0.Services;
 
-public class AccountManagementService : IAccountManagementService
+public class Auth0Service : IAuth0Service
 {
     
     private readonly HttpClient _httpClient;
     private readonly ITokenService _tokenService;
-    private readonly ILogger<AccountManagementService> _logger;
+    private readonly ILogger<Auth0Service> _logger;
     
     private readonly string _domain;
     
-    public AccountManagementService(
+    public Auth0Service(
         HttpClient httpClient, 
         ITokenService tokenService, 
         IConfiguration configuration, 
-        ILogger<AccountManagementService> logger)
+        ILogger<Auth0Service> logger)
     {
         _httpClient = httpClient;
         _tokenService = tokenService;

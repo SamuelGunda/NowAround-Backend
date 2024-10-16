@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace NowAround.Api.Authentication.Utilities;
+namespace NowAround.Api.Apis.Auth0.Utilities;
 
 public static class PasswordUtils
 {

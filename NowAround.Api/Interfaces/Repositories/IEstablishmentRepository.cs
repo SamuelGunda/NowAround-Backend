@@ -1,6 +1,6 @@
 ﻿using NowAround.Api.Models.Domain;
 
-namespace NowAround.Api.Authentication.Interfaces;
+namespace NowAround.Api.Interfaces.Repositories;
 
 public interface IEstablishmentRepository
 {

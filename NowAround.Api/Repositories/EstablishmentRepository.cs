@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NowAround.Api.Authentication.Interfaces;
 using NowAround.Api.Database;
+using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
 
-namespace NowAround.Api.Authentication.Repositories;
+namespace NowAround.Api.Repositories;
 
 public class EstablishmentRepository : IEstablishmentRepository
 {

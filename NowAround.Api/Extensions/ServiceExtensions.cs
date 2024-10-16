@@ -1,6 +1,7 @@
-﻿using NowAround.Api.Authentication.Interfaces;
-using NowAround.Api.Authentication.Repositories;
-using NowAround.Api.Authentication.Services;
+﻿using NowAround.Api.Apis.Auth0.Interfaces;
+using NowAround.Api.Apis.Auth0.Services;
+using NowAround.Api.Apis.Mapbox.Interfaces;
+using NowAround.Api.Apis.Mapbox.Services;
 using NowAround.Api.Interfaces;
 using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Repositories;
@@ -17,7 +18,7 @@ public static class ServiceExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IEstablishmentService, EstablishmentService>();
         services.AddScoped<IMapboxService, MapboxService>();
-        services.AddScoped<IAccountManagementService, AccountManagementService>();
+        services.AddScoped<IAuth0Service, Auth0Service>();
 
         // Repositories
         services.AddScoped<IEstablishmentRepository, EstablishmentRepository>();

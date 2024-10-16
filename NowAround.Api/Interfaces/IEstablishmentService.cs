@@ -1,8 +1,7 @@
-﻿using NowAround.Api.Authentication.Models;
-using NowAround.Api.Models.Domain;
+﻿using NowAround.Api.Apis.Auth0.Models;
 using NowAround.Api.Models.Dtos;
 
-namespace NowAround.Api.Authentication.Interfaces;
+namespace NowAround.Api.Interfaces;
 
 public interface IEstablishmentService
 {

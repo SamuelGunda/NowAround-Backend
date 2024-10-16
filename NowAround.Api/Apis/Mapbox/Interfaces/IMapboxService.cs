@@ -1,4 +1,4 @@
-﻿namespace NowAround.Api.Interfaces;
+﻿namespace NowAround.Api.Apis.Mapbox.Interfaces;
 
 public interface IMapboxService
 {

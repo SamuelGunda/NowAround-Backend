@@ -1,10 +1,10 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using NowAround.Api.Authentication.Interfaces;
 using NowAround.Api.Database;
+using NowAround.Api.Interfaces;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Enum;
 
-namespace NowAround.Api.Authentication.Services;
+namespace NowAround.Api.Services;
 
 public class UserService(AppDbContext context, ILogger<UserService> logger) : IUserService
 {
