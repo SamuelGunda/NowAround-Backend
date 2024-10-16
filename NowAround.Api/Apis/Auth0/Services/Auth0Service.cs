@@ -85,7 +85,7 @@ public class Auth0Service : IAuth0Service
         return user.UserId;
     }
 
-    public async Task<bool> DeleteAccountAsync(string auth0Id)
+    public async Task DeleteAccountAsync(string auth0Id)
     {
         if (auth0Id.IsNullOrEmpty())
         {
@@ -103,12 +103,11 @@ public class Auth0Service : IAuth0Service
         var response = await _httpClient.SendAsync(request);
         var responseBody = await response.Content.ReadAsStringAsync();
         
+        Console.WriteLine(responseBody);
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogError("Failed to delete account. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
             throw new HttpRequestException($"Failed to delete account. Status Code: {response.StatusCode}, Response: {responseBody}");
         }
-
-        return true;
     }
 }

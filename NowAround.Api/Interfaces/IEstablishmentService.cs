@@ -9,5 +9,5 @@ public interface IEstablishmentService
     /*Task<IEnumerable<Establishment>> GetEstablishmentsAsync();*/
     Task<int> RegisterEstablishmentAsync(EstablishmentRegisterRequest establishmentRequest);
     /*Task UpdateEstablishmentAsync(Establishment establishment);*/
-    Task<bool> DeleteEstablishmentAsync(string auth0Id);
+    Task DeleteEstablishmentAsync(string auth0Id);
 }

@@ -36,7 +36,7 @@ public class EstablishmentInfo
     public string? Photo { get; set; } //TODO: add default photo, if not provided
     
     [JsonProperty("establishmentAddress")]
-    public string Adress { get; set; }
+    public string Address { get; set; }
     
     [JsonProperty("establishmentCity")]
     public string City { get; set; }
@@ -53,7 +53,7 @@ public class EstablishmentInfo
     public void ValidateProperties()
     {
         if (string.IsNullOrEmpty(Name) 
-            || string.IsNullOrEmpty(Adress) 
+            || string.IsNullOrEmpty(Address) 
             || string.IsNullOrEmpty(City) 
             || PriceCategory < 0 || PriceCategory >= 3 
             || CategoryNames == null || CategoryNames.Count == 0)

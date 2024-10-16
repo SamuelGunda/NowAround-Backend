@@ -3,6 +3,7 @@ using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Auth0.Models;
 using NowAround.Api.Apis.Mapbox.Interfaces;
+using NowAround.Api.Exceptions;
 using NowAround.Api.Interfaces;
 using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
@@ -61,7 +62,7 @@ public class EstablishmentService : IEstablishmentService
         }
         
         // Get coordinates from address using Mapbox API and set them to variable
-        var fullAddress = $"{establishmentInfo.Adress}, {establishmentInfo.City}";
+        var fullAddress = $"{establishmentInfo.Address}, {establishmentInfo.City}";
         var coordinates = await _mapboxService.GetCoordinatesFromAddressAsync(fullAddress);
         
         // Check if categories and tags exist and set them to variable
@@ -76,7 +77,7 @@ public class EstablishmentService : IEstablishmentService
             Name = establishmentInfo.Name,
             Latitude = coordinates.lat,
             Longitude = coordinates.lng,
-            Address = establishmentInfo.Adress,
+            Address = establishmentInfo.Address,
             City = establishmentInfo.City,
             PriceCategory = establishmentInfo.PriceCategory,
             EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory() { Category = c }).ToList(),
@@ -108,7 +109,7 @@ public class EstablishmentService : IEstablishmentService
         return establishment.ToDto();
     }
     
-    public async Task<bool> DeleteEstablishmentAsync(string auth0Id)
+    public async Task DeleteEstablishmentAsync(string auth0Id)
     {
         if (auth0Id.IsNullOrEmpty())
         {
@@ -120,14 +121,10 @@ public class EstablishmentService : IEstablishmentService
         await _auth0Service.DeleteAccountAsync(auth0Id);
         
         var result = await _establishmentRepository.DeleteEstablishmentByAuth0IdAsync(auth0Id);
-        
         if (!result)
         {
-            _logger.LogWarning("Failed to delete establishment");
-            throw new Exception("Failed to delete establishment");
+            throw new EstablishmentNotFoundException($"Auth0 ID: {auth0Id}");
         }
-        
-        return true;
     }
     
     /// <summary>

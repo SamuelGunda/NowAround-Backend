@@ -57,7 +57,8 @@ public class EstablishmentRepository : IEstablishmentRepository
             var establishment = await _context.Establishments.FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
             if (establishment == null)
             {
-                throw new KeyNotFoundException("Establishment not found");
+                _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
+                return false;
             }
             
             _context.Establishments.Remove(establishment);

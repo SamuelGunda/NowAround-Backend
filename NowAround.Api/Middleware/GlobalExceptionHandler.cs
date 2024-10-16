@@ -28,11 +28,11 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
                 Title = "Establishment already exists",
                 Detail = establishmentAlreadyExistsException.Message
             },
-            EstablishmentNotFound establishmentNotFound => new ProblemDetails
+            EstablishmentNotFoundException establishmentNotFoundException => new ProblemDetails
             {
                 Status = StatusCodes.Status404NotFound,
                 Title = "Establishment not found",
-                Detail = establishmentNotFound.Message
+                Detail = establishmentNotFoundException.Message
             },
             _ => new ProblemDetails
             {
