@@ -97,13 +97,12 @@ public class EstablishmentService : IEstablishmentService
         return result;
     }
     
-    public async Task<EstablishmentDto> GetEstablishmentAsync(string auth0Id)
+    public async Task<EstablishmentDto> GetEstablishmentByIdAsync(int id)
     {
-        var establishment = await _establishmentRepository.GetEstablishmentByAuth0IdAsync(auth0Id);
+        var establishment = await _establishmentRepository.GetEstablishmentByIdAsync(id);
         if (establishment == null)
         {
-            _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
-            throw new Exception("Establishment not found");
+            throw new EstablishmentNotFoundException($"ID: {id}");
         }
 
         return establishment.ToDto();

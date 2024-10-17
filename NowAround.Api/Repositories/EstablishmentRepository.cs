@@ -19,7 +19,15 @@ public class EstablishmentRepository : IEstablishmentRepository
     
     public async Task<bool> CheckIfEstablishmentExistsByNameAsync(string name)
     {
-        return await _context.Establishments.AnyAsync(e => e.Name == name);
+        try
+        {
+            return await _context.Establishments.AnyAsync(e => e.Name == name);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Failed to check if establishment exists by name: {Message}", e.Message);
+            throw new Exception("Failed to check if establishment exists by name", e);
+        }
     }
     
     public async Task<int> CreateEstablishmentAsync(Establishment establishment)
@@ -37,16 +45,23 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
     }
     
-    public async Task<Establishment> GetEstablishmentByAuth0IdAsync(string auth0Id)
+    public async Task<Establishment?> GetEstablishmentByIdAsync(int id)
     {
         try
         {
-            return await _context.Establishments.FirstOrDefaultAsync(e => e.Auth0Id == auth0Id) ?? throw new Exception("Establishment not found");
+            var establishment = await _context.Establishments.FirstOrDefaultAsync(e => e.Id == id);
+            if (establishment == null)
+            {
+                _logger.LogWarning("Establishment with ID {id} not found", id);
+                return null;
+            }
+            
+            return establishment;
         }
         catch (Exception e)
         {
-            _logger.LogError("Failed to get establishment by Auth0 ID: {Message}", e.Message);
-            throw new Exception("Failed to get establishment by Auth0 ID", e);
+            _logger.LogError("Failed to get establishment by ID: {Message}", e.Message);
+            throw new Exception("Failed to get establishment by ID", e);
         }
     }
     

@@ -23,12 +23,12 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         }
     }
     
-    [HttpGet]
-    public async Task<IActionResult> GetEstablishmentAsync(string auth0Id)
+    [HttpGet("id")]
+    public async Task<IActionResult> GetEstablishmentByIdAsync(int id)
     {
         try
         {
-            var establishment = await establishmentService.GetEstablishmentAsync(auth0Id);
+            var establishment = await establishmentService.GetEstablishmentByIdAsync(id);
             return Ok(establishment);
         }
         catch (Exception e)

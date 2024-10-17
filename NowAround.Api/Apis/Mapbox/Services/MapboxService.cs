@@ -33,7 +33,13 @@ public class MapboxService : IMapboxService
         // Call Mapbox API to get coordinates from address
         var url = $"https://api.mapbox.com/geocoding/v5/mapbox.places/{Uri.EscapeDataString(address)}.json?access_token={_mapboxAccessToken}";
         var response = await _httpClient.GetStringAsync(url);
-        var responseJson = JsonConvert.DeserializeObject<JObject>(response) ?? throw new ArgumentNullException(response);
+        var responseJson = JsonConvert.DeserializeObject<JObject>(response);
+        
+        if (responseJson == null)
+        {
+            _logger.LogError("Unable to deserialize the API response.");
+            throw new InvalidOperationException("Unable to deserialize the API response.");
+        }
         
         // Get coordinates from the API response, if they are valid
         var coordinates = responseJson["features"]?[0]?["geometry"]?["coordinates"];
@@ -46,6 +52,7 @@ public class MapboxService : IMapboxService
         
         var lng = (double)(coordinates[0] ?? throw new InvalidOperationException());
         var lat = (double)(coordinates[1] ?? throw new InvalidOperationException());
+        
         return (lat, lng);
     }
 }

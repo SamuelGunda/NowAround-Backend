@@ -5,7 +5,7 @@ namespace NowAround.Api.Interfaces;
 
 public interface IEstablishmentService
 {
-    Task<EstablishmentDto> GetEstablishmentAsync(string auth0Id);
+    Task<EstablishmentDto> GetEstablishmentByIdAsync(int id);
     /*Task<IEnumerable<Establishment>> GetEstablishmentsAsync();*/
     Task<int> RegisterEstablishmentAsync(EstablishmentRegisterRequest establishmentRequest);
     /*Task UpdateEstablishmentAsync(Establishment establishment);*/

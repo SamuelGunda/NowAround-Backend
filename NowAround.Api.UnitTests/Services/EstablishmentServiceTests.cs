@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
+using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
+using NowAround.Api.Apis.Auth0.Models;
 using NowAround.Api.Apis.Mapbox.Interfaces;
 using NowAround.Api.Exceptions;
 using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
-using NowAround.Api.Models.Dtos;
+using NowAround.Api.Models.Enum;
 using NowAround.Api.Services;
 
 namespace NowAround.Api.UnitTests.Services;
@@ -42,10 +44,238 @@ public class EstablishmentServiceTests
     
     // RegisterEstablishmentAsync tests
     
+    [Fact]
+    public async Task RegisterEstablishmentAsync_ValidRequest_ShouldReturnEstablishmentId()
+    {
+        // Arrange
+        var establishmentRequest = new EstablishmentRegisterRequest
+        {
+            EstablishmentInfo = new EstablishmentInfo
+            {
+                Name = "Test Establishment", 
+                Address = "123 Test St", 
+                City = "Test City", 
+                PriceCategory = 1, 
+                CategoryNames = new List<string> { "Restaurant" }, 
+                TagNames = new List<string> { "Italian" }
+            },
+            PersonalInfo = new PersonalInfo
+            {
+                FName = "John", 
+                LName = "Doe", 
+                Email = "john.doe@example.com"
+            }
+        };
+        var coordinates = (lat: 1.0, lng: 1.0);
+        const string auth0Id = "auth0|123";
+        var categories = new[] { new Category { Name = "Restaurant", SkName = "Reštaurácia"} };
+        var tags = new[] { new Tag { Name = "Italian", SkName = "Talianska kuchyňa" } };
+        
+        _establishmentRepositoryMock.Setup(r => r.CheckIfEstablishmentExistsByNameAsync(establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
+        _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>())).ReturnsAsync(coordinates);
+        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<string>(), It.IsAny<PersonalInfo>())).ReturnsAsync(auth0Id);
+        _categoryRepositoryMock.Setup(r => r.GetCategoryByNameWithTagsAsync(It.IsAny<string>())).ReturnsAsync(categories[0]);
+        _tagRepositoryMock.Setup(r => r.GetTagByNameAsync(It.IsAny<string>())).ReturnsAsync(tags[0]);
+        _establishmentRepositoryMock.Setup(r => r.CreateEstablishmentAsync(It.IsAny<Establishment>())).ReturnsAsync(1);
+
+        // Act
+        var result = await _establishmentService.RegisterEstablishmentAsync(establishmentRequest);
+
+        // Assert
+        Assert.Equal(1, result);
+    }
     
-    // GetEstablishmentByAuth0IdAsync tests
+    [Fact]
+    public async Task RegisterEstablishmentAsync_InvalidRequest_ShouldThrowArgumentNullException()
+    {
+        // Arrange
+        var establishmentRequest = new EstablishmentRegisterRequest();
+        
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
+    }
     
+    [Fact]
+    public async Task RegisterEstablishmentAsync_EstablishmentAlreadyExists_ShouldThrowEstablishmentAlreadyExistsException()
+    {
+        // Arrange
+        var establishmentRequest = new EstablishmentRegisterRequest
+        {
+            EstablishmentInfo = new EstablishmentInfo
+            {
+                Name = "Test Establishment", 
+                Address = "123 Test St", 
+                City = "Test City", 
+                PriceCategory = 1, 
+                CategoryNames = new List<string> { "Restaurant" }, 
+                TagNames = new List<string> { "Italian" }
+            },
+            PersonalInfo = new PersonalInfo
+            {
+                FName = "John", 
+                LName = "Doe", 
+                Email = "john.doe@example.com"
+            }
+        };
+
+        // Act & Assert
+        _establishmentRepositoryMock.Setup(r => r.CheckIfEstablishmentExistsByNameAsync(establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(true);
+
+        await Assert.ThrowsAsync<EstablishmentAlreadyExistsException>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
+    }
+
+    [Fact]
+    public async Task RegisterEstablishmentAsync_MapboxServiceThrowsException_ShouldThrowException()
+    {
+        // Arrange
+        var establishmentRequest = new EstablishmentRegisterRequest
+        {
+            EstablishmentInfo = new EstablishmentInfo
+            {
+                Name = "Test Establishment", 
+                Address = "123 Test St", 
+                City = "Test City", 
+                PriceCategory = 1, 
+                CategoryNames = new List<string> { "Restaurant" }, 
+                TagNames = new List<string> { "Italian" }
+            },
+            PersonalInfo = new PersonalInfo
+            {
+                FName = "John", 
+                LName = "Doe", 
+                Email = "john.doe@example.com"
+            }
+        };
+        
+        // Act & Assert
+        _establishmentRepositoryMock.Setup(r => r.CheckIfEstablishmentExistsByNameAsync(establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
+        _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>())).ThrowsAsync(new Exception());
+        
+        await Assert.ThrowsAsync<Exception>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
+    }
+
+    [Fact] 
+    public async Task RegisterEstablishmentAsync_Auth0ServiceThrowsException_ShouldThrowException()
+    {
+        // Arrange
+        var establishmentRequest = new EstablishmentRegisterRequest
+        {
+            EstablishmentInfo = new EstablishmentInfo
+            {
+                Name = "Test Establishment",
+                Address = "123 Test St",
+                City = "Test City",
+                PriceCategory = 1,
+                CategoryNames = new List<string> { "Restaurant" },
+                TagNames = new List<string> { "Italian" }
+            },
+            PersonalInfo = new PersonalInfo
+            {
+                FName = "John",
+                LName = "Doe",
+                Email = "john.doe@example.com"
+            }
+        };
+        
+        // Act & Assert
+        _establishmentRepositoryMock.Setup(r => r.CheckIfEstablishmentExistsByNameAsync(establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
+        _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>())).ReturnsAsync((1.0, 1.0));
+        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<string>(), It.IsAny<PersonalInfo>())).ThrowsAsync(new Exception());
+        
+        await Assert.ThrowsAsync<Exception>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
+    }
+
+    [Fact]
+    public async Task RegisterEstablishmentAsync_EstablishmentRepositoryThrowsException_ShouldThrowException()
+    {
+        // Arrange
+        var establishmentRequest = new EstablishmentRegisterRequest
+        {
+            EstablishmentInfo = new EstablishmentInfo
+            {
+                Name = "Test Establishment", 
+                Address = "123 Test St", 
+                City = "Test City", 
+                PriceCategory = 1, 
+                CategoryNames = new List<string> { "Restaurant" }, 
+                TagNames = new List<string> { "Italian" }
+            },
+            PersonalInfo = new PersonalInfo
+            {
+                FName = "John", 
+                LName = "Doe", 
+                Email = "john.doe@example.com"
+            }
+        };
+        
+        // Act & Assert
+        _establishmentRepositoryMock.Setup(r => r.CheckIfEstablishmentExistsByNameAsync(establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
+        _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>())).ReturnsAsync((1.0, 1.0));
+        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<string>(), It.IsAny<PersonalInfo>())).ReturnsAsync("auth0|123");
+        
+        _establishmentRepositoryMock.Setup(r => r.CreateEstablishmentAsync(It.IsAny<Establishment>())).ThrowsAsync(new Exception());
+        
+        await Assert.ThrowsAsync<Exception>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
+    }
+
+    // GetEstablishmentByIdAsync tests
     
+    [Fact]
+    public async Task GetEstablishmentByIdAsync_ValidId_ShouldReturnEstablishmentDto()
+    {
+        // Arrange
+        const int id = 1;
+        var establishment = new Establishment
+        {
+            Id = 1,
+            Auth0Id = "test-auth0-id",
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = 1,
+            RequestStatus = RequestStatus.Pending,
+            EstablishmentCategories = new List<EstablishmentCategory>(),
+            EstablishmentTags = new List<EstablishmentTag>()
+        };
+        _establishmentRepositoryMock.Setup(r => r.GetEstablishmentByIdAsync(id)).ReturnsAsync(establishment);
+        
+        // Act
+        var result = await _establishmentService.GetEstablishmentByIdAsync(id);
+        
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(establishment.Name, result.Name);
+        Assert.Equal(establishment.Description, result.Description);
+        Assert.Equal(establishment.City, result.City);
+        Assert.Equal(establishment.Address, result.Address);
+        Assert.Equal(establishment.Latitude, result.Latitude);
+        Assert.Equal(establishment.Longitude, result.Longitude);
+        Assert.Equal(establishment.PriceCategory, result.PriceCategory);
+        Assert.Equal(establishment.RequestStatus, result.RequestStatus);
+        Assert.Equal(establishment.EstablishmentCategories, result.EstablishmentCategories);
+        Assert.Equal(establishment.EstablishmentTags, result.EstablishmentTags);
+    }
+    
+    [Fact]
+    public async Task GetEstablishmentByIdAsync_InvalidId_ShouldThrowEstablishmentNotFoundException()
+    {
+        const int id = 999;
+        _establishmentRepositoryMock.Setup(r => r.GetEstablishmentByIdAsync(id)).ReturnsAsync(null as Establishment);
+
+        await Assert.ThrowsAsync<EstablishmentNotFoundException>(() => _establishmentService.GetEstablishmentByIdAsync(id));
+    }
+    
+    [Fact]
+    public async Task GetEstablishmentByIdAsync_RepositoryThrowsException_ShouldThrowException()
+    {
+        const int id = 1;
+        _establishmentRepositoryMock.Setup(r => r.GetEstablishmentByIdAsync(id)).ThrowsAsync(new Exception());
+
+        await Assert.ThrowsAsync<Exception>(() => _establishmentService.GetEstablishmentByIdAsync(id));
+    }
     
     // DeleteEstablishmentAsync tests
     
