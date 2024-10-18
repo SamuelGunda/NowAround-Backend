@@ -70,7 +70,7 @@ public class EstablishmentService : IEstablishmentService
         
         // Register establishment on Auth0
         var auth0Id = await _auth0Service.RegisterEstablishmentAccountAsync(establishmentInfo.Name, personalInfo);
-        
+
         var establishmentEntity = new Establishment()
         {
             Auth0Id = auth0Id,
@@ -84,17 +84,18 @@ public class EstablishmentService : IEstablishmentService
             EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag() { Tag = t }).ToList()
         };
             
-        // Save establishment to the database
-        var result =  await _establishmentRepository.CreateEstablishmentAsync(establishmentEntity);
-        
-        if (result == 0)
+        try
+        {
+            // Save establishment to the database
+            var result =  await _establishmentRepository.CreateEstablishmentAsync(establishmentEntity);
+            return result;
+        }
+        catch (Exception)
         {
             _logger.LogWarning("Failed to create establishment in the database");
             await _auth0Service.DeleteAccountAsync(auth0Id);
             throw new Exception("Failed to create establishment in the database");
         }
-        
-        return result;
     }
     
     public async Task<EstablishmentDto> GetEstablishmentByIdAsync(int id)

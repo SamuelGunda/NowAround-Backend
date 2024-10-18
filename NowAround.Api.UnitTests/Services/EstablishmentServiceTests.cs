@@ -208,14 +208,23 @@ public class EstablishmentServiceTests
             }
         };
         
+        var coordinates = (lat: 1.0, lng: 1.0);
+        const string auth0Id = "auth0|123";
+        var categories = new[] { new Category { Name = "Restaurant", SkName = "Reštaurácia"} };
+        var tags = new[] { new Tag { Name = "Italian", SkName = "Talianska kuchyňa" } };
+        
         // Act & Assert
         _establishmentRepositoryMock.Setup(r => r.CheckIfEstablishmentExistsByNameAsync(establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
-        _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>())).ReturnsAsync((1.0, 1.0));
-        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<string>(), It.IsAny<PersonalInfo>())).ReturnsAsync("auth0|123");
+        _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>())).ReturnsAsync(coordinates);
+        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<string>(), It.IsAny<PersonalInfo>())).ReturnsAsync(auth0Id);
+        _categoryRepositoryMock.Setup(r => r.GetCategoryByNameWithTagsAsync(It.IsAny<string>())).ReturnsAsync(categories[0]);
+        _tagRepositoryMock.Setup(r => r.GetTagByNameAsync(It.IsAny<string>())).ReturnsAsync(tags[0]);
         
         _establishmentRepositoryMock.Setup(r => r.CreateEstablishmentAsync(It.IsAny<Establishment>())).ThrowsAsync(new Exception());
         
         await Assert.ThrowsAsync<Exception>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
+        
+        _auth0ServiceMock.Verify(s => s.DeleteAccountAsync(auth0Id), Times.Once);
     }
 
     // GetEstablishmentByIdAsync tests
