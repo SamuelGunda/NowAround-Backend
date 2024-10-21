@@ -1,4 +1,5 @@
 ﻿using NowAround.Api.Models.Dtos;
+using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 
 namespace NowAround.Api.Models.Domain;
@@ -36,6 +37,16 @@ public class Establishment
             RequestStatus = RequestStatus,
             EstablishmentCategories = EstablishmentCategories,
             EstablishmentTags = EstablishmentTags
+        };
+    }
+
+    public EstablishmentPin ToPin()
+    {
+        return new EstablishmentPin
+        {
+            Auth0Id = Auth0Id,
+            Latitude = Latitude,
+            Longitude = Longitude
         };
     }
 }

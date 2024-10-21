@@ -65,6 +65,50 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
     }
     
+    public async Task<Establishment?> GetEstablishmentByAuth0IdAsync(string auth0Id)
+    {
+        try
+        {
+            var establishment = await _context.Establishments.FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
+            if (establishment == null)
+            {
+                _logger.LogWarning("Establishment with Auth0ID {auth0Id} not found", auth0Id);
+                return null;
+            }
+            
+            return establishment;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Failed to get establishment by Auth0ID: {Message}", e.Message);
+            throw new Exception("Failed to get establishment by Auth0ID", e);
+        }
+    }
+    
+    public async Task<List<Establishment>?> GetEstablishmentsByAreaAsync(double nwLatitude, double nwLongitude, double seLatitude, double seLongitude)
+    {
+        try
+        {
+            var establishments = await _context.Establishments
+                .Where(e => e.Latitude <= nwLatitude && e.Latitude >= seLatitude)
+                .Where(e => e.Longitude >= nwLongitude && e.Longitude <= seLongitude)
+                .ToListAsync();
+            
+            if (establishments.Count == 0)
+            {
+                _logger.LogWarning("Establishments in area not found");
+                return null;
+            }
+            
+            return establishments;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Failed to get establishments by area: {Message}", e.Message);
+            throw new Exception("Failed to get establishments by area", e);
+        }
+    }
+    
     public async Task<bool> DeleteEstablishmentByAuth0IdAsync(string auth0Id)
     {
         try

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Auth0.Models;
+using NowAround.Api.Apis.Auth0.Models.Responses;
 
 namespace NowAround.Api.Apis.Auth0.Services;
 

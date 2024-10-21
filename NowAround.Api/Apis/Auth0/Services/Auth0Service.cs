@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Auth0.Models;
+using NowAround.Api.Apis.Auth0.Models.Requests;
 using NowAround.Api.Apis.Auth0.Utilities;
 
 namespace NowAround.Api.Apis.Auth0.Services;

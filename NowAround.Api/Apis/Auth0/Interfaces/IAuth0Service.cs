@@ -1,4 +1,5 @@
 ﻿using NowAround.Api.Apis.Auth0.Models;
+using NowAround.Api.Apis.Auth0.Models.Requests;
 
 namespace NowAround.Api.Apis.Auth0.Interfaces;
 

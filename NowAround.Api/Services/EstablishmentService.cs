@@ -2,12 +2,16 @@
 using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Auth0.Models;
+using NowAround.Api.Apis.Auth0.Models.Requests;
 using NowAround.Api.Apis.Mapbox.Interfaces;
 using NowAround.Api.Exceptions;
 using NowAround.Api.Interfaces;
 using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
+using NowAround.Api.Models.Entities;
+using NowAround.Api.Models.Requests;
+
 // ReSharper disable InvertIf
 
 namespace NowAround.Api.Services;
@@ -109,6 +113,31 @@ public class EstablishmentService : IEstablishmentService
         return establishment.ToDto();
     }
     
+    public async Task<EstablishmentDto> GetEstablishmentByAuth0IdAsync(string auth0Id)
+    {
+        var establishment = await _establishmentRepository.GetEstablishmentByAuth0IdAsync(auth0Id);
+        if (establishment == null)
+        {
+            throw new EstablishmentNotFoundException($"Auth0ID: {auth0Id}");
+        }
+
+        return establishment.ToDto();
+    }
+
+    public async Task<List<EstablishmentPin>?> GetEstablishmentPinsByAreaAsync(EstablishmentsInAreaRequest establishmentsInAreaRequest)
+    {
+        establishmentsInAreaRequest.ValidateProperties();
+        
+        var nwLatitude = establishmentsInAreaRequest.NWCorner[0];
+        var nwLongitude = establishmentsInAreaRequest.NWCorner[1];
+        var seLatitude = establishmentsInAreaRequest.SECorner[0];
+        var seLongitude = establishmentsInAreaRequest.SECorner[1];
+        
+        var establishments = await _establishmentRepository.GetEstablishmentsByAreaAsync(nwLatitude, nwLongitude, seLatitude, seLongitude);
+
+        return establishments?.Select(e => e.ToPin()).ToList();
+    }
+
     public async Task DeleteEstablishmentAsync(string auth0Id)
     {
         if (auth0Id.IsNullOrEmpty())
