@@ -1,13 +1,14 @@
-﻿namespace NowAround.Api.Models.Domain;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NowAround.Api.Models.Domain;
 
 public class Category
 {
-    public int Id { get; set; }
+    public int Id { get; init; }
     
-    public required string Name { get; set; }
-    public required string SkName { get; set; }
-    public string Icon { get; set; }
-    
-    public virtual ICollection<EstablishmentCategory> EstablishmentCategories { get; } = new List<EstablishmentCategory>();
+    [MaxLength(32)]
+    public required string Name { get; init; }
+
     public virtual ICollection<Tag> Tags { get; } = new List<Tag>();
+    public virtual ICollection<EstablishmentCategory> EstablishmentCategories { get; } = new List<EstablishmentCategory>();
 }

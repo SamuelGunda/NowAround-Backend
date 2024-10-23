@@ -2,8 +2,8 @@
 
 public class EstablishmentTag
 {
-    public int EstablishmentId { get; set; }
-    public Establishment Establishment { get; set; }
-    public int TagId { get; set; }
-    public Tag Tag { get; set; }
+    public int EstablishmentId { get; init; }
+    public Establishment Establishment { get; init; }
+    public int TagId { get; init; }
+    public Tag Tag { get; init; }
 }

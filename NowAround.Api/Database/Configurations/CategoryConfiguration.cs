@@ -10,8 +10,6 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Name).IsRequired();
-        builder.Property(c => c.SkName).IsRequired();
-        builder.Property(c => c.Icon).IsRequired();
         
         builder.HasMany(c => c.EstablishmentCategories)
             .WithOne(ec => ec.Category)
@@ -21,6 +19,6 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.HasMany(c => c.Tags)
             .WithOne(t => t.Category)
             .HasForeignKey(t => t.CategoryId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

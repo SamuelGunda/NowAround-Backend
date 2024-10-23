@@ -69,8 +69,8 @@ public class EstablishmentServiceTests
         };
         var coordinates = (lat: 1.0, lng: 1.0);
         const string auth0Id = "auth0|123";
-        var categories = new[] { new Category { Name = "Restaurant", SkName = "Reštaurácia"} };
-        var tags = new[] { new Tag { Name = "Italian", SkName = "Talianska kuchyňa" } };
+        var categories = new[] { new Category { Name = "Restaurant"} };
+        var tags = new[] { new Tag { Name = "Italian"} };
         
         _establishmentRepositoryMock.Setup(r => r.CheckIfEstablishmentExistsByNameAsync(establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>())).ReturnsAsync(coordinates);
@@ -211,8 +211,8 @@ public class EstablishmentServiceTests
         
         var coordinates = (lat: 1.0, lng: 1.0);
         const string auth0Id = "auth0|123";
-        var categories = new[] { new Category { Name = "Restaurant", SkName = "Reštaurácia"} };
-        var tags = new[] { new Tag { Name = "Italian", SkName = "Talianska kuchyňa" } };
+        var categories = new[] { new Category { Name = "Restaurant"} };
+        var tags = new[] { new Tag { Name = "Italian"} };
         
         // Act & Assert
         _establishmentRepositoryMock.Setup(r => r.CheckIfEstablishmentExistsByNameAsync(establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
@@ -245,8 +245,8 @@ public class EstablishmentServiceTests
             Address = "test-address",
             Latitude = 1.0,
             Longitude = 1.0,
-            PriceCategory = 1,
-            RequestStatus = RequestStatus.Pending,
+            PriceCategory = (PriceCategory) 0,
+            RequestStatus = (RequestStatus) 0,
             EstablishmentCategories = new List<EstablishmentCategory>(),
             EstablishmentTags = new List<EstablishmentTag>()
         };

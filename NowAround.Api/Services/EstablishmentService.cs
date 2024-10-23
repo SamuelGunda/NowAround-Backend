@@ -9,6 +9,7 @@ using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
+using NowAround.Api.Models.Enum;
 
 // ReSharper disable InvertIf
 
@@ -81,7 +82,7 @@ public class EstablishmentService : IEstablishmentService
             Longitude = coordinates.lng,
             Address = establishmentInfo.Address,
             City = establishmentInfo.City,
-            PriceCategory = establishmentInfo.PriceCategory,
+            PriceCategory = (PriceCategory) establishmentInfo.PriceCategory,
             EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory() { Category = c }).ToList(),
             EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag() { Tag = t }).ToList()
         };
