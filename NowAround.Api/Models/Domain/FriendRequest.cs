@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using NowAround.Api.Models.Enum;
+﻿using NowAround.Api.Models.Enum;
 
 namespace NowAround.Api.Models.Domain;
 

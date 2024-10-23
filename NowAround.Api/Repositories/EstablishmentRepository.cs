@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NowAround.Api.Builders;
 using NowAround.Api.Database;
 using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
@@ -85,14 +86,17 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
     }
     
-    public async Task<List<Establishment>?> GetEstablishmentsByAreaAsync(double nwLatitude, double nwLongitude, double seLatitude, double seLongitude)
+    public async Task<List<Establishment>?> GetEstablishmentsWithFilterByAreaAsync(double nwLat, double nwLong, double seLat, double seLong, string? name, string? categoryName, List<string>? tagNames)
     {
         try
         {
-            var establishments = await _context.Establishments
-                .Where(e => e.Latitude <= nwLatitude && e.Latitude >= seLatitude)
-                .Where(e => e.Longitude >= nwLongitude && e.Longitude <= seLongitude)
-                .ToListAsync();
+            var query = _context.Establishments
+                .Where(e => e.Latitude <= nwLat && e.Latitude >= seLat)
+                .Where(e => e.Longitude >= nwLong && e.Longitude <= seLong);
+            
+            query = EstablishmentFilterQueryBuilder.ApplyFilters(query, name, categoryName, tagNames);
+            
+            var establishments = await query.ToListAsync();
             
             if (establishments.Count == 0)
             {

@@ -41,7 +41,7 @@ public class EstablishmentInfo
     [JsonProperty("establishmentCity")]
     public string City { get; set; }
     
-    [JsonProperty("establishmentPrize")]
+    [JsonProperty("establishmentPrice")]
     public int PriceCategory { get; set; }
     
     [JsonProperty("establishmentCategory")]

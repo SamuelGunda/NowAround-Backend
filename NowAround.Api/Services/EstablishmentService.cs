@@ -1,7 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
-using NowAround.Api.Apis.Auth0.Models;
 using NowAround.Api.Apis.Auth0.Models.Requests;
 using NowAround.Api.Apis.Mapbox.Interfaces;
 using NowAround.Api.Exceptions;
@@ -10,7 +9,6 @@ using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
-using NowAround.Api.Models.Requests;
 
 // ReSharper disable InvertIf
 
@@ -123,18 +121,37 @@ public class EstablishmentService : IEstablishmentService
 
         return establishment.ToDto();
     }
-
-    public async Task<List<EstablishmentPin>?> GetEstablishmentPinsByAreaAsync(EstablishmentsInAreaRequest establishmentsInAreaRequest)
+    
+    public async Task<List<EstablishmentPin>?> GetEstablishmentPinsByAreaAsync(MapBounds mapBounds)
     {
-        establishmentsInAreaRequest.ValidateProperties();
-        
-        var nwLatitude = establishmentsInAreaRequest.NWCorner[0];
-        var nwLongitude = establishmentsInAreaRequest.NWCorner[1];
-        var seLatitude = establishmentsInAreaRequest.SECorner[0];
-        var seLongitude = establishmentsInAreaRequest.SECorner[1];
-        
-        var establishments = await _establishmentRepository.GetEstablishmentsByAreaAsync(nwLatitude, nwLongitude, seLatitude, seLongitude);
+        mapBounds.ValidateProperties();
 
+        
+        var establishments = await _establishmentRepository.GetEstablishmentsWithFilterByAreaAsync(
+            mapBounds.NwLat, mapBounds.NwLong,
+            mapBounds.SeLat, mapBounds.SeLong,
+            null, null, null);
+        
+        // Map the establishments to pins and return
+        return establishments?.Select(e => e.ToPin()).ToList();
+    }
+    
+    public async Task<List<EstablishmentPin>?> GetEstablishmentPinsWithFilterByAreaAsync(
+        MapBounds mapBounds, string? name, string? categoryName, List<string>? tagNames)
+    {
+        mapBounds.ValidateProperties();
+        if (name != null && name.Length < 3)
+        {
+            _logger.LogWarning("Name is too short");
+            throw new ArgumentException("Name is too short");
+        }
+        
+        var establishments = await _establishmentRepository.GetEstablishmentsWithFilterByAreaAsync(
+            mapBounds.NwLat, mapBounds.NwLong,
+            mapBounds.SeLat, mapBounds.SeLong,
+            name, categoryName, tagNames);
+        
+        // Map the establishments to pins and return
         return establishments?.Select(e => e.ToPin()).ToList();
     }
 

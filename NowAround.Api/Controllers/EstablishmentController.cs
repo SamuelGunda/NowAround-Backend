@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NowAround.Api.Apis.Auth0.Models;
 using NowAround.Api.Apis.Auth0.Models.Requests;
 using NowAround.Api.Interfaces;
-using NowAround.Api.Models.Requests;
+using NowAround.Api.Models.Dtos;
+using NowAround.Api.Models.Entities;
 
 namespace NowAround.Api.Controllers;
 
@@ -15,7 +15,7 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     {
         try
         {
-            var establishmentId = await establishmentService.RegisterEstablishmentAsync(establishment);
+            await establishmentService.RegisterEstablishmentAsync(establishment);
             return StatusCode(201);
         }
         catch (Exception e)
@@ -25,27 +25,22 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         }
     }
     
-    [HttpGet("id")]
-    public async Task<IActionResult> GetEstablishmentByIdAsync(int id)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetEstablishmentAsync([FromRoute] string id)
     {
         try
         {
-            var establishment = await establishmentService.GetEstablishmentByIdAsync(id);
-            return Ok(establishment);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, "Error getting establishment");
-            throw;
-        }
-    }
-
-    [HttpGet("auth0-id")]
-    public async Task<IActionResult> GetEstablishmentAsync(string auth0Id)
-    {
-        try
-        {
-            var establishment = await establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
+            EstablishmentDto establishment;
+        
+            if (int.TryParse(id , out var numericId))
+            {
+                establishment = await establishmentService.GetEstablishmentByIdAsync(numericId);
+            }
+            else
+            {
+                establishment = await establishmentService.GetEstablishmentByAuth0IdAsync(id);
+            }
+            
             return Ok(establishment);
         }
         catch (Exception e)
@@ -55,12 +50,60 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         }
     }
     
-    [HttpPost("area-pins")]
-    public async Task<IActionResult> GetEstablishmentPinsInAreaAsync(EstablishmentsInAreaRequest establishmentsInAreaRequest)
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchEstablishmentsAsync(string? name, string? categoryName, List<string>? tagNames)
     {
+        var tags = tagNames != null ? string.Join(", ", tagNames) : "No tags";
+        return Ok(new { message = $"name: {name}, categoryName: {categoryName}, tagNames: {tags}, tag count: {tagNames[0]}" });
+    }
+
+    [HttpGet("search/pins")]
+    public async Task<IActionResult> SearchEstablishmentPinsInAreaAsync(
+        double northWestLat, double northWestLong,
+        double southEastLat, double southEastLong)
+    {
+        var mapBounds = new MapBounds
+        {
+            NwLat = northWestLat,
+            NwLong = northWestLong,
+            SeLat = southEastLat,
+            SeLong = southEastLong
+        };
+        
         try
         {
-            var establishmentPins = await establishmentService.GetEstablishmentPinsByAreaAsync(establishmentsInAreaRequest);
+            var establishmentPins = await establishmentService.GetEstablishmentPinsByAreaAsync(mapBounds);
+            if (establishmentPins == null)
+            {
+                return NotFound(new { message = "No pins found for the specified location" });
+            }
+            return Ok(establishmentPins);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error getting establishments in area");
+            throw;
+        }
+    }
+    
+    [HttpGet("search/pins/filter")]
+    public async Task<IActionResult> GetEstablishmentPinsWithFilterByAreaAsync(
+        double northWestLat, double northWestLong, 
+        double southEastLat, double southEastLong, 
+        string? name, string? categoryName, List<string>? tagNames)
+    {
+        
+        var mapBounds = new MapBounds
+        {
+            NwLat = northWestLat,
+            NwLong = northWestLong,
+            SeLat = southEastLat,
+            SeLong = southEastLong
+        };
+        
+        try
+        {
+            var establishmentPins = await establishmentService.GetEstablishmentPinsWithFilterByAreaAsync(mapBounds, name, categoryName, tagNames);
             if (establishmentPins == null)
             {
                 return NotFound(new { message = "No pins found for the specified location" });
