@@ -31,6 +31,6 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(e => e.RequestStatus)
-            .HasDefaultValue((RequestStatus) 0);
+            .HasDefaultValue(RequestStatus.Pending);
     }
 }

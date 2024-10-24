@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NowAround.Api.Apis.Auth0.Models.Requests;
 using NowAround.Api.Interfaces;
 using NowAround.Api.Models.Dtos;

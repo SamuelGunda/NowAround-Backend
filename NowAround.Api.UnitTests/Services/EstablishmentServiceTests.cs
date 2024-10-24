@@ -245,8 +245,8 @@ public class EstablishmentServiceTests
             Address = "test-address",
             Latitude = 1.0,
             Longitude = 1.0,
-            PriceCategory = (PriceCategory) 0,
-            RequestStatus = (RequestStatus) 0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
             EstablishmentCategories = new List<EstablishmentCategory>(),
             EstablishmentTags = new List<EstablishmentTag>()
         };

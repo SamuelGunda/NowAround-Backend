@@ -8,6 +8,7 @@ public static class AuthenticationExtensions
     public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         var auth0Domain = configuration["Auth0:Domain"] ?? throw new InvalidOperationException("Auth0 Domain is missing");
+        var auth0Audience = configuration["Auth0:Audience"] ?? throw new InvalidOperationException("Auth0 Audience is missing");
 
         services.AddAuthentication(options =>
         {
@@ -17,13 +18,14 @@ public static class AuthenticationExtensions
         .AddJwtBearer(options =>
         {
             options.Authority = $"https://{auth0Domain}/";
-            options.Audience = "https://now-around-auth-api/";
+            options.Audience = $"{auth0Audience}";
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = true,
-                ValidateIssuerSigningKey = true
+                ValidateIssuerSigningKey = true,
+                RoleClaimType = $"{auth0Audience}/roles"
             };
             options.Events = new JwtBearerEvents
             {
@@ -34,6 +36,13 @@ public static class AuthenticationExtensions
                     return Task.CompletedTask;
                 }
             };
+        });
+        
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("EstablishmentOnly", policy => policy.RequireRole("Establishment"));
+            options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+            options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
         });
     }
 }

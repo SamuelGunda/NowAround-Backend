@@ -18,6 +18,7 @@ public class Auth0Service : IAuth0Service
     private readonly ILogger<Auth0Service> _logger;
     
     private readonly string _domain;
+    private readonly string _establishmentRoleId;
     
     public Auth0Service(
         HttpClient httpClient, 
@@ -30,6 +31,7 @@ public class Auth0Service : IAuth0Service
         _logger = logger;
         
         _domain = configuration["Auth0:Domain"] ?? throw new ArgumentNullException(configuration["Auth0:Domain"]);
+        _establishmentRoleId = configuration["Auth0:Roles:Establishment"] ?? throw new ArgumentNullException(configuration["Auth0:Roles:Establishment"]);
     }
     
     /// <summary>
@@ -82,6 +84,8 @@ public class Auth0Service : IAuth0Service
         // Deserialize response to get Auth0 user ID
         var user = JsonConvert.DeserializeObject<User>(responseBody) ?? throw new JsonException("Failed to deserialize Auth0 response");
         
+        await AssignRoleToEstablishmentAsync(user.UserId, accessToken);
+        
         return user.UserId;
     }
 
@@ -108,6 +112,28 @@ public class Auth0Service : IAuth0Service
         {
             _logger.LogError("Failed to delete account. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
             throw new HttpRequestException($"Failed to delete account. Status Code: {response.StatusCode}, Response: {responseBody}");
+        }
+    }
+
+    private async Task AssignRoleToEstablishmentAsync(string auth0Id, string accessToken)
+    {
+        var requestBody = new
+        {
+            roles = new[] { _establishmentRoleId }
+        };
+        
+        using var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"https://{_domain}/api/v2/users/{auth0Id}/roles");
+        request.Headers.Add("Authorization" , $"Bearer {accessToken}");
+        request.Content = content;
+        
+        var response = await _httpClient.SendAsync(request);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError("Failed to assign role to establishment. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
+            throw new HttpRequestException($"Failed to assign role to establishment. Status Code: {response.StatusCode}, Response: {responseBody}");
         }
     }
 }
