@@ -1,6 +1,6 @@
 ﻿using NowAround.Api.Models.Domain;
 
-namespace NowAround.Api.Builders;
+namespace NowAround.Api.Utilities;
 
 public static class EstablishmentFilterQueryBuilder
 {

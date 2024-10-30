@@ -51,6 +51,7 @@ public class Establishment
     {
         return new EstablishmentPin
         {
+            Name = Name,
             Auth0Id = Auth0Id,
             Latitude = Latitude,
             Longitude = Longitude

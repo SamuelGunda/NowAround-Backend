@@ -123,7 +123,13 @@ public class EstablishmentService : IEstablishmentService
         return establishment.ToDto();
     }
     
-    public async Task<List<EstablishmentPin>?> GetEstablishmentPinsByAreaAsync(MapBounds mapBounds)
+    public async Task<List<EstablishmentDto>?> GetPendingEstablishmentsAsync()
+    {
+        var establishments = await _establishmentRepository.GetEstablishmentsWithPendingRegisterStatusAsync();
+        return establishments?.Select(e => e.ToDto()).ToList();
+    }
+    
+    public async Task<List<EstablishmentPin>?> GetEstablishmentPinsInAreaAsync(MapBounds mapBounds)
     {
         mapBounds.ValidateProperties();
 
@@ -137,7 +143,7 @@ public class EstablishmentService : IEstablishmentService
         return establishments?.Select(e => e.ToPin()).ToList();
     }
     
-    public async Task<List<EstablishmentPin>?> GetEstablishmentPinsWithFilterByAreaAsync(
+    public async Task<List<EstablishmentPin>?> GetEstablishmentPinsWithFilterInAreaAsync(
         MapBounds mapBounds, string? name, string? categoryName, List<string>? tagNames)
     {
         mapBounds.ValidateProperties();
@@ -154,6 +160,26 @@ public class EstablishmentService : IEstablishmentService
         
         // Map the establishments to pins and return
         return establishments?.Select(e => e.ToPin()).ToList();
+    }
+
+    public async Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus)
+    {
+        if (auth0Id.IsNullOrEmpty())
+        {
+            _logger.LogWarning("auth0Id is null");
+            throw new ArgumentNullException(nameof(auth0Id));
+        }
+        
+        var establishmentDto = new EstablishmentDto
+        {
+            RequestStatus = requestStatus
+        };
+        
+        var result = await _establishmentRepository.UpdateEstablishmentByAuth0IdAsync(auth0Id, establishmentDto);
+        if (!result)
+        {
+            throw new EstablishmentNotFoundException($"Auth0 ID: {auth0Id}");
+        }
     }
 
     public async Task DeleteEstablishmentAsync(string auth0Id)

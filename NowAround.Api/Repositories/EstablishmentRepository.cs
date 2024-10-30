@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NowAround.Api.Builders;
 using NowAround.Api.Database;
 using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
+using NowAround.Api.Models.Dtos;
+using NowAround.Api.Models.Enum;
+using NowAround.Api.Utilities;
 
 namespace NowAround.Api.Repositories;
 
@@ -50,7 +52,9 @@ public class EstablishmentRepository : IEstablishmentRepository
     {
         try
         {
-            var establishment = await _context.Establishments.FirstOrDefaultAsync(e => e.Id == id);
+            var establishment = await _context.Establishments
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(e => e.Id == id);
             if (establishment == null)
             {
                 _logger.LogWarning("Establishment with ID {id} not found", id);
@@ -70,7 +74,9 @@ public class EstablishmentRepository : IEstablishmentRepository
     {
         try
         {
-            var establishment = await _context.Establishments.FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
+            var establishment = await _context.Establishments
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
             if (establishment == null)
             {
                 _logger.LogWarning("Establishment with Auth0ID {auth0Id} not found", auth0Id);
@@ -83,6 +89,29 @@ public class EstablishmentRepository : IEstablishmentRepository
         {
             _logger.LogError("Failed to get establishment by Auth0ID: {Message}", e.Message);
             throw new Exception("Failed to get establishment by Auth0ID", e);
+        }
+    }
+    
+    public async Task<List<Establishment>?> GetEstablishmentsWithPendingRegisterStatusAsync()
+    {
+        try
+        {
+            var establishments = await _context.Establishments
+                .IgnoreQueryFilters()
+                .Where(e => e.RequestStatus == RequestStatus.Pending)
+                .ToListAsync();
+            if (establishments.Count == 0)
+            {
+                _logger.LogWarning("Pending establishments not found");
+                return null;
+            }
+            
+            return establishments;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Failed to get pending establishments: {Message}", e.Message);
+            throw new Exception("Failed to get pending establishments", e);
         }
     }
     
@@ -112,6 +141,43 @@ public class EstablishmentRepository : IEstablishmentRepository
             throw new Exception("Failed to get establishments by area", e);
         }
     }
+    
+    public async Task<bool> UpdateEstablishmentByAuth0IdAsync(string auth0Id, EstablishmentDto establishmentDto)
+        {
+            try
+            {
+                var establishment = await _context.Establishments
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
+                if (establishment == null)
+                {
+                    _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
+                    return false;
+                }
+    
+                foreach (var property in typeof(EstablishmentDto).GetProperties())
+                {
+                    var newValue = property.GetValue(establishmentDto);
+                    Console.WriteLine(newValue);
+                    if (newValue != null)
+                    {
+                        var establishmentProperty = typeof(Establishment).GetProperty(property.Name);
+                        if (establishmentProperty != null && establishmentProperty.CanWrite)
+                        {
+                            establishmentProperty.SetValue(establishment, newValue);
+                        }
+                    }
+                }
+                
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Failed to update establishment register request: {Message}", e.Message);
+                throw new InvalidOperationException("Failed to update establishment register request", e);
+            }
+        }
     
     public async Task<bool> DeleteEstablishmentByAuth0IdAsync(string auth0Id)
     {
