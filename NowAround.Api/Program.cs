@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NowAround.Api.Database;
 using NowAround.Api.Extensions;
