@@ -11,7 +11,7 @@ public class User
     
     public virtual ICollection<Friend> Friends { get; set; } = new List<Friend>();
 
-    public string ToString()
+    public override string ToString()
     {
         return $"Id: {Id}, Auth0Id: {Auth0Id}, Role: {Role}";
     }

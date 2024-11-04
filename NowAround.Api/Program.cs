@@ -41,6 +41,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseExceptionHandler("/Home/Error");
+app.UseHsts();
+
 
 app.UseCors("AllowSpecificOrigin");
 

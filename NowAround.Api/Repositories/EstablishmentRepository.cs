@@ -171,7 +171,7 @@ public class EstablishmentRepository : IEstablishmentRepository
             }
         }
 
-        if (establishmentDto.EstablishmentCategories != null && establishmentDto.EstablishmentCategories.Any())
+        if (establishmentDto.EstablishmentCategories != null && establishmentDto.EstablishmentCategories.Count != 0)
         {
             // Remove all existing categories and add new ones
             await _context.EstablishmentCategories
@@ -180,7 +180,7 @@ public class EstablishmentRepository : IEstablishmentRepository
             establishment.EstablishmentCategories = establishmentDto.EstablishmentCategories;
         }
 
-        if (establishmentDto.EstablishmentTags != null && establishmentDto.EstablishmentCategories.Any())
+        if (establishmentDto.EstablishmentTags != null && establishmentDto.EstablishmentTags.Count != 0)
         {
             // Remove all existing tags and add new ones
             await _context.EstablishmentTags
