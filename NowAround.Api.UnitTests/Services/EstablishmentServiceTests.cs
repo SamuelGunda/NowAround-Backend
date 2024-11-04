@@ -181,9 +181,14 @@ public class EstablishmentServiceTests
             }
         };
         
+        var categories = new[] { new Category { Name = "Restaurant"} };
+        var tags = new[] { new Tag { Name = "Italian"} };
+        
         // Act & Assert
         _establishmentRepositoryMock.Setup(r => r.CheckIfEstablishmentExistsByNameAsync(establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync((1.0, 1.0));
+        _categoryRepositoryMock.Setup(r => r.GetCategoryByNameWithTagsAsync(It.IsAny<string>())).ReturnsAsync(categories[0]);
+        _tagRepositoryMock.Setup(r => r.GetTagByNameAsync(It.IsAny<string>())).ReturnsAsync(tags[0]);
         _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<PersonalInfo>())).ThrowsAsync(new Exception());
         
         await Assert.ThrowsAsync<Exception>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
@@ -269,8 +274,6 @@ public class EstablishmentServiceTests
         Assert.Equal(establishment.Longitude, result.Longitude);
         Assert.Equal(establishment.PriceCategory, result.PriceCategory);
         Assert.Equal(establishment.RequestStatus, result.RequestStatus);
-        Assert.Equal(establishment.EstablishmentCategories, result.EstablishmentCategories);
-        Assert.Equal(establishment.EstablishmentTags, result.EstablishmentTags);
     }
     
     [Fact]

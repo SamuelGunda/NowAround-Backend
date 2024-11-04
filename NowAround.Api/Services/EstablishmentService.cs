@@ -11,6 +11,7 @@ using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;
+using NowAround.Api.Models.Responses;
 
 // ReSharper disable InvertIf
 
@@ -74,7 +75,7 @@ public class EstablishmentService : IEstablishmentService
         if (catsAndTags.categories.Length == 0)
         {
             _logger.LogWarning("No categories found");
-            throw new Exception("No categories found");
+            throw new InvalidCategoryException("At least one category is required");
         }
         
         // Register establishment on Auth0
@@ -118,7 +119,7 @@ public class EstablishmentService : IEstablishmentService
         return establishment.ToDto();
     }
     
-    public async Task<EstablishmentDto> GetEstablishmentByAuth0IdAsync(string auth0Id)
+    public async Task<EstablishmentResponse> GetEstablishmentByAuth0IdAsync(string auth0Id)
     {
         var establishment = await _establishmentRepository.GetEstablishmentByAuth0IdAsync(auth0Id);
         if (establishment == null)
@@ -127,7 +128,7 @@ public class EstablishmentService : IEstablishmentService
             throw new EstablishmentNotFoundException($"Auth0ID: {auth0Id}");
         }
 
-        return establishment.ToDto();
+        return establishment.ToDetailedResponse();
     }
     
     public async Task<List<EstablishmentDto>?> GetPendingEstablishmentsAsync()
@@ -171,7 +172,7 @@ public class EstablishmentService : IEstablishmentService
             Description = request.Description,
             PriceCategory = request.PriceCategory.HasValue ? (PriceCategory)request.PriceCategory.Value : null,
             EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory { Category = c }).ToList(),
-            EstablishmentTags = request.Tags == null ? null : catsAndTags.tags.Select(t => new EstablishmentTag() { Tag = t }).ToList()
+            EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag() { Tag = t }).ToList()
         };
         
         var result = await _establishmentRepository.UpdateEstablishmentByAuth0IdAsync(auth0Id, establishmentDto);
@@ -244,7 +245,7 @@ public class EstablishmentService : IEstablishmentService
                 if (categoryEntity == null)
                 {
                     _logger.LogWarning("Category {CategoryName} not found", categoryName);
-                    throw new Exception("Category not found");
+                    throw new InvalidCategoryException();
                 }
 
                 categories.Add(categoryEntity);
@@ -264,7 +265,7 @@ public class EstablishmentService : IEstablishmentService
                 if (tagEntity == null)
                 {
                     _logger.LogWarning("Tag {TagName} not found", tag);
-                    throw new Exception("Tag not found");
+                    throw new InvalidTagException();
                 }
                 
                 tags.Add(tagEntity);

@@ -1,9 +1,8 @@
-﻿using NowAround.Api.Models.Domain;
-using NowAround.Api.Models.Enum;
+﻿using NowAround.Api.Models.Enum;
 
-namespace NowAround.Api.Models.Dtos;
+namespace NowAround.Api.Models.Responses;
 
-public class EstablishmentDto
+public class EstablishmentResponse
 {
     public string? Auth0Id { get; set; }
     public string? Name { get; set; }
@@ -15,6 +14,6 @@ public class EstablishmentDto
     public PriceCategory? PriceCategory { get; set; }
     public RequestStatus? RequestStatus { get; set; }
     
-    public virtual ICollection<EstablishmentCategory>? EstablishmentCategories { get; set; }
-    public virtual ICollection<EstablishmentTag>? EstablishmentTags { get; set; }
+    public List<string>? CategoryNames { get; set; }
+    public List<string>? TagNames { get; set; }
 }

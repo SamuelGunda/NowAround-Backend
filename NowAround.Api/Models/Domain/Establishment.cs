@@ -2,6 +2,7 @@
 using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
+using NowAround.Api.Models.Responses;
 
 namespace NowAround.Api.Models.Domain;
 
@@ -44,6 +45,25 @@ public class Establishment
             RequestStatus = RequestStatus,
             EstablishmentCategories = EstablishmentCategories,
             EstablishmentTags = EstablishmentTags
+        };
+    }
+
+    public EstablishmentResponse ToDetailedResponse()
+    {
+        return new EstablishmentResponse
+        {
+            Auth0Id = Auth0Id,
+            Name = Name,
+            Description = Description,
+            City = City,
+            Address = Address,
+            Latitude = Latitude,
+            Longitude = Longitude,
+            PriceCategory = PriceCategory,
+            RequestStatus = RequestStatus,
+
+            CategoryNames = EstablishmentCategories.Select(ec => ec.Category.Name).ToList(),
+            TagNames = EstablishmentTags.Select(et => et.Tag.Name).ToList()
         };
     }
 

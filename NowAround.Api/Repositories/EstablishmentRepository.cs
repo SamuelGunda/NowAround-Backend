@@ -76,6 +76,8 @@ public class EstablishmentRepository : IEstablishmentRepository
         {
             var establishment = await _context.Establishments
                 .IgnoreQueryFilters()
+                .Include(e => e.EstablishmentCategories).ThenInclude(ec => ec.Category)
+                .Include(e => e.EstablishmentTags).ThenInclude(ec => ec.Tag)
                 .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
             if (establishment == null)
             {
@@ -149,6 +151,7 @@ public class EstablishmentRepository : IEstablishmentRepository
         var establishment = await _context.Establishments
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
+        
         if (establishment == null)
         {
             _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
@@ -177,17 +180,13 @@ public class EstablishmentRepository : IEstablishmentRepository
             establishment.EstablishmentCategories = establishmentDto.EstablishmentCategories;
         }
 
-        if (establishmentDto.EstablishmentTags != null)
+        if (establishmentDto.EstablishmentTags != null && establishmentDto.EstablishmentCategories.Any())
         {
-            if (establishmentDto.EstablishmentTags.Any())
-            {
-                // Remove all existing tags and add new ones
-                await _context.EstablishmentTags
-                    .Where(et => et.EstablishmentId == establishment.Id)
-                    .ForEachAsync(et => _context.EstablishmentTags.Remove(et));
-                establishment.EstablishmentTags = establishmentDto.EstablishmentTags;
-            }
-            // If tags are null, leave them unchanged
+            // Remove all existing tags and add new ones
+            await _context.EstablishmentTags
+                .Where(et => et.EstablishmentId == establishment.Id)
+                .ForEachAsync(et => _context.EstablishmentTags.Remove(et));
+            establishment.EstablishmentTags = establishmentDto.EstablishmentTags;
         }
 
         await _context.SaveChangesAsync();
