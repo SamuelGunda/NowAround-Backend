@@ -7,6 +7,7 @@ public static class LoggingExtensions
         logging.ClearProviders();
         logging.AddConsole();
         logging.AddDebug();
+        logging.AddAzureWebAppDiagnostics();
         logging.SetMinimumLevel(LogLevel.Debug);
     }
 }
