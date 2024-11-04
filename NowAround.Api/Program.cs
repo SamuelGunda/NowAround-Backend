@@ -23,8 +23,6 @@ builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
 builder.Services.AddProblemDetails();
 
-// builder.Configuration.AddEnvironmentVariables();
-
 builder.Services.AddCustomServices();
 builder.Services.AddAuthentication(builder.Configuration);
 builder.Services.AddDatabase(builder.Configuration);

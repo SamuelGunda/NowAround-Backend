@@ -2,5 +2,5 @@
 
 public interface IMapboxService
 {
-    public Task<(double lat, double lng)> GetCoordinatesFromAddressAsync(string address);
+    public Task<(double lat, double lng)> GetCoordinatesFromAddressAsync(string address, string postalCode, string city);
 }

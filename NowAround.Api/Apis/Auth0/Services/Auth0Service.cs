@@ -40,7 +40,7 @@ public class Auth0Service : IAuth0Service
     /// Management API is called to create a new user.
     /// </summary>
     
-    public async Task<string> RegisterEstablishmentAccountAsync(string establishmentName, PersonalInfo personalInfo)
+    public async Task<string> RegisterEstablishmentAccountAsync(PersonalInfo personalInfo)
     {
         personalInfo.ValidateProperties();
         
@@ -48,9 +48,8 @@ public class Auth0Service : IAuth0Service
         {
             email = personalInfo.Email,
             password = PasswordUtils.Generate(),
-            name = establishmentName,
-            given_name = personalInfo.FName,
-            family_name = personalInfo.LName,
+            given_name = personalInfo.FirstName,
+            family_name = personalInfo.LastName,
             connection = "Username-Password-Authentication"
         };
         

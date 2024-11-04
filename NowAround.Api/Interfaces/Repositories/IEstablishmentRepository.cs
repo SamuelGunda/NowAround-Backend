@@ -11,7 +11,7 @@ public interface IEstablishmentRepository
     Task<Establishment?> GetEstablishmentByAuth0IdAsync(string auth0Id);
     //TODO: Task<List<Establishment>?> GetEstablishmentsByAreaAsync(double nwLat, double nwLong, double seLat, double seLong);
     Task<List<Establishment>?> GetEstablishmentsWithPendingRegisterStatusAsync();
-    Task<List<Establishment>?> GetEstablishmentsWithFilterByAreaAsync(
+    Task<List<Establishment>?> GetEstablishmentsWithFilterInAreaAsync(
         double nwLat, double nwLong, double seLat, double seLong,
         string? name, string? categoryName, List<string>? tagNames
     );

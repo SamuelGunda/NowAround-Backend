@@ -115,7 +115,7 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
     }
     
-    public async Task<List<Establishment>?> GetEstablishmentsWithFilterByAreaAsync(double nwLat, double nwLong, double seLat, double seLong, string? name, string? categoryName, List<string>? tagNames)
+    public async Task<List<Establishment>?> GetEstablishmentsWithFilterInAreaAsync(double nwLat, double nwLong, double seLat, double seLong, string? name, string? categoryName, List<string>? tagNames)
     {
         try
         {
@@ -143,47 +143,70 @@ public class EstablishmentRepository : IEstablishmentRepository
     }
     
     public async Task<bool> UpdateEstablishmentByAuth0IdAsync(string auth0Id, EstablishmentDto establishmentDto)
+    {
+    try
+    {
+        var establishment = await _context.Establishments
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
+        if (establishment == null)
         {
-            try
+            _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
+            return false;
+        }
+
+        foreach (var property in typeof(EstablishmentDto).GetProperties())
+        {
+            var newValue = property.GetValue(establishmentDto);
+            if (newValue != null)
             {
-                var establishment = await _context.Establishments
-                    .IgnoreQueryFilters()
-                    .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
-                if (establishment == null)
+                var establishmentProperty = typeof(Establishment).GetProperty(property.Name);
+                if (property.Name != "EstablishmentCategories" && property.Name != "EstablishmentTags")
                 {
-                    _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
-                    return false;
+                    establishmentProperty?.SetValue(establishment, newValue);
                 }
-    
-                foreach (var property in typeof(EstablishmentDto).GetProperties())
-                {
-                    var newValue = property.GetValue(establishmentDto);
-                    Console.WriteLine(newValue);
-                    if (newValue != null)
-                    {
-                        var establishmentProperty = typeof(Establishment).GetProperty(property.Name);
-                        if (establishmentProperty != null && establishmentProperty.CanWrite)
-                        {
-                            establishmentProperty.SetValue(establishment, newValue);
-                        }
-                    }
-                }
-                
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("Failed to update establishment register request: {Message}", e.Message);
-                throw new InvalidOperationException("Failed to update establishment register request", e);
             }
         }
+
+        if (establishmentDto.EstablishmentCategories != null && establishmentDto.EstablishmentCategories.Any())
+        {
+            // Remove all existing categories and add new ones
+            await _context.EstablishmentCategories
+                .Where(ec => ec.EstablishmentId == establishment.Id)
+                .ForEachAsync(ec => _context.EstablishmentCategories.Remove(ec));
+            establishment.EstablishmentCategories = establishmentDto.EstablishmentCategories;
+        }
+
+        if (establishmentDto.EstablishmentTags != null)
+        {
+            if (establishmentDto.EstablishmentTags.Any())
+            {
+                // Remove all existing tags and add new ones
+                await _context.EstablishmentTags
+                    .Where(et => et.EstablishmentId == establishment.Id)
+                    .ForEachAsync(et => _context.EstablishmentTags.Remove(et));
+                establishment.EstablishmentTags = establishmentDto.EstablishmentTags;
+            }
+            // If tags are null, leave them unchanged
+        }
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+    catch (Exception e)
+    {
+        _logger.LogError("Failed to update establishment register request: {Message}", e.Message);
+        throw new InvalidOperationException("Failed to update establishment register request", e);
+    }
+}
     
     public async Task<bool> DeleteEstablishmentByAuth0IdAsync(string auth0Id)
     {
         try
         {
-            var establishment = await _context.Establishments.FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
+            var establishment = await _context.Establishments
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
             if (establishment == null)
             {
                 _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);

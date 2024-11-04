@@ -10,6 +10,7 @@ using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
+using NowAround.Api.Models.Requests;
 
 // ReSharper disable InvertIf
 
@@ -50,12 +51,12 @@ public class EstablishmentService : IEstablishmentService
     /// If database operation fails, the establishment account gets deleted from Auth0.
     /// </summary>
     
-    public async Task<int> RegisterEstablishmentAsync(EstablishmentRegisterRequest establishmentRequest)
+    public async Task<int> RegisterEstablishmentAsync(EstablishmentRegisterRequest request)
     {
-        establishmentRequest.ValidateProperties();
+        request.ValidateProperties();
         
-        var establishmentInfo = establishmentRequest.EstablishmentInfo;
-        var personalInfo = establishmentRequest.PersonalInfo;
+        var establishmentInfo = request.EstablishmentInfo;
+        var personalInfo = request.PersonalInfo;
         
         // Check if establishment with this name already exists
         if (await _establishmentRepository.CheckIfEstablishmentExistsByNameAsync(establishmentInfo.Name))
@@ -65,14 +66,19 @@ public class EstablishmentService : IEstablishmentService
         }
         
         // Get coordinates from address using Mapbox API and set them to variable
-        var fullAddress = $"{establishmentInfo.Address}, {establishmentInfo.City}";
-        var coordinates = await _mapboxService.GetCoordinatesFromAddressAsync(fullAddress);
+        var coordinates = await _mapboxService.GetCoordinatesFromAddressAsync(establishmentInfo.Address, establishmentInfo.PostalCode, establishmentInfo.City);
         
         // Check if categories and tags exist and set them to variable
-        var catsAndTags = await SetCategoriesAndTagsAsync(establishmentInfo);
+        
+        var catsAndTags = await SetCategoriesAndTagsAsync(establishmentInfo.Category, establishmentInfo.Tags);
+        if (catsAndTags.categories.Length == 0)
+        {
+            _logger.LogWarning("No categories found");
+            throw new Exception("No categories found");
+        }
         
         // Register establishment on Auth0
-        var auth0Id = await _auth0Service.RegisterEstablishmentAccountAsync(establishmentInfo.Name, personalInfo);
+        var auth0Id = await _auth0Service.RegisterEstablishmentAccountAsync(personalInfo);
 
         var establishmentEntity = new Establishment()
         {
@@ -117,6 +123,7 @@ public class EstablishmentService : IEstablishmentService
         var establishment = await _establishmentRepository.GetEstablishmentByAuth0IdAsync(auth0Id);
         if (establishment == null)
         {
+            _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
             throw new EstablishmentNotFoundException($"Auth0ID: {auth0Id}");
         }
 
@@ -129,21 +136,7 @@ public class EstablishmentService : IEstablishmentService
         return establishments?.Select(e => e.ToDto()).ToList();
     }
     
-    public async Task<List<EstablishmentPin>?> GetEstablishmentPinsInAreaAsync(MapBounds mapBounds)
-    {
-        mapBounds.ValidateProperties();
-
-        
-        var establishments = await _establishmentRepository.GetEstablishmentsWithFilterByAreaAsync(
-            mapBounds.NwLat, mapBounds.NwLong,
-            mapBounds.SeLat, mapBounds.SeLong,
-            null, null, null);
-        
-        // Map the establishments to pins and return
-        return establishments?.Select(e => e.ToPin()).ToList();
-    }
-    
-    public async Task<List<EstablishmentPin>?> GetEstablishmentPinsWithFilterInAreaAsync(
+    public async Task<List<EstablishmentDto>?> GetEstablishmentMarkersWithFilterInAreaAsync(
         MapBounds mapBounds, string? name, string? categoryName, List<string>? tagNames)
     {
         mapBounds.ValidateProperties();
@@ -153,15 +146,42 @@ public class EstablishmentService : IEstablishmentService
             throw new ArgumentException("Name is too short");
         }
         
-        var establishments = await _establishmentRepository.GetEstablishmentsWithFilterByAreaAsync(
+        var establishments = await _establishmentRepository.GetEstablishmentsWithFilterInAreaAsync(
             mapBounds.NwLat, mapBounds.NwLong,
             mapBounds.SeLat, mapBounds.SeLong,
             name, categoryName, tagNames);
         
-        // Map the establishments to pins and return
-        return establishments?.Select(e => e.ToPin()).ToList();
+        return establishments?.Select(e => e.ToMarker()).ToList();
     }
 
+    public async Task UpdateEstablishmentAsync(EstablishmentUpdateRequest request)
+    {
+        var auth0Id = request.Auth0Id;
+        if (auth0Id.IsNullOrEmpty())
+        {
+            _logger.LogWarning("auth0Id is null");
+            throw new ArgumentNullException(nameof(auth0Id));
+        }
+        
+        var catsAndTags = await SetCategoriesAndTagsAsync(request.Category, request.Tags);
+        
+        var establishmentDto = new EstablishmentDto
+        {
+            Name = request.Name,
+            Description = request.Description,
+            PriceCategory = request.PriceCategory.HasValue ? (PriceCategory)request.PriceCategory.Value : null,
+            EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory { Category = c }).ToList(),
+            EstablishmentTags = request.Tags == null ? null : catsAndTags.tags.Select(t => new EstablishmentTag() { Tag = t }).ToList()
+        };
+        
+        var result = await _establishmentRepository.UpdateEstablishmentByAuth0IdAsync(auth0Id, establishmentDto);
+        if (!result)
+        {
+            _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
+            throw new EstablishmentNotFoundException($"Auth0 ID: {auth0Id}");
+        }
+    }
+    
     public async Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus)
     {
         if (auth0Id.IsNullOrEmpty())
@@ -178,6 +198,7 @@ public class EstablishmentService : IEstablishmentService
         var result = await _establishmentRepository.UpdateEstablishmentByAuth0IdAsync(auth0Id, establishmentDto);
         if (!result)
         {
+            _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
             throw new EstablishmentNotFoundException($"Auth0 ID: {auth0Id}");
         }
     }
@@ -208,28 +229,31 @@ public class EstablishmentService : IEstablishmentService
     /// they are fetched from the database.
     /// </summary>
     
-    private async Task<(Category[] categories, Tag[] tags)> SetCategoriesAndTagsAsync(EstablishmentInfo establishmentInfo)
+    private async Task<(Category[] categories, Tag[] tags)> SetCategoriesAndTagsAsync(ICollection<string>? categoryNames, ICollection<string>? tagNames)
     {
         List<Category> categories = [];
         List<Tag> tags = [];
-        
-        foreach (var categoryName in establishmentInfo.CategoryNames)
+
+        if (categoryNames != null)
         {
-            // Get category from database by name, including tags
-            var categoryEntity = await _categoryRepository.GetCategoryByNameWithTagsAsync(categoryName);
-                
-            if (categoryEntity == null)
+            foreach (var categoryName in categoryNames)
             {
-                _logger.LogWarning("Category {CategoryName} not found", categoryName);
-                throw new Exception("Category not found");
+                // Get category from database by name, including tags
+                var categoryEntity = await _categoryRepository.GetCategoryByNameWithTagsAsync(categoryName);
+
+                if (categoryEntity == null)
+                {
+                    _logger.LogWarning("Category {CategoryName} not found", categoryName);
+                    throw new Exception("Category not found");
+                }
+
+                categories.Add(categoryEntity);
             }
-            
-            categories.Add(categoryEntity);
         }
 
-        if (establishmentInfo.TagNames != null)
+        if (tagNames != null)
         {
-            foreach (var tag in establishmentInfo.TagNames)
+            foreach (var tag in tagNames)
             {
                 // Check if tag belongs to any of the categories, if not, get it from the database
                 var tagEntity = categories

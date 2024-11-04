@@ -2,18 +2,18 @@
 using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
+using NowAround.Api.Models.Requests;
 
 namespace NowAround.Api.Interfaces;
 
 public interface IEstablishmentService
 {
-    Task<int> RegisterEstablishmentAsync(EstablishmentRegisterRequest establishmentRequest);
+    Task<int> RegisterEstablishmentAsync(EstablishmentRegisterRequest request);
     Task<EstablishmentDto> GetEstablishmentByIdAsync(int id);
     Task<EstablishmentDto> GetEstablishmentByAuth0IdAsync(string auth0Id);
     Task<List<EstablishmentDto>?> GetPendingEstablishmentsAsync();
-    Task<List<EstablishmentPin>?> GetEstablishmentPinsInAreaAsync(MapBounds mapBounds);
-    Task<List<EstablishmentPin>?> GetEstablishmentPinsWithFilterInAreaAsync(MapBounds mapBounds, string? name, string? categoryName, List<string>? tagNames);
-    //TODO: Task UpdateEstablishmentAsync(Establishment establishment);
+    Task<List<EstablishmentDto>?> GetEstablishmentMarkersWithFilterInAreaAsync(MapBounds mapBounds, string? name, string? categoryName, List<string>? tagNames);
+    Task UpdateEstablishmentAsync(EstablishmentUpdateRequest request);
     Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus);
     Task DeleteEstablishmentAsync(string auth0Id);
 }

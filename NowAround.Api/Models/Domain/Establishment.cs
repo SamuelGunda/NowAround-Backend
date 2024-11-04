@@ -47,9 +47,9 @@ public class Establishment
         };
     }
 
-    public EstablishmentPin ToPin()
+    public EstablishmentDto ToMarker()
     {
-        return new EstablishmentPin
+        return new EstablishmentDto
         {
             Name = Name,
             Auth0Id = Auth0Id,

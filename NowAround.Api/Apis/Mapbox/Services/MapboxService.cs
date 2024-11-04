@@ -26,12 +26,15 @@ public class MapboxService : IMapboxService
     /// TODO: In future, the country should be passed as a parameter
     /// </summary>
     
-    public async Task<(double lat, double lng)> GetCoordinatesFromAddressAsync(string address)
+    public async Task<(double lat, double lng)> GetCoordinatesFromAddressAsync(string address, string postalCode, string city)
     {
-        address += ", Slovakia";
+        var country = Uri.EscapeDataString("Slovakia");
+        address = Uri.EscapeDataString(address);
+        city = Uri.EscapeDataString(city);
+        postalCode = Uri.EscapeDataString(postalCode);
         
         // Call Mapbox API to get coordinates from address
-        var url = $"https://api.mapbox.com/geocoding/v5/mapbox.places/{Uri.EscapeDataString(address)}.json?access_token={_mapboxAccessToken}";
+        var url = $"https://api.mapbox.com/search/geocode/v6/forward?address_line1={address}&postcode={postalCode}&place={city}&country={country}&access_token={_mapboxAccessToken}";
         var response = await _httpClient.GetStringAsync(url);
         var responseJson = JsonConvert.DeserializeObject<JObject>(response);
         

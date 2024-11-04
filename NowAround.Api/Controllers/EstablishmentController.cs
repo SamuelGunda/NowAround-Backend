@@ -5,6 +5,7 @@ using NowAround.Api.Interfaces;
 using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
+using NowAround.Api.Models.Requests;
 
 namespace NowAround.Api.Controllers;
 
@@ -28,11 +29,11 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     }
     
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetEstablishmentAsync(string id)
+    public async Task<IActionResult> GetEstablishmentByAuth0IdAsync(string id)
     {
         try
         {
-            EstablishmentDto establishment;
+            /*EstablishmentDto establishment;
         
             if (int.TryParse(id , out var numericId))
             {
@@ -41,7 +42,9 @@ public class EstablishmentController(IEstablishmentService establishmentService,
             else
             {
                 establishment = await establishmentService.GetEstablishmentByAuth0IdAsync(id);
-            }
+            }*/
+            
+            var establishment = await establishmentService.GetEstablishmentByAuth0IdAsync(id);
             
             return Ok(establishment);
         }
@@ -52,7 +55,7 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         }
     }
     
-    
+    //TODO: Implement search
     /*[HttpGet("search")]
     public async Task<IActionResult> SearchEstablishmentsAsync(string? name, string? categoryName, List<string>? tagNames)
     {
@@ -60,37 +63,9 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         return Ok(new { message = $"name: {name}, categoryName: {categoryName}, tagNames: {tags}, tag count: {tagNames[0]}" });
     }*/
 
-    [HttpGet("search/pins")]
-    public async Task<IActionResult> GetEstablishmentPinsInAreaAsync(
-        double northWestLat, double northWestLong,
-        double southEastLat, double southEastLong)
-    {
-        var mapBounds = new MapBounds
-        {
-            NwLat = northWestLat,
-            NwLong = northWestLong,
-            SeLat = southEastLat,
-            SeLong = southEastLong
-        };
-        
-        try
-        {
-            var establishmentPins = await establishmentService.GetEstablishmentPinsInAreaAsync(mapBounds);
-            if (establishmentPins == null)
-            {
-                return NotFound(new { message = "No pins found for the specified location" });
-            }
-            return Ok(establishmentPins);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, "Error getting establishments in area");
-            throw;
-        }
-    }
     
-    [HttpGet("search/pins/filter")]
-    public async Task<IActionResult> GetEstablishmentPinsWithFilterInAreaAsync(
+    [HttpGet("search-pins")]
+    public async Task<IActionResult> GetEstablishmentMarkersWithFilterInAreaAsync(
         double northWestLat, double northWestLong, 
         double southEastLat, double southEastLong, 
         string? name, string? categoryName, List<string>? tagNames)
@@ -106,16 +81,31 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         
         try
         {
-            var establishmentPins = await establishmentService.GetEstablishmentPinsWithFilterInAreaAsync(mapBounds, name, categoryName, tagNames);
-            if (establishmentPins == null)
+            var establishmentMarker = await establishmentService.GetEstablishmentMarkersWithFilterInAreaAsync(mapBounds, name, categoryName, tagNames);
+            if (establishmentMarker == null)
             {
-                return NotFound(new { message = "No pins found for the specified location" });
+                return NotFound(new { message = "No markers found for the specified location" });
             }
-            return Ok(establishmentPins);
+            return Ok(establishmentMarker);
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error getting establishments in area");
+            throw;
+        }
+    }
+    
+    [HttpPut]
+    public async Task<IActionResult> UpdateEstablishmentAsync(EstablishmentUpdateRequest establishmentUpdateRequest)
+    {
+        try
+        {
+            await establishmentService.UpdateEstablishmentAsync(establishmentUpdateRequest);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error updating establishment");
             throw;
         }
     }
