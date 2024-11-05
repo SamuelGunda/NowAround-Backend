@@ -12,6 +12,7 @@ using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;
 using NowAround.Api.Models.Responses;
+using NowAround.Api.Utilities;
 
 // ReSharper disable InvertIf
 
@@ -87,7 +88,7 @@ public class EstablishmentService : IEstablishmentService
             Name = establishmentInfo.Name,
             Latitude = coordinates.lat,
             Longitude = coordinates.lng,
-            Address = establishmentInfo.Address,
+            Address = $"{establishmentInfo.Address}, {establishmentInfo.PostalCode}",
             City = establishmentInfo.City,
             PriceCategory = (PriceCategory) establishmentInfo.PriceCategory,
             EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory() { Category = c }).ToList(),
@@ -131,21 +132,22 @@ public class EstablishmentService : IEstablishmentService
         return establishment.ToDetailedResponse();
     }
     
-    public async Task<List<EstablishmentDto>?> GetPendingEstablishmentsAsync()
+    public async Task<List<EstablishmentResponse>?> GetPendingEstablishmentsAsync()
     {
         var establishments = await _establishmentRepository.GetEstablishmentsWithPendingRegisterStatusAsync();
-        return establishments?.Select(e => e.ToDto()).ToList();
+        return establishments?.Select(e => e.ToDetailedResponse()).ToList();
+    }
+
+    public async Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterAsync(string? name, string? categoryName, List<string>? tagNames)
+    {
+        var establishments = await _establishmentRepository.GetEstablishmentsWithFilterAsync(name, categoryName, tagNames);
+        
+        return establishments?.Select(e => e.ToMarker()).ToList();
     }
     
-    public async Task<List<EstablishmentDto>?> GetEstablishmentMarkersWithFilterInAreaAsync(
+    public async Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterInAreaAsync(
         MapBounds mapBounds, string? name, string? categoryName, List<string>? tagNames)
     {
-        mapBounds.ValidateProperties();
-        if (name != null && name.Length < 3)
-        {
-            _logger.LogWarning("Name is too short");
-            throw new ArgumentException("Name is too short");
-        }
         
         var establishments = await _establishmentRepository.GetEstablishmentsWithFilterInAreaAsync(
             mapBounds.NwLat, mapBounds.NwLong,

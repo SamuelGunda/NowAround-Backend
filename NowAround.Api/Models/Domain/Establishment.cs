@@ -67,9 +67,9 @@ public class Establishment
         };
     }
 
-    public EstablishmentDto ToMarker()
+    public EstablishmentResponse ToMarker()
     {
-        return new EstablishmentDto
+        return new EstablishmentResponse
         {
             Name = Name,
             Auth0Id = Auth0Id,

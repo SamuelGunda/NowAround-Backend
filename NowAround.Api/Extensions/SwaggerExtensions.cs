@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using System.Reflection;
+using Microsoft.OpenApi.Models;
 
 namespace NowAround.Api.Extensions;
 
@@ -10,7 +11,8 @@ public static class SwaggerExtensions
          {
              options.SwaggerDoc("v1", new OpenApiInfo
              {
-                 Title = "NowAround.Api", Version = "v1" 
+                 Title = "NowAround.Api", 
+                 Version = "v1" 
                  
              });
              
@@ -38,6 +40,9 @@ public static class SwaggerExtensions
                      []
                  }
              });
+             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
          });
+         
     }
 }

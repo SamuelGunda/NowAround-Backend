@@ -117,6 +117,31 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
     }
     
+    public async Task<List<Establishment>?> GetEstablishmentsWithFilterAsync(string? name, string? categoryName, List<string>? tagNames)
+    {
+        try
+        {
+            var query = _context.Establishments.AsQueryable();
+            
+            query = EstablishmentFilterQueryBuilder.ApplyFilters(query, name, categoryName, tagNames);
+            
+            var establishments = await query.ToListAsync();
+            
+            if (establishments.Count == 0)
+            {
+                _logger.LogWarning("Establishments with filter not found");
+                return null;
+            }
+            
+            return establishments;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Failed to get establishments by filter: {Message}", e.Message);
+            throw new Exception("Failed to get establishments by filter", e);
+        }
+    }
+    
     public async Task<List<Establishment>?> GetEstablishmentsWithFilterInAreaAsync(double nwLat, double nwLong, double seLat, double seLong, string? name, string? categoryName, List<string>? tagNames)
     {
         try
