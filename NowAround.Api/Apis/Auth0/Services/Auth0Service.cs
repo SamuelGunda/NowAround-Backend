@@ -35,11 +35,14 @@ public class Auth0Service : IAuth0Service
     }
     
     /// <summary>
-    /// Registers a new establishment account asynchronously.
-    /// PersonalInfo is validated.
-    /// Management API is called to create a new user.
+    /// Registers a new establishment account by creating a new user in Auth0 and assigning a role to the user.
+    /// Establishment goes into a pending state until the establishment is verified.
     /// </summary>
-    
+    /// <param name="personalInfo"> The personal information of the establishment owner </param>
+    /// <returns> The Auth0 user ID of the newly created establishment account </returns>
+    /// <exception cref="EmailAlreadyInUseException"> Thrown when the email is already in use </exception>
+    /// <exception cref="HttpRequestException"> Thrown when the request to Auth0 API fails </exception>
+    /// <exception cref="JsonException"> Thrown when the response from Auth0 API cannot be deserialized </exception>
     public async Task<string> RegisterEstablishmentAccountAsync(PersonalInfo personalInfo)
     {
         personalInfo.ValidateProperties();
@@ -88,6 +91,40 @@ public class Auth0Service : IAuth0Service
         return user.UserId;
     }
 
+    /// <summary>
+    /// Gets the full name of the establishment owner by their Auth0 ID.
+    /// </summary>
+    /// <param name="auth0Id"> The Auth0 ID of the establishment owner </param>
+    /// <returns> The full name of the establishment owner </returns>
+    /// <exception cref="HttpRequestException"> Thrown when the request to Auth0 API fails </exception>
+    /// <exception cref="JsonException"> Thrown when the response from Auth0 API cannot be deserialized </exception>
+    public async Task<string> GetEstablishmentOwnerFullNameAsync(string auth0Id)
+    {
+        var accessToken = await _tokenService.GetManagementAccessTokenAsync();
+        
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"https://{_domain}/api/v2/users/{Uri.EscapeDataString(auth0Id)}");
+        request.Headers.Add("Authorization" , $"Bearer {accessToken}");
+        
+        var response = await _httpClient.SendAsync(request);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError("Failed to get establishment owner full name. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
+            throw new HttpRequestException($"Failed to get establishment owner full name. Status Code: {response.StatusCode}, Response: {responseBody}");
+        }
+        
+        var user = JsonConvert.DeserializeObject<User>(responseBody) ?? throw new JsonException("Failed to deserialize Auth0 response");
+        
+        return $"{user.FirstName} {user.LastName}";
+    }
+
+    /// <summary>
+    /// Deletes an establishment account.
+    /// </summary>
+    /// <param name="auth0Id"> The Auth0 ID of the establishment to delete </param>
+    /// <exception cref="ArgumentNullException"> Thrown when the provided Auth0 ID is null or empty </exception>
+    /// <exception cref="HttpRequestException"> Thrown when the request to Auth0 API fails </exception>
     public async Task DeleteAccountAsync(string auth0Id)
     {
         if (auth0Id.IsNullOrEmpty())
@@ -114,6 +151,11 @@ public class Auth0Service : IAuth0Service
         }
     }
 
+    /// <summary>
+    /// Assigns a role to an establishment in Auth0.
+    /// </summary>
+    /// <param name="auth0Id"> The Auth0 ID of the establishment </param>
+    /// <param name="accessToken"> The access token for Auth0 Management API </param>
     private async Task AssignRoleToEstablishmentAsync(string auth0Id, string accessToken)
     {
         var requestBody = new

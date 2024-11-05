@@ -18,14 +18,13 @@ public class EstablishmentController(IEstablishmentService establishmentService,
 {
     
     /// <summary>
-    /// Creates a new establishment,
-    /// establishment must be approved by an admin before it is visible to users
+    /// Creates a new establishment. The establishment must be approved by an admin before it is visible to users.
     /// </summary>
-    /// <param name="establishment"></param>
+    /// <param name="establishment"> The establishment registration request containing the establishment details</param>
     /// <returns> A status code indicating the result of the operation</returns>
-    /// <response code="201">Establishment created successfully</response>
-    /// <response code="400">Establishment already exists or Email already in use</response>
-    /// <response code="500">An error occurred while creating the establishment</response>
+    /// <response code="201"> Establishment created successfully </response>
+    /// <response code="400"> Establishment already exists or Email already in use </response>
+    /// <response code="500"> An error occurred while creating the establishment </response>
     [HttpPost]
     public async Task<IActionResult> CreateEstablishmentAsync(EstablishmentRegisterRequest establishment)
     {
@@ -42,20 +41,20 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     }
     
     /// <summary>
-    /// Returns the establishment with the given Auth0 ID if it exists
-    /// RETURNS ONLY APPROVED ESTABLISHMENTS
+    /// Returns the establishment with the given Auth0 ID if it exists.
+    /// RETURNS ONLY APPROVED ESTABLISHMENTS.
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns> An IActionResult containing the establishment details if found, or a 404 status code if not found.</returns>
-    /// <response code="200">Returns the establishment with the given Auth0 ID</response>
-    /// <response code="404">No establishment with the given Auth0 ID was found</response>
-    /// <response code="500">An error occurred while retrieving the establishment</response>
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetEstablishmentByAuth0IdAsync(string id)
+    /// <param name="auth0Id"> The Auth0 ID of the establishment </param>
+    /// <returns> An IActionResult containing the establishment details if found, or a 404 status code if not found </returns>
+    /// <response code="200">Returns the establishment with the given Auth0 ID </response>
+    /// <response code="404">No establishment with the given Auth0 ID was found </response>
+    /// <response code="500">An error occurred while retrieving the establishment </response>
+    [HttpGet("{auth0Id}")]
+    public async Task<IActionResult> GetEstablishmentByAuth0IdAsync(string auth0Id)
     {
         try
         {
-            EstablishmentResponse establishment = await establishmentService.GetEstablishmentByAuth0IdAsync(id);
+            EstablishmentResponse establishment = await establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
             
             return Ok(establishment);
         }
@@ -70,11 +69,11 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     /// Returns all establishments that have not been approved,
     /// only an admin can view pending establishments
     /// </summary>
-    /// <returns> An IActionResult containing list of pending establishments if found, or a 404 status code if not found.</returns>
-    /// <response code="200">Returns the pending establishments</response>
-    /// <response code="403">User does not have permission to view pending establishments</response>
-    /// <response code="404">No pending establishments were found</response>
-    /// <response code="500">An error occurred while retrieving the establishments</response>
+    /// <returns> An IActionResult containing list of pending establishments if found, or a 404 status code if not found </returns>
+    /// <response code="200"> Returns the pending establishments </response>
+    /// <response code="403"> User does not have permission to view pending establishments </response>
+    /// <response code="404"> No pending establishments were found </response>
+    /// <response code="500"> An error occurred while retrieving the establishments </response>
     [Authorize(Roles = "Admin")]
     [HttpGet("pending")]
     public async Task<IActionResult> GetPendingEstablishmentsAsync()
@@ -92,17 +91,17 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     }
     
     /// <summary>
-    /// Returns all establishments that match the given filter criteria,
+    /// Returns all establishments that match the given filter criteria.
     /// At least one of the filter criteria must be provided.
-    /// RETURNS ONLY APPROVED ESTABLISHMENTS
+    /// RETURNS ONLY APPROVED ESTABLISHMENTS.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="categoryName"></param>
-    /// <param name="tagNames"></param>
-    /// <returns> An IActionResult containing list of establishment markers if found, or a 404 status code if not found.</returns>
-    /// <response code="200">Returns the establishment markers that match the given filter criteria</response>
-    /// <response code="404">No establishments with these criteria were found</response>
-    /// <response code="500">An error occurred while retrieving the establishments</response>
+    /// <param name="name"> The name of the establishment to filter by </param>
+    /// <param name="categoryName"> The category name of the establishment to filter by </param>
+    /// <param name="tagNames"> The list of tag names to filter by </param>
+    /// <returns> An IActionResult containing a list of establishment markers if found, or a 404 status code if not found </returns>
+    /// <response code="200"> Returns the establishment markers that match the given filter criteria </response>
+    /// <response code="404"> No establishments with these criteria were found </response>
+    /// <response code="500"> An error occurred while retrieving the establishments </response>
     [HttpGet("search")]
     public async Task<IActionResult> GetEstablishmentMarkersWithFilterAsync(string? name, string? categoryName, List<string>? tagNames)
     {
@@ -134,13 +133,13 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     /// <param name="northWestLong"></param>
     /// <param name="southEastLat"></param>
     /// <param name="southEastLong"></param>
-    /// <param name="name"></param>
-    /// <param name="categoryName"></param>
-    /// <param name="tagNames"></param>
-    /// <returns> An IActionResult containing list of establishment markers if found, or a 404 status code if not found.</returns>
-    /// <response code="200">Returns the establishment markers that match the given filter criteria and are within the given map bounds</response>
-    /// <response code="404">No markers found for the specified location</response>
-    /// <response code="500">An error occurred while retrieving the establishments</response>
+    /// <param name="name"> The name of the establishment to filter by </param>
+    /// <param name="categoryName"> The category name of the establishment to filter by </param>
+    /// <param name="tagNames"> The list of tag names to filter by </param>
+    /// <returns> An IActionResult containing list of establishment markers if found, or a 404 status code if not found </returns>
+    /// <response code="200"> Returns the establishment markers that match the given filter criteria and are within the given map bounds </response>
+    /// <response code="404"> No markers found for the specified location </response>
+    /// <response code="500"> An error occurred while retrieving the establishments </response>
     [HttpGet("search-area")]
     public async Task<IActionResult> GetEstablishmentMarkersWithFilterInAreaAsync(
         double northWestLat, double northWestLong, 
@@ -179,12 +178,12 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     /// Updates the establishment with the given Auth0 ID,
     /// only the establishment owner or an admin can update the establishment
     /// </summary>
-    /// <param name="establishmentUpdateRequest"></param>
-    /// <returns> A status code indicating the result of the operation</returns>
-    /// <response code="200">Establishment updated successfully</response>
-    /// <response code="403">User does not have permission to update this establishment</response>
-    /// <response code="404">No establishment with the given Auth0 ID was found</response>
-    /// <response code="500">An error occurred while updating the establishment</response>
+    /// <param name="establishmentUpdateRequest"> The establishment update request containing the updated establishment details </param>
+    /// <returns> A status code indicating the result of the operation </returns>
+    /// <response code="200"> Establishment updated successfully </response>
+    /// <response code="403"> User does not have permission to update this establishment </response>
+    /// <response code="404"> No establishment with the given Auth0 ID was found </response>
+    /// <response code="500"> An error occurred while updating the establishment </response>
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> UpdateEstablishmentAsync(EstablishmentUpdateRequest establishmentUpdateRequest)
@@ -210,14 +209,14 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     /// Updates the register status of the establishment with the given Auth0 ID,
     /// only an admin can update the establishment register status
     /// </summary>
-    /// <param name="auth0Id"></param>
-    /// <param name="action"></param>
-    /// <returns> A status code indicating the result of the operation</returns>
-    /// <response code="200">Establishment register status updated successfully</response>
-    /// <response code="400">Invalid action type</response>
-    /// <response code="403">User does not have permission to update this establishment</response>
-    /// <response code="404">No establishment with the given Auth0 ID was found</response>
-    /// <response code="500">An error occurred while updating the establishment register status</response>
+    /// <param name="auth0Id"> The Auth0 ID of the establishment </param>
+    /// <param name="action"> The action to perform on the establishment register request </param>
+    /// <returns> A status code indicating the result of the operation </returns>
+    /// <response code="200"> Establishment register status updated successfully </response>
+    /// <response code="400"> Invalid action type </response>
+    /// <response code="403"> User does not have permission to update this establishment </response>
+    /// <response code="404"> No establishment with the given Auth0 ID was found </response>
+    /// <response code="500"> An error occurred while updating the establishment register status </response>
     [Authorize(Roles = "Admin")]
     [HttpPut("register-status")]
     public async Task<IActionResult> UpdateEstablishmentRegisterRequestAsync(string auth0Id, string action)
@@ -252,14 +251,14 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     /// Deletes the establishment with the given Auth0 ID
     /// Only the establishment owner or an admin can delete the establishment
     /// </summary>
-    /// <param name="auth0Id"></param>
-    /// <returns> A status code indicating the result of the operation</returns>
-    /// <response code="200">Establishment deleted successfully</response>
-    /// <response code="403">User does not have permission to delete this establishment</response>
-    /// <response code="404">No establishment with the given Auth0 ID was found</response>
-    /// <response code="500">An error occurred while deleting the establishment</response>
-    [HttpDelete]
+    /// <param name="auth0Id"> The Auth0 ID of the establishment </param>
+    /// <returns> A status code indicating the result of the operation </returns>
+    /// <response code="200"> Establishment deleted successfully </response>
+    /// <response code="403"> User does not have permission to delete this establishment </response>
+    /// <response code="404"> No establishment with the given Auth0 ID was found </response>
+    /// <response code="500"> An error occurred while deleting the establishment </response>
     [Authorize]
+    [HttpDelete]
     public async Task<IActionResult> DeleteEstablishmentAsync(string auth0Id)
     {
         try
@@ -279,8 +278,8 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         }
     }
     
-    [HttpGet]
     [Authorize(Roles = "Admin")]
+    [HttpGet("time-created")]
     public async Task<IActionResult> GetAllEstablishmentsTimeCreatedAsync()
     {
         throw new NotImplementedException();

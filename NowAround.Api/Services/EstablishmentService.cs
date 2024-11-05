@@ -12,7 +12,6 @@ using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;
 using NowAround.Api.Models.Responses;
-using NowAround.Api.Utilities;
 
 // ReSharper disable InvertIf
 
@@ -45,15 +44,16 @@ public class EstablishmentService : IEstablishmentService
     }
     
     /// <summary>
-    /// Registers a new establishment asynchronously.
-    /// Establishment Request is validated.
-    /// Categories and tags are validated and fetched from the database.
-    /// Coordinates are fetched from the address using Mapbox API.
+    /// Registers a new establishment.
     /// Establishment is registered on Auth0 and saved to the database on success.
     /// If database operation fails, the establishment account gets deleted from Auth0.
     /// </summary>
-    
-    public async Task<int> RegisterEstablishmentAsync(EstablishmentRegisterRequest request)
+    /// <param name="request"> The establishment register request </param>
+    /// <returns> ID of the newly created establishment </returns>
+    /// <exception cref="EstablishmentAlreadyExistsException"> If establishment with the same name already exists </exception>
+    /// <exception cref="InvalidCategoryException"> If no categories are found </exception>
+    /// <exception cref="Exception"> If establishment creation in the database fails </exception>
+    public async Task RegisterEstablishmentAsync(EstablishmentRegisterRequest request)
     {
         request.ValidateProperties();
         
@@ -67,11 +67,10 @@ public class EstablishmentService : IEstablishmentService
             throw new EstablishmentAlreadyExistsException(establishmentInfo.Name);
         }
         
-        // Get coordinates from address using Mapbox API and set them to variable
+        // Get coordinates from address using Mapbox API and set them to a variable
         var coordinates = await _mapboxService.GetCoordinatesFromAddressAsync(establishmentInfo.Address, establishmentInfo.PostalCode, establishmentInfo.City);
         
-        // Check if categories and tags exist and set them to variable
-        
+        // Check if categories and tags exist by their name and set them to a variable
         var catsAndTags = await SetCategoriesAndTagsAsync(establishmentInfo.Category, establishmentInfo.Tags);
         if (catsAndTags.categories.Length == 0)
         {
@@ -82,7 +81,7 @@ public class EstablishmentService : IEstablishmentService
         // Register establishment on Auth0
         var auth0Id = await _auth0Service.RegisterEstablishmentAccountAsync(personalInfo);
 
-        var establishmentEntity = new Establishment()
+        var establishmentEntity = new Establishment
         {
             Auth0Id = auth0Id,
             Name = establishmentInfo.Name,
@@ -91,15 +90,14 @@ public class EstablishmentService : IEstablishmentService
             Address = $"{establishmentInfo.Address}, {establishmentInfo.PostalCode}",
             City = establishmentInfo.City,
             PriceCategory = (PriceCategory) establishmentInfo.PriceCategory,
-            EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory() { Category = c }).ToList(),
-            EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag() { Tag = t }).ToList()
+            EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory { Category = c }).ToList(),
+            EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag { Tag = t }).ToList()
         };
             
         try
         {
             // Save establishment to the database
-            var result =  await _establishmentRepository.CreateEstablishmentAsync(establishmentEntity);
-            return result;
+            await _establishmentRepository.CreateEstablishmentAsync(establishmentEntity);
         }
         catch (Exception)
         {
@@ -109,17 +107,30 @@ public class EstablishmentService : IEstablishmentService
         }
     }
     
-    public async Task<EstablishmentDto> GetEstablishmentByIdAsync(int id)
+    /// <summary>
+    /// Gets an establishment by its ID.
+    /// </summary>
+    /// <param name="id"> The ID of the establishment </param>
+    /// <returns> Establishment detailed response </returns>
+    /// <exception cref="EstablishmentNotFoundException"> If establishment with the specified ID is not found </exception>
+    public async Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id)
     {
         var establishment = await _establishmentRepository.GetEstablishmentByIdAsync(id);
         if (establishment == null)
         {
+            _logger.LogWarning("Establishment with ID {id} not found", id);
             throw new EstablishmentNotFoundException($"ID: {id}");
         }
 
-        return establishment.ToDto();
+        return establishment.ToDetailedResponse();
     }
-    
+
+    /// <summary>
+    /// Gets an establishment by its Auth0 ID.
+    /// </summary>
+    /// <param name="auth0Id"> The Auth0 ID of the establishment </param>
+    /// <returns> Establishment detailed response </returns>
+    /// <exception cref="EstablishmentNotFoundException"> If establishment with the specified Auth0 ID is not found </exception>
     public async Task<EstablishmentResponse> GetEstablishmentByAuth0IdAsync(string auth0Id)
     {
         var establishment = await _establishmentRepository.GetEstablishmentByAuth0IdAsync(auth0Id);
@@ -132,12 +143,31 @@ public class EstablishmentService : IEstablishmentService
         return establishment.ToDetailedResponse();
     }
     
-    public async Task<List<EstablishmentResponse>?> GetPendingEstablishmentsAsync()
+    /// <summary>
+    /// Gets a list of establishments with pending register status.
+    /// </summary>
+    /// <returns> List of pending establishments </returns>
+    public async Task<List<PendingEstablishmentResponse>?> GetPendingEstablishmentsAsync()
     {
         var establishments = await _establishmentRepository.GetEstablishmentsWithPendingRegisterStatusAsync();
-        return establishments?.Select(e => e.ToDetailedResponse()).ToList();
+        
+        var pendingEstablishments = establishments?.Select(e => new PendingEstablishmentResponse
+        {
+            Auth0Id = e.Auth0Id,
+            Name = e.Name,
+            OwnerName = _auth0Service.GetEstablishmentOwnerFullNameAsync(e.Auth0Id).Result
+        }).ToList();
+        
+        return pendingEstablishments;
     }
 
+    /// <summary>
+    /// Gets a list of establishment markers with applied filter.
+    /// </summary>
+    /// <param name="name"> The name to be set </param>
+    /// <param name="categoryName"> The category name to be set </param>
+    /// <param name="tagNames"> The list of tag names to be set </param>
+    /// <returns> List of establishment markers </returns>
     public async Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterAsync(string? name, string? categoryName, List<string>? tagNames)
     {
         var establishments = await _establishmentRepository.GetEstablishmentsWithFilterAsync(name, categoryName, tagNames);
@@ -145,6 +175,14 @@ public class EstablishmentService : IEstablishmentService
         return establishments?.Select(e => e.ToMarker()).ToList();
     }
     
+    /// <summary>
+    /// Gets a list of establishment markers with applied filter in the specified area.
+    /// </summary>
+    /// <param name="mapBounds"> The map bounds to be set </param>
+    /// <param name="name"> The name to be set </param>
+    /// <param name="categoryName"> The category name to be set </param>
+    /// <param name="tagNames"> The list of tag names to be set </param>
+    /// <returns> List of establishment markers </returns>
     public async Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterInAreaAsync(
         MapBounds mapBounds, string? name, string? categoryName, List<string>? tagNames)
     {
@@ -157,6 +195,12 @@ public class EstablishmentService : IEstablishmentService
         return establishments?.Select(e => e.ToMarker()).ToList();
     }
 
+    /// <summary>
+    /// Updates an establishment.
+    /// </summary>
+    /// <param name="request"> The establishment update request </param>
+    /// <exception cref="ArgumentNullException"> If Auth0 ID is null </exception>
+    /// <exception cref="EstablishmentNotFoundException"> If establishment with the specified Auth0 ID is not found </exception>
     public async Task UpdateEstablishmentAsync(EstablishmentUpdateRequest request)
     {
         var auth0Id = request.Auth0Id;
@@ -174,7 +218,7 @@ public class EstablishmentService : IEstablishmentService
             Description = request.Description,
             PriceCategory = request.PriceCategory.HasValue ? (PriceCategory)request.PriceCategory.Value : null,
             EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory { Category = c }).ToList(),
-            EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag() { Tag = t }).ToList()
+            EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag { Tag = t }).ToList()
         };
         
         var result = await _establishmentRepository.UpdateEstablishmentByAuth0IdAsync(auth0Id, establishmentDto);
@@ -185,6 +229,13 @@ public class EstablishmentService : IEstablishmentService
         }
     }
     
+    /// <summary>
+    /// Updates the register request status of an establishment.
+    /// </summary>
+    /// <param name="auth0Id"> The Auth0 ID of the establishment </param>
+    /// <param name="requestStatus"> The status to be set </param>
+    /// <exception cref="ArgumentNullException"> If Auth0 ID is null </exception>
+    /// <exception cref="EstablishmentNotFoundException"> If establishment with the specified Auth0 ID is not found </exception>
     public async Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus)
     {
         if (auth0Id.IsNullOrEmpty())
@@ -206,6 +257,12 @@ public class EstablishmentService : IEstablishmentService
         }
     }
 
+    /// <summary>
+    /// Deletes an establishment.
+    /// </summary>
+    /// <param name="auth0Id"> The Auth0 ID of the establishment to delete </param>
+    /// <exception cref="ArgumentNullException"> If Auth0 ID is null </exception>
+    /// <exception cref="EstablishmentNotFoundException"> If establishment with the specified Auth0 ID is not found </exception>
     public async Task DeleteEstablishmentAsync(string auth0Id)
     {
         if (auth0Id.IsNullOrEmpty())
@@ -217,6 +274,7 @@ public class EstablishmentService : IEstablishmentService
         // Delete establishment account from Auth0
         await _auth0Service.DeleteAccountAsync(auth0Id);
         
+        // Delete establishment from the database
         var result = await _establishmentRepository.DeleteEstablishmentByAuth0IdAsync(auth0Id);
         if (!result)
         {
@@ -226,12 +284,17 @@ public class EstablishmentService : IEstablishmentService
     
     /// <summary>
     /// Sets categories and tags for the establishment.
-    /// Categories are validated and fetched from the database.
+    /// If category name or tag name is not found, an exception is thrown.
+    /// Categories are fetched from the database.
     /// Tags are fetched from the categories list,
     /// if they don't belong to any category (they have null Category in DB),
     /// they are fetched from the database.
     /// </summary>
-    
+    /// <param name="categoryNames"> The list of category names to be set </param>
+    /// <param name="tagNames"> The list of tag names to be set </param>
+    /// <returns> Tuple of categories and tags </returns>
+    /// <exception cref="InvalidCategoryException"> If category name is not found </exception>
+    /// <exception cref="InvalidTagException"> If tag name is not found </exception>
     private async Task<(Category[] categories, Tag[] tags)> SetCategoriesAndTagsAsync(ICollection<string>? categoryNames, ICollection<string>? tagNames)
     {
         List<Category> categories = [];

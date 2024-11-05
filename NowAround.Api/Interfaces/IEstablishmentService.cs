@@ -9,10 +9,10 @@ namespace NowAround.Api.Interfaces;
 
 public interface IEstablishmentService
 {
-    Task<int> RegisterEstablishmentAsync(EstablishmentRegisterRequest request);
-    //Task<EstablishmentDto> GetEstablishmentByIdAsync(int id);
+    Task RegisterEstablishmentAsync(EstablishmentRegisterRequest request);
+    Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id);
     Task<EstablishmentResponse> GetEstablishmentByAuth0IdAsync(string auth0Id);
-    Task<List<EstablishmentResponse>?> GetPendingEstablishmentsAsync();
+    Task<List<PendingEstablishmentResponse>?> GetPendingEstablishmentsAsync();
     Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterAsync(string? name, string? categoryName, List<string>? tagNames);
     Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterInAreaAsync(MapBounds mapBounds, string? name, string? categoryName, List<string>? tagNames);
     Task UpdateEstablishmentAsync(EstablishmentUpdateRequest request);

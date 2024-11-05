@@ -80,10 +80,10 @@ public class EstablishmentServiceTests
         _establishmentRepositoryMock.Setup(r => r.CreateEstablishmentAsync(It.IsAny<Establishment>())).ReturnsAsync(1);
 
         // Act
-        var result = await _establishmentService.RegisterEstablishmentAsync(establishmentRequest);
+        await _establishmentService.RegisterEstablishmentAsync(establishmentRequest);
 
         // Assert
-        Assert.Equal(1, result);
+        _establishmentRepositoryMock.Verify(r => r.CreateEstablishmentAsync(It.IsAny<Establishment>()), Times.Once);
     }
     
     [Fact]

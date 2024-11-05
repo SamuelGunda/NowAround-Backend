@@ -20,6 +20,12 @@ public class EstablishmentRepository : IEstablishmentRepository
         _logger = logger;
     }
     
+    /// <summary>
+    /// Checks if an establishment with the given name exists.
+    /// </summary>
+    /// <param name="name"> The name of the establishment </param>
+    /// <returns> True if establishment exists, false if not </returns>
+    /// <exception cref="Exception"> Failed to check if establishment exists by name </exception>
     public async Task<bool> CheckIfEstablishmentExistsByNameAsync(string name)
     {
         try
@@ -33,6 +39,12 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
     }
     
+    /// <summary>
+    /// Creates a new establishment.
+    /// </summary>
+    /// <param name="establishment"> The establishment to create </param>
+    /// <returns> ID of the created establishment </returns>
+    /// <exception cref="Exception"> Failed to create establishment </exception>
     public async Task<int> CreateEstablishmentAsync(Establishment establishment)
     {
         try
@@ -48,6 +60,12 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
     }
     
+    /// <summary>
+    /// Gets an establishment by ID.
+    /// </summary>
+    /// <param name="id"> The ID of the establishment </param>
+    /// <returns> Establishment or null </returns>
+    /// <exception cref="Exception"> Failed to get establishment by ID </exception>
     public async Task<Establishment?> GetEstablishmentByIdAsync(int id)
     {
         try
@@ -70,6 +88,12 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
     }
     
+    /// <summary>
+    /// Gets an establishment by Auth0 ID.
+    /// </summary>
+    /// <param name="auth0Id"> The Auth0 ID of the establishment </param>
+    /// <returns> Establishment or null </returns>
+    /// <exception cref="Exception"> Failed to get establishment by Auth0ID </exception>
     public async Task<Establishment?> GetEstablishmentByAuth0IdAsync(string auth0Id)
     {
         try
@@ -94,6 +118,11 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
     }
     
+    /// <summary>
+    /// Gets establishments with pending register status.
+    /// </summary>
+    /// <returns> List of establishments or null </returns>
+    /// <exception cref="Exception"> Failed to get pending establishments </exception>
     public async Task<List<Establishment>?> GetEstablishmentsWithPendingRegisterStatusAsync()
     {
         try
@@ -117,6 +146,15 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
     }
     
+    /// <summary>
+    /// Gets establishments with filter.
+    /// Query is being added if the filter value is not null or empty.
+    /// </summary>
+    /// <param name="name"> Establishment name </param>
+    /// <param name="categoryName"> Category name </param>
+    /// <param name="tagNames"> List of tag names </param>
+    /// <returns> List of establishments or null </returns>
+    /// <exception cref="InvalidOperationException"> Failed to get establishments by filter </exception>
     public async Task<List<Establishment>?> GetEstablishmentsWithFilterAsync(string? name, string? categoryName, List<string>? tagNames)
     {
         try
@@ -138,10 +176,23 @@ public class EstablishmentRepository : IEstablishmentRepository
         catch (Exception e)
         {
             _logger.LogError("Failed to get establishments by filter: {Message}", e.Message);
-            throw new Exception("Failed to get establishments by filter", e);
+            throw new InvalidOperationException("Failed to get establishments by filter", e);
         }
     }
     
+    /// <summary>
+    /// Gets establishments with filter in area.
+    /// Query is being added if the filter value is not null or empty.
+    /// </summary>
+    /// <param name="nwLat"></param>
+    /// <param name="nwLong"></param>
+    /// <param name="seLat"></param>
+    /// <param name="seLong"></param>
+    /// <param name="name"> Establishment name </param>
+    /// <param name="categoryName"> Category name </param>
+    /// <param name="tagNames"> List of tag names </param>
+    /// <returns> List of establishments or null </returns>
+    /// <exception cref="Exception"> Failed to get establishments by area </exception>
     public async Task<List<Establishment>?> GetEstablishmentsWithFilterInAreaAsync(double nwLat, double nwLong, double seLat, double seLong, string? name, string? categoryName, List<string>? tagNames)
     {
         try
@@ -169,61 +220,78 @@ public class EstablishmentRepository : IEstablishmentRepository
         }
     }
     
+    /// <summary>
+    /// Updates an establishment.
+    /// Categories and tags are being updated separately.
+    /// </summary>
+    /// <param name="auth0Id"> The Auth0 ID of the establishment to update </param>
+    /// <param name="establishmentDto"> DTO with updated establishment properties </param>
+    /// <returns> True if establishment was updated, false if not found </returns>
+    /// <exception cref="InvalidOperationException"> Failed to update establishment </exception>
     public async Task<bool> UpdateEstablishmentByAuth0IdAsync(string auth0Id, EstablishmentDto establishmentDto)
     {
-    try
-    {
-        var establishment = await _context.Establishments
-            .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
-        
-        if (establishment == null)
+        try
         {
-            _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
-            return false;
-        }
-
-        foreach (var property in typeof(EstablishmentDto).GetProperties())
-        {
-            var newValue = property.GetValue(establishmentDto);
-            if (newValue != null)
+            var establishment = await _context.Establishments
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
+            
+            if (establishment == null)
             {
-                var establishmentProperty = typeof(Establishment).GetProperty(property.Name);
-                if (property.Name != "EstablishmentCategories" && property.Name != "EstablishmentTags")
+                _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
+                return false;
+            }
+
+            // For each property in the DTO, update the corresponding property in the entity if it is provided
+            foreach (var property in typeof(EstablishmentDto).GetProperties())
+            {
+                var newValue = property.GetValue(establishmentDto);
+                if (newValue != null)
                 {
-                    establishmentProperty?.SetValue(establishment, newValue);
+                    var establishmentProperty = typeof(Establishment).GetProperty(property.Name);
+                    if (property.Name != "EstablishmentCategories" && property.Name != "EstablishmentTags")
+                    {
+                        establishmentProperty?.SetValue(establishment, newValue);
+                    }
                 }
             }
-        }
 
-        if (establishmentDto.EstablishmentCategories != null && establishmentDto.EstablishmentCategories.Count != 0)
+            // If categories are provided, update them
+            if (establishmentDto.EstablishmentCategories != null && establishmentDto.EstablishmentCategories.Count != 0)
+            {
+                // Remove all existing categories and add new ones
+                await _context.EstablishmentCategories
+                    .Where(ec => ec.EstablishmentId == establishment.Id)
+                    .ForEachAsync(ec => _context.EstablishmentCategories.Remove(ec));
+                establishment.EstablishmentCategories = establishmentDto.EstablishmentCategories;
+            }
+
+            // If tags are provided, update them
+            if (establishmentDto.EstablishmentTags != null && establishmentDto.EstablishmentTags.Count != 0)
+            {
+                // Remove all existing tags and add new ones
+                await _context.EstablishmentTags
+                    .Where(et => et.EstablishmentId == establishment.Id)
+                    .ForEachAsync(et => _context.EstablishmentTags.Remove(et));
+                establishment.EstablishmentTags = establishmentDto.EstablishmentTags;
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception e)
         {
-            // Remove all existing categories and add new ones
-            await _context.EstablishmentCategories
-                .Where(ec => ec.EstablishmentId == establishment.Id)
-                .ForEachAsync(ec => _context.EstablishmentCategories.Remove(ec));
-            establishment.EstablishmentCategories = establishmentDto.EstablishmentCategories;
+            _logger.LogError("Failed to update establishment register request: {Message}", e.Message);
+            throw new InvalidOperationException("Failed to update establishment register request", e);
         }
-
-        if (establishmentDto.EstablishmentTags != null && establishmentDto.EstablishmentTags.Count != 0)
-        {
-            // Remove all existing tags and add new ones
-            await _context.EstablishmentTags
-                .Where(et => et.EstablishmentId == establishment.Id)
-                .ForEachAsync(et => _context.EstablishmentTags.Remove(et));
-            establishment.EstablishmentTags = establishmentDto.EstablishmentTags;
-        }
-
-        await _context.SaveChangesAsync();
-        return true;
     }
-    catch (Exception e)
-    {
-        _logger.LogError("Failed to update establishment register request: {Message}", e.Message);
-        throw new InvalidOperationException("Failed to update establishment register request", e);
-    }
-}
     
+    /// <summary>
+    /// Deletes an establishment by Auth0 ID.
+    /// </summary>
+    /// <param name="auth0Id"> The Auth0 ID of the establishment to delete </param>
+    /// <returns> True if establishment was deleted, false if not found </returns>
+    /// <exception cref="InvalidOperationException"> Failed to delete establishment </exception>
     public async Task<bool> DeleteEstablishmentByAuth0IdAsync(string auth0Id)
     {
         try
