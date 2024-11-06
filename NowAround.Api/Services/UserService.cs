@@ -1,37 +1,44 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Database;
 using NowAround.Api.Interfaces;
+using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Enum;
+using NowAround.Api.Repositories;
 
 namespace NowAround.Api.Services;
 
-public class UserService(AppDbContext context, ILogger<UserService> logger) : IUserService
+public class UserService : IUserService
 {
-    
-    public async Task<int> CreateUserAsync(string auth0Id)
+    private readonly ILogger<UserService> _logger;
+    private readonly IUserRepository _userRepository;
+    private readonly IAuth0Service _auth0Service;
+    public UserService(ILogger<UserService> logger, IUserRepository userRepository, IAuth0Service auth0Service)
     {
-        if (auth0Id.IsNullOrEmpty())
-        {
-            logger.LogWarning("auth0Id is null");
-            throw new ArgumentNullException(nameof(auth0Id));
-        }
-        
-        var user = new User()
-        {
-            Auth0Id = auth0Id,
-            Role = Role.User,
-        };
+        _logger = logger;
+        _userRepository = userRepository;
+        _auth0Service = auth0Service;
+    }
+    
+    /// <summary>
+    /// Assign user to azure database and assign user role.
+    /// </summary>
+    /// <param name="auth0Id"> The Auth0 ID of the user to be created </param>
+    /// <returns> A task that represents the asynchronous operation /returns>
+    /// <exception cref="Exception"> Thrown when the user creation or role assignment fails </exception>
+    public async Task CreateUserAsync(string auth0Id)
+    {
+        var user = new User { Auth0Id = auth0Id };
         
         try
         {
-            await context.Users.AddAsync(user);
-            await context.SaveChangesAsync();
-            return user.Id;
+            await _userRepository.CreateUserAsync(user);
+            await _auth0Service.AssignRoleToAccountAsync(auth0Id, "user");
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Failed to create user");
             throw new Exception("Failed to create user", e);
         }
     }

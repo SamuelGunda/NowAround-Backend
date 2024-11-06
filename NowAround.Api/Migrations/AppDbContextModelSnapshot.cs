@@ -181,6 +181,32 @@ namespace NowAround.Api.Migrations
                     b.ToTable("FriendRequests");
                 });
 
+            modelBuilder.Entity("NowAround.Api.Models.Domain.SocialLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EstablishmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EstablishmentId");
+
+                    b.ToTable("SocialLinks");
+                });
+
             modelBuilder.Entity("NowAround.Api.Models.Domain.Tag", b =>
                 {
                     b.Property<int>("Id")
@@ -215,9 +241,6 @@ namespace NowAround.Api.Migrations
                     b.Property<string>("Auth0Id")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -300,6 +323,17 @@ namespace NowAround.Api.Migrations
                     b.Navigation("Sender");
                 });
 
+            modelBuilder.Entity("NowAround.Api.Models.Domain.SocialLink", b =>
+                {
+                    b.HasOne("NowAround.Api.Models.Domain.Establishment", "Establishment")
+                        .WithMany("SocialLinks")
+                        .HasForeignKey("EstablishmentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Establishment");
+                });
+
             modelBuilder.Entity("NowAround.Api.Models.Domain.Tag", b =>
                 {
                     b.HasOne("NowAround.Api.Models.Domain.Category", "Category")
@@ -322,6 +356,8 @@ namespace NowAround.Api.Migrations
                     b.Navigation("EstablishmentCategories");
 
                     b.Navigation("EstablishmentTags");
+
+                    b.Navigation("SocialLinks");
                 });
 
             modelBuilder.Entity("NowAround.Api.Models.Domain.Tag", b =>

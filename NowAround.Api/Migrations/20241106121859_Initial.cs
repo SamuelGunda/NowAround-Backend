@@ -5,7 +5,7 @@
 namespace NowAround.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,8 +51,7 @@ namespace NowAround.Api.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Auth0Id = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<int>(type: "int", nullable: false)
+                    Auth0Id = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -101,6 +100,26 @@ namespace NowAround.Api.Migrations
                         principalTable: "Establishments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SocialLinks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EstablishmentId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SocialLinks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SocialLinks_Establishments_EstablishmentId",
+                        column: x => x.EstablishmentId,
+                        principalTable: "Establishments",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -221,6 +240,11 @@ namespace NowAround.Api.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SocialLinks_EstablishmentId",
+                table: "SocialLinks",
+                column: "EstablishmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tags_CategoryId",
                 table: "Tags",
                 column: "CategoryId");
@@ -242,13 +266,16 @@ namespace NowAround.Api.Migrations
                 name: "Friends");
 
             migrationBuilder.DropTable(
-                name: "Establishments");
+                name: "SocialLinks");
 
             migrationBuilder.DropTable(
                 name: "Tags");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Establishments");
 
             migrationBuilder.DropTable(
                 name: "Categories");

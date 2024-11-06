@@ -15,7 +15,6 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
         builder.Property(e => e.Description);
         builder.Property(e => e.Address).IsRequired();
         builder.Property(e => e.City).IsRequired();
-        builder.Property(e => e.Website);
         builder.Property(e => e.Latitude).IsRequired();
         builder.Property(e => e.Longitude).IsRequired();
         builder.Property(e => e.PriceCategory).IsRequired();
@@ -28,6 +27,11 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
         builder.HasMany(e => e.EstablishmentTags)
             .WithOne(et => et.Establishment)
             .HasForeignKey(et => et.EstablishmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasMany(e => e.SocialLinks)
+            .WithOne(sl => sl.Establishment)
+            .HasForeignKey(sl => sl.EstablishmentId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(e => e.RequestStatus)

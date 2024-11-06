@@ -20,12 +20,13 @@ public class Establishment
     public required string City { get; set; }
     [MaxLength(64)]
     public required string Address { get; set; }
-    public string Website { get; set; } = string.Empty; //TODO: Change to socials
+    public string Website { get; set; } = string.Empty;
     public required double Latitude { get; set; }
     public required double Longitude { get; set; }
     public required PriceCategory PriceCategory { get; set; }
     public RequestStatus RequestStatus { get; set; }
     
+    public virtual ICollection<SocialLink> SocialLinks { get; set; } = new List<SocialLink>();
     public virtual ICollection<EstablishmentCategory> EstablishmentCategories { get; set; } = new List<EstablishmentCategory>();
     public virtual ICollection<EstablishmentTag> EstablishmentTags { get; set; } = new List<EstablishmentTag>();
     

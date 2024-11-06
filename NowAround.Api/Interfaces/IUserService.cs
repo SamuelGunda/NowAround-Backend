@@ -2,6 +2,6 @@
 
 public interface IUserService
 {
-    Task<int> CreateUserAsync(string auth0Id);
+    Task CreateUserAsync(string auth0Id);
     
 }

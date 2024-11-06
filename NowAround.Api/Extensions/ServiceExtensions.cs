@@ -24,5 +24,6 @@ public static class ServiceExtensions
         services.AddScoped<IEstablishmentRepository, EstablishmentRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
     }
 }

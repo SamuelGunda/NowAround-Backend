@@ -10,7 +10,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Auth0Id).IsRequired();
-        builder.Property(u => u.Role).IsRequired();
 
         builder.HasMany(u => u.Friends)
             .WithOne(f => f.User)

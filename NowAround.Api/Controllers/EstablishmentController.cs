@@ -103,14 +103,16 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     /// <response code="404"> No establishments with these criteria were found </response>
     /// <response code="500"> An error occurred while retrieving the establishments </response>
     [HttpGet("search")]
-    public async Task<IActionResult> GetEstablishmentMarkersWithFilterAsync(string? name, string? categoryName, List<string>? tagNames)
+    public async Task<IActionResult> GetEstablishmentMarkersWithFilterAsync(string? name, string? categoryName, string? tagNames)
     {
         
-        SearchValidator.ValidateFilterValues(name, categoryName, tagNames, true);
+        var tagNamesList = tagNames?.Split(',').ToList();
+        
+        SearchValidator.ValidateFilterValues(name, categoryName, tagNamesList, true);
         
         try
         {
-            var establishmentMarker = await establishmentService.GetEstablishmentMarkersWithFilterAsync(name, categoryName, tagNames);
+            var establishmentMarker = await establishmentService.GetEstablishmentMarkersWithFilterAsync(name, categoryName, tagNamesList);
             if (establishmentMarker == null)
             {
                 return NotFound(new { message = "No establishments with these criteria were found" });
@@ -144,10 +146,12 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     public async Task<IActionResult> GetEstablishmentMarkersWithFilterInAreaAsync(
         double northWestLat, double northWestLong, 
         double southEastLat, double southEastLong, 
-        string? name, string? categoryName, List<string>? tagNames)
+        string? name, string? categoryName, string? tagNames)
     {
+        
+        var tagNamesList = tagNames?.Split(',').ToList();
      
-        SearchValidator.ValidateFilterValues(name, categoryName, tagNames, false);
+        SearchValidator.ValidateFilterValues(name, categoryName, tagNamesList, false);
         SearchValidator.ValidateMapBounds(northWestLat, northWestLong, southEastLat, southEastLong);
         
         var mapBounds = new MapBounds
@@ -160,7 +164,7 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         
         try
         {
-            var establishmentMarker = await establishmentService.GetEstablishmentMarkersWithFilterInAreaAsync(mapBounds, name, categoryName, tagNames);
+            var establishmentMarker = await establishmentService.GetEstablishmentMarkersWithFilterInAreaAsync(mapBounds, name, categoryName, tagNamesList);
             if (establishmentMarker == null)
             {
                 return NotFound(new { message = "No markers found for the specified location" });
@@ -172,6 +176,12 @@ public class EstablishmentController(IEstablishmentService establishmentService,
             logger.LogError(e, "Error getting establishments in area");
             throw;
         }
+    }
+    
+    [HttpGet("register-count/between-dates")]
+    public Task<IActionResult> GetEstablishmentRegisterCountBetweenDatesAsync(string dateFromTo)
+    {
+        throw new NotImplementedException();
     }
     
     /// <summary>
@@ -277,12 +287,4 @@ public class EstablishmentController(IEstablishmentService establishmentService,
             throw;
         }
     }
-    
-    [Authorize(Roles = "Admin")]
-    [HttpGet("time-created")]
-    public async Task<IActionResult> GetAllEstablishmentsTimeCreatedAsync()
-    {
-        throw new NotImplementedException();
-    }
-    
 }

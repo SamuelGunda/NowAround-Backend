@@ -30,7 +30,6 @@ builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Logging.AddLogging();
 
-
 var app = builder.Build();
 
 app.UseExceptionHandler();
