@@ -46,3 +46,10 @@ jobs:
           --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
           --plan "${{ secrets.AZURE_APPSERVICE_PLAN }}" \
           --runtime "${{ secrets.AZURE_WEBAPP_RUNTIME }}"
+
+      # Create the Azure App Configuration (if it doesn't exist)
+      - name: 'Create Azure App Configuration'
+        run: |
+          az appconfig create --name ${{ secrets.AZURE_APPCONFIG_NAME }} \
+          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --location ${{ secrets.AZURE_LOCATION }}
