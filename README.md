@@ -93,7 +93,7 @@ To run the back-end locally, ensure you have:
       
       Include your Auth0 Api url.
       
-      ####Click bellow to expand JS Script 
+      Click bellow to expand JS Script 
       <details>
         <summary></b>JS Script</summary>
         
