@@ -107,7 +107,7 @@ To run the back-end locally, ensure you have:
       
       </details>
      
-   3. **Back-end Connection**: Add this script into Post-User-Register.
+   2. **Back-end Connection**: Add this script into Post-User-Register.
 
       After user registers on auth0 send call to back-end in order to save his ID.
       Adds true check to app_metada on success.
@@ -168,7 +168,7 @@ To run the back-end locally, ensure you have:
       
       </details>
       
-   4. **Check Back-end Existance**: Add this script into Post-Login.
+   3. **Check Back-end Existance**: Add this script into Post-Login.
       
       Checks if user exist within our database by checking his app_metadata,
       if he does not exist and is not establishment or admin use previous script.
@@ -178,7 +178,7 @@ To run the back-end locally, ensure you have:
   
       Include your deployed back-end url.
   
-      ####Click bellow to expand JS Script
+      Click bellow to expand JS Script
       <details>
         <summary>JS Script</summary>
         
@@ -233,7 +233,7 @@ To run the back-end locally, ensure you have:
 ### Deployment
 
 The back-end is deployed on Azure with configured CI/CD pipelines.
-Your free to choose deployment of your own, although be aware that this repo is meant for Azure Deployment.
+You are free to choose deployment of your own, although be aware that this repo is meant for Azure Deployment.
 
 ### Documentation
 
