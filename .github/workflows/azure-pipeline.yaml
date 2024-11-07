@@ -50,10 +50,20 @@ jobs:
   create-app-configuration:
     runs-on: ubuntu-latest
     steps:
+      # Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      # Login to Azure using the service principal credentials stored in GitHub Secrets
+      - name: 'Login to Azure'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       # Create the Azure App Configuration (if it doesn't exist)
       - name: 'Create Azure App Configuration'
         run: |
           az appconfig create --name ${{ secrets.AZURE_APPCONFIG_NAME }} \
           --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-          --location ${{ secrets.AZURE_LOCATION }}
+          --location ${{ secrets.AZURE_LOCATION }} \
           --sku Free
