@@ -1,10 +1,10 @@
-name: Create Azure Web App
+name: Create Azure Resources
 
 on:
   workflow_dispatch:
 
 jobs:
-  create-and-deploy:
+  create-azure-web-app:
     runs-on: ubuntu-latest
     steps:
       # Checkout the code from the repository
@@ -47,6 +47,9 @@ jobs:
           --plan "${{ secrets.AZURE_APPSERVICE_PLAN }}" \
           --runtime "${{ secrets.AZURE_WEBAPP_RUNTIME }}"
 
+  create-app-configuration:
+    runs-on: ubuntu-latest
+    steps:
       # Create the Azure App Configuration (if it doesn't exist)
       - name: 'Create Azure App Configuration'
         run: |
