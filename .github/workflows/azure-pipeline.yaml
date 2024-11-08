@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  create-azure-web-app:
+  Create_azure_web_app:
     runs-on: ubuntu-latest
     steps:
       # Checkout the code from the repository
@@ -47,7 +47,7 @@ jobs:
           --plan "${{ secrets.AZURE_APPSERVICE_PLAN }}" \
           --runtime "${{ secrets.AZURE_WEBAPP_RUNTIME }}"
 
-  create-app-configuration:
+  Create_app_configuration_and_add_secrets:
     runs-on: ubuntu-latest
     steps:
       # Checkout the code from the repository
