@@ -87,3 +87,47 @@ jobs:
           --key "Auth0:Domain" \
           --value "${{ secrets.AUTH0_DOMAIN }}" \
           --yes
+
+  Create_sql_server_and_database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: 'Login to Azure'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: 'Create Azure SQL Server'
+        run: |
+            az sql server create \
+            --name ${{ secrets.AZURE_SERVER_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --location ${{ secrets.AZURE_LOCATION }} \
+            --admin-user ${{ secrets.AZURE_DATABASE_ADMIN }} \
+            --admin-password ${{ secrets.AZURE_DATABASE_PASSWORD }} \
+            --enable-public-network true
+      
+      - name: 'Create firewall rules'
+        run: |
+              az sql server firewall-rule create \
+              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+              --server ${{ secrets.AZURE_SERVER_NAME }} \
+              --name "AllowAzureIPs" \
+              --start-ip-address "0.0.0.0" \
+              --end-ip-address "255.255.255.255"
+
+      - name: 'Create Azure SQL Database'
+        run: |
+          az sql db create \
+            --name ${{ secrets.AZURE_SQL_DATABASE_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --server ${{ secrets.AZURE_SERVER_NAME }} \
+            --tier GeneralPurpose \
+            --family Gen5 \
+            --capacity 2 \
+            --compute-model Serverless \
+            --max-size 32GB \
+            --auto-pause-delay 60 \
+            --use-free-limit true
