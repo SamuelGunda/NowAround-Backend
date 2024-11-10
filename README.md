@@ -109,8 +109,7 @@ To run the back-end locally, ensure you have:
       
    2. **Check Back-end Existance**: Add this script into Post-Login.
       
-      Checks if user exist within our database by checking his app_metadata,
-      if he does not exist and is not establishment or admin use previous script.
+      Checks if user exist within database by checking his app_metadata,
 
       Store the M2MSecretKey within this function secrets.
       Add Axios dependency.
