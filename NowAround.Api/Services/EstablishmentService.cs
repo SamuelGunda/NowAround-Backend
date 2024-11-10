@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using System.Runtime.InteropServices.JavaScript;
+using Microsoft.IdentityModel.Tokens;
 using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Auth0.Models.Requests;
@@ -49,7 +50,7 @@ public class EstablishmentService : IEstablishmentService
     /// If database operation fails, the establishment account gets deleted from Auth0.
     /// </summary>
     /// <param name="request"> The establishment register request </param>
-    /// <returns> ID of the newly created establishment </returns>
+    /// <returns> A task that represents the asynchronous operation </returns>
     /// <exception cref="EstablishmentAlreadyExistsException"> If establishment with the same name already exists </exception>
     /// <exception cref="InvalidCategoryException"> If no categories are found </exception>
     /// <exception cref="Exception"> If establishment creation in the database fails </exception>
@@ -194,6 +195,18 @@ public class EstablishmentService : IEstablishmentService
         
         return establishments?.Select(e => e.ToMarker()).ToList();
     }
+
+    /// <summary>
+    /// Gets the count of establishments created within a specified date range.
+    /// </summary>
+    /// <param name="monthStart"> The start date of the month </param>
+    /// <param name="monthEnd"> The end date of the month </param>
+    /// <returns> The count of establishments created within the specified date range </returns>
+    public async Task<int> GetEstablishmentsCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd)
+    {
+        return await _establishmentRepository.GetEstablishmentsCountByCreatedAtBetweenDatesAsync(monthStart, monthEnd);
+    }
+
 
     /// <summary>
     /// Updates an establishment.

@@ -1,4 +1,5 @@
-﻿using NowAround.Api.Database;
+﻿using Microsoft.EntityFrameworkCore;
+using NowAround.Api.Database;
 using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
 
@@ -34,6 +35,28 @@ public class UserRepository : IUserRepository
         {
             _logger.LogError(e, "Failed to create user");
             throw new Exception("Failed to create user", e);
+        }
+    }
+
+    /// <summary>
+    /// Gets the count of users created between the specified start and end dates.
+    /// </summary>
+    /// <param name="startDate">The start date of the range.</param>
+    /// <param name="endDate">The end date of the range.</param>
+    /// <returns>The count of users created between the specified dates.</returns>
+    /// <exception cref="Exception">Thrown when there is an error retrieving the count of users.</exception>
+    public async Task<int> GetUsersCountByCreatedAtBetweenDatesAsync(DateTime startDate, DateTime endDate)
+    {
+        try
+        {
+            return await _context.Users
+                .Where(u => u.CreatedAt >= startDate && u.CreatedAt <= endDate)
+                .CountAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get users count");
+            throw new Exception("Failed to get users count", e);
         }
     }
 }

@@ -20,6 +20,7 @@ public class HealthCheckController : ControllerBase
         return Ok("Secure");
     }
     
+    /*
     [HttpGet("establishment")]
     [Authorize(Roles = "Establishment")]
     public Task<IActionResult> EstablishmentAuthorization()
@@ -40,4 +41,6 @@ public class HealthCheckController : ControllerBase
     {
         return Task.FromResult<IActionResult>(Ok("Hello Admin"));
     }
+    */
+    
 }

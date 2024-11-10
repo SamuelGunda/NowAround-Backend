@@ -4,5 +4,5 @@ namespace NowAround.Api.Interfaces.Repositories;
 
 public interface ITagRepository
 {
-    Task<Tag> GetTagByNameAsync(string name);
+    Task<Tag?> GetTagByNameAsync(string name);
 }

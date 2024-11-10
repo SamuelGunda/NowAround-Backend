@@ -58,7 +58,7 @@ public class Auth0Service : IAuth0Service
             connection = "Username-Password-Authentication",
             app_metadata = new
             {
-                type = "establishment"
+                registeredInApi = true
             }
         };
         

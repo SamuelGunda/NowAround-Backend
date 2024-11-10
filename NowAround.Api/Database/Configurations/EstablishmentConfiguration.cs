@@ -11,6 +11,8 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
     {
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Auth0Id).IsRequired();
+        builder.HasIndex(e => e.Auth0Id).IsUnique();
+        
         builder.Property(e => e.Name).IsRequired();
         builder.Property(e => e.Description);
         builder.Property(e => e.Address).IsRequired();
@@ -18,6 +20,8 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
         builder.Property(e => e.Latitude).IsRequired();
         builder.Property(e => e.Longitude).IsRequired();
         builder.Property(e => e.PriceCategory).IsRequired();
+        builder.Property(e => e.CreatedAt).IsRequired();
+        builder.Property(e => e.UpdatedAt).IsRequired();
         
         builder.HasMany(e => e.EstablishmentCategories)
             .WithOne(ec => ec.Establishment)

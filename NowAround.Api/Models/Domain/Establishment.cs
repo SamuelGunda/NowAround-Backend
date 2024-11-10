@@ -26,6 +26,9 @@ public class Establishment
     public required PriceCategory PriceCategory { get; set; }
     public RequestStatus RequestStatus { get; set; }
     
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime UpdatedAt { get; set; } = DateTime.Now;
+    
     public virtual ICollection<SocialLink> SocialLinks { get; set; } = new List<SocialLink>();
     public virtual ICollection<EstablishmentCategory> EstablishmentCategories { get; set; } = new List<EstablishmentCategory>();
     public virtual ICollection<EstablishmentTag> EstablishmentTags { get; set; } = new List<EstablishmentTag>();

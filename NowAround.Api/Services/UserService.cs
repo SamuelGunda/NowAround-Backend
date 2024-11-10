@@ -11,6 +11,7 @@ namespace NowAround.Api.Services;
 
 public class UserService : IUserService
 {
+    
     private readonly ILogger<UserService> _logger;
     private readonly IUserRepository _userRepository;
     private readonly IAuth0Service _auth0Service;
@@ -25,7 +26,7 @@ public class UserService : IUserService
     /// Assign user to azure database and assign user role.
     /// </summary>
     /// <param name="auth0Id"> The Auth0 ID of the user to be created </param>
-    /// <returns> A task that represents the asynchronous operation /returns>
+    /// <returns> A task that represents the asynchronous operation </returns>
     /// <exception cref="Exception"> Thrown when the user creation or role assignment fails </exception>
     public async Task CreateUserAsync(string auth0Id)
     {
@@ -41,5 +42,10 @@ public class UserService : IUserService
             _logger.LogError(e, "Failed to create user");
             throw new Exception("Failed to create user", e);
         }
+    }
+
+    public async Task<int> GetUsersCountCreatedInMonthAsync(DateTime startDate, DateTime endDate)
+    {
+        return await _userRepository.GetUsersCountByCreatedAtBetweenDatesAsync(startDate, endDate);
     }
 }

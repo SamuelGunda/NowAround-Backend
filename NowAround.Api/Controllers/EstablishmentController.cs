@@ -14,8 +14,17 @@ namespace NowAround.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class EstablishmentController(IEstablishmentService establishmentService, ILogger<EstablishmentController> logger) : ControllerBase
+public class EstablishmentController : ControllerBase
 {
+    
+    private readonly ILogger<EstablishmentController> _logger;
+    private readonly IEstablishmentService _establishmentService;
+    
+    public EstablishmentController(IEstablishmentService establishmentService, ILogger<EstablishmentController> logger)
+    {
+        _logger = logger;
+        _establishmentService = establishmentService;
+    }
     
     /// <summary>
     /// Creates a new establishment. The establishment must be approved by an admin before it is visible to users.
@@ -30,12 +39,12 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     {
         try
         {
-            await establishmentService.RegisterEstablishmentAsync(establishment);
+            await _establishmentService.RegisterEstablishmentAsync(establishment);
             return StatusCode(201);
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error creating establishment");
+            _logger.LogError(e, "Error creating establishment");
             throw;
         }
     }
@@ -54,13 +63,13 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     {
         try
         {
-            EstablishmentResponse establishment = await establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
+            EstablishmentResponse establishment = await _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
             
             return Ok(establishment);
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error getting establishment");
+            _logger.LogError(e, "Error getting establishment");
             throw;
         }
     }
@@ -80,12 +89,12 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     {
         try
         {
-            var establishments = await establishmentService.GetPendingEstablishmentsAsync();
+            var establishments = await _establishmentService.GetPendingEstablishmentsAsync();
             return Ok(establishments);
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error getting pending establishments");
+            _logger.LogError(e, "Error getting pending establishments");
             throw;
         }
     }
@@ -112,7 +121,7 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         
         try
         {
-            var establishmentMarker = await establishmentService.GetEstablishmentMarkersWithFilterAsync(name, categoryName, tagNamesList);
+            var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterAsync(name, categoryName, tagNamesList);
             if (establishmentMarker == null)
             {
                 return NotFound(new { message = "No establishments with these criteria were found" });
@@ -121,7 +130,7 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error getting establishments in area");
+            _logger.LogError(e, "Error getting establishments in area");
             throw;
         }
     }
@@ -164,7 +173,7 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         
         try
         {
-            var establishmentMarker = await establishmentService.GetEstablishmentMarkersWithFilterInAreaAsync(mapBounds, name, categoryName, tagNamesList);
+            var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterInAreaAsync(mapBounds, name, categoryName, tagNamesList);
             if (establishmentMarker == null)
             {
                 return NotFound(new { message = "No markers found for the specified location" });
@@ -173,15 +182,9 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error getting establishments in area");
+            _logger.LogError(e, "Error getting establishments in area");
             throw;
         }
-    }
-    
-    [HttpGet("register-count/between-dates")]
-    public Task<IActionResult> GetEstablishmentRegisterCountBetweenDatesAsync(string dateFromTo)
-    {
-        throw new NotImplementedException();
     }
     
     /// <summary>
@@ -202,7 +205,7 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         {
             if (AuthorizationHelper.HasAdminOrMatchingEstablishmentId(User, establishmentUpdateRequest.Auth0Id))
             {
-                await establishmentService.UpdateEstablishmentAsync(establishmentUpdateRequest);
+                await _establishmentService.UpdateEstablishmentAsync(establishmentUpdateRequest);
                 return Ok();
             }
 
@@ -210,7 +213,7 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error updating establishment");
+            _logger.LogError(e, "Error updating establishment");
             throw;
         }
     }
@@ -231,16 +234,16 @@ public class EstablishmentController(IEstablishmentService establishmentService,
     [HttpPut("register-status")]
     public async Task<IActionResult> UpdateEstablishmentRegisterRequestAsync(string auth0Id, string action)
     {
-        Console.WriteLine("Action");
+        //TODO: redo this
         try
         {
             if (action.Equals("accept", StringComparison.OrdinalIgnoreCase))
             {
-                await establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, RequestStatus.Accepted);
+                await _establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, RequestStatus.Accepted);
             }
             else if (action.Equals("reject", StringComparison.OrdinalIgnoreCase))
             {
-                await establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, RequestStatus.Rejected);
+                await _establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, RequestStatus.Rejected);
             }
             else
             {
@@ -252,7 +255,7 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error accepting establishment");
+            _logger.LogError(e, "Error accepting establishment");
             throw;
         }
     }
@@ -275,7 +278,7 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         {
             if (AuthorizationHelper.HasAdminOrMatchingEstablishmentId(User, auth0Id))
             {
-                await establishmentService.DeleteEstablishmentAsync(auth0Id);
+                await _establishmentService.DeleteEstablishmentAsync(auth0Id);
                 return Ok();
             }
 
@@ -283,7 +286,7 @@ public class EstablishmentController(IEstablishmentService establishmentService,
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error deleting establishment");
+            _logger.LogError(e, "Error deleting establishment");
             throw;
         }
     }

@@ -15,6 +15,7 @@ public interface IEstablishmentRepository
         double nwLat, double nwLong, double seLat, double seLong,
         string? name, string? categoryName, List<string>? tagNames
     );
+    Task<int> GetEstablishmentsCountByCreatedAtBetweenDatesAsync(DateTime startDate, DateTime endDate);
     Task<bool> UpdateEstablishmentByAuth0IdAsync(string auth0Id, EstablishmentDto establishmentDto);
     Task<bool> DeleteEstablishmentByAuth0IdAsync(string auth0Id);
 }

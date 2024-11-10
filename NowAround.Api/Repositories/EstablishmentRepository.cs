@@ -221,6 +221,27 @@ public class EstablishmentRepository : IEstablishmentRepository
     }
     
     /// <summary>
+    /// Gets the count of establishments created between the specified start and end dates.
+    /// </summary>
+    /// <param name="startDate"> The start date of the range </param>
+    /// <param name="endDate"> The end date of the range </param>
+    /// <returns> The count of establishments created between the specified dates </returns>
+    /// <exception cref="Exception"> Thrown when there is an error retrieving the count of establishments </exception>
+    public async Task<int> GetEstablishmentsCountByCreatedAtBetweenDatesAsync(DateTime startDate, DateTime endDate)
+    {
+        try
+        {
+            return await _context.Establishments
+                .CountAsync(e => e.CreatedAt >= startDate && e.CreatedAt <= endDate);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Failed to get establishments count by created at between dates: {Message}", e.Message);
+            throw new Exception("Failed to get establishments count by created at between dates", e);
+        }
+    }
+
+    /// <summary>
     /// Updates an establishment.
     /// Categories and tags are being updated separately.
     /// </summary>
@@ -275,6 +296,8 @@ public class EstablishmentRepository : IEstablishmentRepository
                     .ForEachAsync(et => _context.EstablishmentTags.Remove(et));
                 establishment.EstablishmentTags = establishmentDto.EstablishmentTags;
             }
+            
+            establishment.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
             return true;
