@@ -14,8 +14,8 @@ public interface IEstablishmentService
     Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id);
     Task<EstablishmentResponse> GetEstablishmentByAuth0IdAsync(string auth0Id);
     Task<List<PendingEstablishmentResponse>?> GetPendingEstablishmentsAsync();
-    Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterAsync(string? name, string? categoryName, List<string>? tagNames);
-    Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterInAreaAsync(MapBounds mapBounds, string? name, string? categoryName, List<string>? tagNames);
+    Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterAsync(string? name, int? priceCategory, string? categoryName, List<string>? tagNames);
+    Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterInAreaAsync(MapBounds mapBounds, string? name, int? priceCategory, string? categoryName, List<string>? tagNames);
     Task<int> GetEstablishmentsCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd);
     Task UpdateEstablishmentAsync(EstablishmentUpdateRequest request);
     Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus);

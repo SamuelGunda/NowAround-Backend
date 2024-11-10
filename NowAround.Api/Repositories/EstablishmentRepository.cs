@@ -155,13 +155,13 @@ public class EstablishmentRepository : IEstablishmentRepository
     /// <param name="tagNames"> List of tag names </param>
     /// <returns> List of establishments or null </returns>
     /// <exception cref="InvalidOperationException"> Failed to get establishments by filter </exception>
-    public async Task<List<Establishment>?> GetEstablishmentsWithFilterAsync(string? name, string? categoryName, List<string>? tagNames)
+    public async Task<List<Establishment>?> GetEstablishmentsWithFilterAsync(string? name, int? priceCategory, string? categoryName, List<string>? tagNames)
     {
         try
         {
             var query = _context.Establishments.AsQueryable();
             
-            query = EstablishmentFilterQueryBuilder.ApplyFilters(query, name, categoryName, tagNames);
+            query = EstablishmentFilterQueryBuilder.ApplyFilters(query, name, priceCategory, categoryName, tagNames);
             
             var establishments = await query.ToListAsync();
             
@@ -193,7 +193,10 @@ public class EstablishmentRepository : IEstablishmentRepository
     /// <param name="tagNames"> List of tag names </param>
     /// <returns> List of establishments or null </returns>
     /// <exception cref="Exception"> Failed to get establishments by area </exception>
-    public async Task<List<Establishment>?> GetEstablishmentsWithFilterInAreaAsync(double nwLat, double nwLong, double seLat, double seLong, string? name, string? categoryName, List<string>? tagNames)
+    public async Task<List<Establishment>?> GetEstablishmentsWithFilterInAreaAsync(
+        double nwLat, double nwLong,
+        double seLat, double seLong, 
+        string? name, int? priceCategory, string? categoryName, List<string>? tagNames)
     {
         try
         {
@@ -201,7 +204,7 @@ public class EstablishmentRepository : IEstablishmentRepository
                 .Where(e => e.Latitude <= nwLat && e.Latitude >= seLat)
                 .Where(e => e.Longitude >= nwLong && e.Longitude <= seLong);
             
-            query = EstablishmentFilterQueryBuilder.ApplyFilters(query, name, categoryName, tagNames);
+            query = EstablishmentFilterQueryBuilder.ApplyFilters(query, name, priceCategory, categoryName, tagNames);
             
             var establishments = await query.ToListAsync();
             

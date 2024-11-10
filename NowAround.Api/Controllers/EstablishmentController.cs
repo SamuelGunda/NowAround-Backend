@@ -112,16 +112,16 @@ public class EstablishmentController : ControllerBase
     /// <response code="404"> No establishments with these criteria were found </response>
     /// <response code="500"> An error occurred while retrieving the establishments </response>
     [HttpGet("search")]
-    public async Task<IActionResult> GetEstablishmentMarkersWithFilterAsync(string? name, string? categoryName, string? tagNames)
+    public async Task<IActionResult> GetEstablishmentMarkersWithFilterAsync(string? name, int? priceCategory, string? categoryName, string? tagNames)
     {
         
         var tagNamesList = tagNames?.Split(',').ToList();
         
-        SearchValidator.ValidateFilterValues(name, categoryName, tagNamesList, true);
+        SearchValidator.ValidateFilterValues(name, priceCategory, categoryName, tagNamesList, true);
         
         try
         {
-            var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterAsync(name, categoryName, tagNamesList);
+            var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterAsync(name, priceCategory, categoryName, tagNamesList);
             if (establishmentMarker == null)
             {
                 return NotFound(new { message = "No establishments with these criteria were found" });
@@ -145,6 +145,7 @@ public class EstablishmentController : ControllerBase
     /// <param name="southEastLat"></param>
     /// <param name="southEastLong"></param>
     /// <param name="name"> The name of the establishment to filter by </param>
+    /// <param name="priceCategory"> The price category of the establishment to filter by </param>
     /// <param name="categoryName"> The category name of the establishment to filter by </param>
     /// <param name="tagNames"> The list of tag names to filter by </param>
     /// <returns> An IActionResult containing list of establishment markers if found, or a 404 status code if not found </returns>
@@ -155,12 +156,12 @@ public class EstablishmentController : ControllerBase
     public async Task<IActionResult> GetEstablishmentMarkersWithFilterInAreaAsync(
         double northWestLat, double northWestLong, 
         double southEastLat, double southEastLong, 
-        string? name, string? categoryName, string? tagNames)
+        string? name, int? priceCategory, string? categoryName, string? tagNames)
     {
         
         var tagNamesList = tagNames?.Split(',').ToList();
      
-        SearchValidator.ValidateFilterValues(name, categoryName, tagNamesList, false);
+        SearchValidator.ValidateFilterValues(name, priceCategory, categoryName, tagNamesList, false);
         SearchValidator.ValidateMapBounds(northWestLat, northWestLong, southEastLat, southEastLong);
         
         var mapBounds = new MapBounds
@@ -173,7 +174,7 @@ public class EstablishmentController : ControllerBase
         
         try
         {
-            var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterInAreaAsync(mapBounds, name, categoryName, tagNamesList);
+            var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterInAreaAsync(mapBounds, name, priceCategory, categoryName, tagNamesList);
             if (establishmentMarker == null)
             {
                 return NotFound(new { message = "No markers found for the specified location" });

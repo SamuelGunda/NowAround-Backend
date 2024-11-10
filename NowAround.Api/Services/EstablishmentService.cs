@@ -169,9 +169,9 @@ public class EstablishmentService : IEstablishmentService
     /// <param name="categoryName"> The category name to be set </param>
     /// <param name="tagNames"> The list of tag names to be set </param>
     /// <returns> List of establishment markers </returns>
-    public async Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterAsync(string? name, string? categoryName, List<string>? tagNames)
+    public async Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterAsync(string? name, int? priceCategory, string? categoryName, List<string>? tagNames)
     {
-        var establishments = await _establishmentRepository.GetEstablishmentsWithFilterAsync(name, categoryName, tagNames);
+        var establishments = await _establishmentRepository.GetEstablishmentsWithFilterAsync(name, priceCategory, categoryName, tagNames);
         
         return establishments?.Select(e => e.ToMarker()).ToList();
     }
@@ -185,13 +185,13 @@ public class EstablishmentService : IEstablishmentService
     /// <param name="tagNames"> The list of tag names to be set </param>
     /// <returns> List of establishment markers </returns>
     public async Task<List<EstablishmentResponse>?> GetEstablishmentMarkersWithFilterInAreaAsync(
-        MapBounds mapBounds, string? name, string? categoryName, List<string>? tagNames)
+        MapBounds mapBounds, string? name, int? priceCategory, string? categoryName, List<string>? tagNames)
     {
         
         var establishments = await _establishmentRepository.GetEstablishmentsWithFilterInAreaAsync(
             mapBounds.NwLat, mapBounds.NwLong,
             mapBounds.SeLat, mapBounds.SeLong,
-            name, categoryName, tagNames);
+            name, priceCategory, categoryName, tagNames);
         
         return establishments?.Select(e => e.ToMarker()).ToList();
     }
@@ -206,8 +206,7 @@ public class EstablishmentService : IEstablishmentService
     {
         return await _establishmentRepository.GetEstablishmentsCountByCreatedAtBetweenDatesAsync(monthStart, monthEnd);
     }
-
-
+    
     /// <summary>
     /// Updates an establishment.
     /// </summary>

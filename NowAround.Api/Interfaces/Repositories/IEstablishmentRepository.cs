@@ -10,10 +10,10 @@ public interface IEstablishmentRepository
     Task<Establishment?> GetEstablishmentByIdAsync(int id);
     Task<Establishment?> GetEstablishmentByAuth0IdAsync(string auth0Id);
     Task<List<Establishment>?> GetEstablishmentsWithPendingRegisterStatusAsync();
-    Task<List<Establishment>?> GetEstablishmentsWithFilterAsync(string? name, string? categoryName, List<string>? tagNames);
+    Task<List<Establishment>?> GetEstablishmentsWithFilterAsync(string? name, int? priceCategory, string? categoryName, List<string>? tagNames);
     Task<List<Establishment>?> GetEstablishmentsWithFilterInAreaAsync(
         double nwLat, double nwLong, double seLat, double seLong,
-        string? name, string? categoryName, List<string>? tagNames
+        string? name, int? priceCategory, string? categoryName, List<string>? tagNames
     );
     Task<int> GetEstablishmentsCountByCreatedAtBetweenDatesAsync(DateTime startDate, DateTime endDate);
     Task<bool> UpdateEstablishmentByAuth0IdAsync(string auth0Id, EstablishmentDto establishmentDto);

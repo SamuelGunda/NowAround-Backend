@@ -1,19 +1,25 @@
 ﻿using NowAround.Api.Exceptions;
+using NowAround.Api.Models.Enum;
 
 namespace NowAround.Api.Utilities;
 
 public static class SearchValidator
 {
-    public static void ValidateFilterValues(string? name, string? categoryName, List<string>? tagNames, bool required)
+    public static void ValidateFilterValues(string? name, int? priceCategory, string? categoryName, List<string>? tagNames, bool required)
     {
-        if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(categoryName) && (tagNames == null || tagNames.Count == 0) && required)
+        if (priceCategory.HasValue && !Enum.IsDefined(typeof(PriceCategory), priceCategory.Value))
         {
-            throw new ArgumentException("At least one filter value must be provided");
+            throw new ArgumentException("Invalid price category");
         }
         
         if (!string.IsNullOrEmpty(name) && name.Length < 3)
         {
             throw new ArgumentException("Name is too short");
+        }
+        
+        if (string.IsNullOrEmpty(name) && !priceCategory.HasValue && string.IsNullOrEmpty(categoryName) && (tagNames == null || tagNames.Count == 0) && required)
+        {
+            throw new ArgumentException("At least one filter value must be provided");
         }
     }
     

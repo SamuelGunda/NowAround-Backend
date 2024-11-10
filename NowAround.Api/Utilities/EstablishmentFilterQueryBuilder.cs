@@ -1,4 +1,5 @@
 ﻿using NowAround.Api.Models.Domain;
+using NowAround.Api.Models.Enum;
 
 namespace NowAround.Api.Utilities;
 
@@ -6,7 +7,8 @@ public static class EstablishmentFilterQueryBuilder
 {
     public static IQueryable<Establishment> ApplyFilters(
         IQueryable<Establishment> query, 
-        string? name, 
+        string? name,
+        int? priceCategory,
         string? categoryName, 
         List<string>? tagNames)
     {
@@ -14,7 +16,12 @@ public static class EstablishmentFilterQueryBuilder
         {
             query = query.Where(e => e.Name.Contains(name));
         }
-
+        
+        if (priceCategory.HasValue)
+        {
+            query = query.Where(e => e.PriceCategory == (PriceCategory) priceCategory);
+        }
+        
         if (!string.IsNullOrEmpty(categoryName))
         {
             query = query.Where(e => e.EstablishmentCategories.Any(ec => ec.Category.Name == categoryName));
