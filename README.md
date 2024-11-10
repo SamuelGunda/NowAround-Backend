@@ -106,69 +106,8 @@ To run the back-end locally, ensure you have:
           }
       
       </details>
-     
-   2. **Back-end Connection**: Add this script into Post-User-Register.
-
-      After user registers on auth0 send call to back-end in order to save his ID.
-      Adds true check to app_metada on success.
-
-      Store the M2MSecretKey, Domain, ClientId and ClientSecret within this functions secrets.
-      Add Axios dependency.
-  
-      Include your deployed back-end url.
-  
-      Click bellow to expand JS Script
-      <details>
-        <summary>JS Script</summary>
-        
-          exports.onExecutePostUserRegistration = async (event, api) => {
-            const axios = require('axios');
-          
-            const token = event.secrets.M2M_SECRET_KEY;
-          
-            const userId = event.user.user_id;
-            if (event.user.app_metadata.role !== "Establishment" && 
-            event.user.app_metadata.role !== "Admin")
-            {
-              const backendUrl = "https://{your-back-end-url}/api/User?auth0Id=" + userId;
-          
-              let attempts = 0;
-              const maxAttempts = 3;
-          
-              const registerUser = async () => {
-                try {
-          
-                  const response = await axios.post(backendUrl, {}, {
-                      headers: {
-                          'Auth0-Server-Token': token
-                      }
-                  });
-                  
-                  const ManagementClient = require('auth0').ManagementClient;
-          
-                  var management = new ManagementClient({
-                    domain: event.secrets.domain,
-                    clientId: event.secrets.clientId,
-                    clientSecret: event.secrets.clientSecret,
-                  });
-          
-                  await management.updateAppMetadata({id: event.user.user_id }, { registeredInApi: true});
-                } catch (error) {
-                  attempts++;
-                  if (attempts < maxAttempts) {
-                    await registerUser();
-                  } else {
-                    console.error('Failed to create user after multiple attempts', error);
-                  }    
-                }
-              }
-              await registerUser();
-            }
-          };
       
-      </details>
-      
-   3. **Check Back-end Existance**: Add this script into Post-Login.
+   2. **Check Back-end Existance**: Add this script into Post-Login.
       
       Checks if user exist within our database by checking his app_metadata,
       if he does not exist and is not establishment or admin use previous script.
@@ -188,9 +127,7 @@ To run the back-end locally, ensure you have:
             const serverAuthToken = event.secrets.M2M_SECRET_KEY;
           
             const userId = event.user.user_id;
-            if (event.user.app_metadata.registeredInApi !== true && 
-            event.user.app_metadata.role !== "Establishment" && 
-            event.user.app_metadata.role !== "Admin")
+            if (event.user.app_metadata.registeredInApi !== true)
             {
               const backendUrl = "https://{your-back-end-url}/api/User?auth0Id=" + userId;
           
