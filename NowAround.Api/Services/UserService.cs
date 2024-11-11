@@ -44,6 +44,12 @@ public class UserService : IUserService
         }
     }
 
+    /// <summary>
+    /// Retrieves the count of users created within a specified date range.
+    /// </summary>
+    /// <param name="startDate"> The start date of the date range </param>
+    /// <param name="endDate"> The end date of the date range </param>
+    /// <returns> The task result contains the count of users created within the specified date range </returns>
     public async Task<int> GetUsersCountCreatedInMonthAsync(DateTime startDate, DateTime endDate)
     {
         return await _userRepository.GetUsersCountByCreatedAtBetweenDatesAsync(startDate, endDate);

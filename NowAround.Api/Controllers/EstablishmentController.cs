@@ -105,6 +105,7 @@ public class EstablishmentController : ControllerBase
     /// RETURNS ONLY APPROVED ESTABLISHMENTS.
     /// </summary>
     /// <param name="name"> The name of the establishment to filter by </param>
+    /// <param name="priceCategory"> The price category of the establishment to filter by </param>
     /// <param name="categoryName"> The category name of the establishment to filter by </param>
     /// <param name="tagNames"> The list of tag names to filter by </param>
     /// <returns> An IActionResult containing a list of establishment markers if found, or a 404 status code if not found </returns>

@@ -166,6 +166,7 @@ public class EstablishmentService : IEstablishmentService
     /// Gets a list of establishment markers with applied filter.
     /// </summary>
     /// <param name="name"> The name to be set </param>
+    /// <param name="priceCategory"> The price category to be set </param>
     /// <param name="categoryName"> The category name to be set </param>
     /// <param name="tagNames"> The list of tag names to be set </param>
     /// <returns> List of establishment markers </returns>
@@ -181,6 +182,7 @@ public class EstablishmentService : IEstablishmentService
     /// </summary>
     /// <param name="mapBounds"> The map bounds to be set </param>
     /// <param name="name"> The name to be set </param>
+    /// <param name="priceCategory"> The price category to be set </param>
     /// <param name="categoryName"> The category name to be set </param>
     /// <param name="tagNames"> The list of tag names to be set </param>
     /// <returns> List of establishment markers </returns>

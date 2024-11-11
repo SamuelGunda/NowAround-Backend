@@ -151,6 +151,7 @@ public class EstablishmentRepository : IEstablishmentRepository
     /// Query is being added if the filter value is not null or empty.
     /// </summary>
     /// <param name="name"> Establishment name </param>
+    /// <param name="priceCategory"> Price category </param>
     /// <param name="categoryName"> Category name </param>
     /// <param name="tagNames"> List of tag names </param>
     /// <returns> List of establishments or null </returns>
@@ -189,6 +190,7 @@ public class EstablishmentRepository : IEstablishmentRepository
     /// <param name="seLat"></param>
     /// <param name="seLong"></param>
     /// <param name="name"> Establishment name </param>
+    /// <param name="priceCategory"> Price category </param>
     /// <param name="categoryName"> Category name </param>
     /// <param name="tagNames"> List of tag names </param>
     /// <returns> List of establishments or null </returns>
