@@ -5,17 +5,18 @@ using NowAround.Api.Models.Domain;
 
 namespace NowAround.Api.Repositories;
 
-public class UserRepository : IUserRepository
+public interface IUserRepository
 {
-    
-    private readonly AppDbContext _context;
-    private readonly ILogger<UserRepository> _logger;
-    
-    public UserRepository(AppDbContext context, ILogger<UserRepository> logger)
+    Task<int> CreateUserAsync(User user);
+    Task<int> GetUsersCountByCreatedAtBetweenDatesAsync(DateTime startDate, DateTime endDate);
+}
+
+public class UserRepository : BaseRepository<User>, IUserRepository
+{
+    public UserRepository(AppDbContext context, ILogger<User> logger) 
+        : base(context, logger)
     {
-        _context = context;
-        _logger = logger;
-    } 
+    }
     
     /// <summary>
     /// Creates a new user in the database.
@@ -25,17 +26,8 @@ public class UserRepository : IUserRepository
     /// <exception cref="Exception">Thrown when database fails.</exception>
     public async Task<int> CreateUserAsync(User user)
     {
-        try
-        {
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-            return user.Id;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to create user");
-            throw new Exception("Failed to create user", e);
-        }
+        await CreateAsync(user);
+        return user.Id;
     }
 
     /// <summary>
@@ -49,13 +41,13 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            return await _context.Users
+            return await DbSet
                 .Where(u => u.CreatedAt >= startDate && u.CreatedAt <= endDate)
                 .CountAsync();
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Failed to get users count");
+            Logger.LogError(e, "Failed to get users count");
             throw new Exception("Failed to get users count", e);
         }
     }

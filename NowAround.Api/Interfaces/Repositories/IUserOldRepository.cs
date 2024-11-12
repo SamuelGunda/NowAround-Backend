@@ -2,7 +2,7 @@
 
 namespace NowAround.Api.Interfaces.Repositories;
 
-public interface IUserRepository
+public interface IUserOldRepository
 {
     Task<int> CreateUserAsync(User user);
     Task<int> GetUsersCountByCreatedAtBetweenDatesAsync(DateTime startDate, DateTime endDate);

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NowAround.Api.Database;
+using NowAround.Api.Models.Entities;
 
 namespace NowAround.Api.Repositories;
 
@@ -7,43 +8,55 @@ public interface IBaseRepository<TEntity> where TEntity : class
 {
     Task<TEntity> GetByIdAsync(int id);
     Task<IEnumerable<TEntity>> GetAllAsync();
-    Task AddAsync(TEntity entity);
+    Task<int> CreateAsync(TEntity entity);
     Task UpdateAsync(TEntity entity);
     Task DeleteAsync(int id);
 }
 
-internal abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
+public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class, IEntity
 {
-    private readonly AppDbContext _context;
-    private readonly DbSet<TEntity> _dbSet;
-    
-    public BaseRepository(AppDbContext context)
+    protected AppDbContext Context { get; }
+    protected DbSet<TEntity> DbSet { get; }
+    protected ILogger<TEntity> Logger { get; }
+
+    protected BaseRepository(AppDbContext context, ILogger<TEntity> logger)
     {
-        _context = context;
-        _dbSet = _context.Set<TEntity>();
+        Context = context;
+        DbSet = Context.Set<TEntity>();
+        Logger = logger;
     }
 
-    public Task<TEntity> GetByIdAsync(int id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TEntity>> GetAllAsync()
+    public async Task<TEntity> GetByIdAsync(int id)
     {
         throw new NotImplementedException();
     }
 
-    public Task AddAsync(TEntity entity)
+    public async Task<IEnumerable<TEntity>> GetAllAsync()
     {
         throw new NotImplementedException();
     }
 
-    public Task UpdateAsync(TEntity entity)
+    public async Task<int> CreateAsync(TEntity entity)
+    {
+        try
+        {
+            await DbSet.AddAsync(entity);
+            await Context.SaveChangesAsync();
+            return entity.Id;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to create entity of type {EntityType}", typeof(TEntity).Name);
+            throw new Exception($"Failed to create entity of type {typeof(TEntity).Name}", e);
+        }
+    }
+
+    public async Task UpdateAsync(TEntity entity)
     {
         throw new NotImplementedException();
     }
 
-    public Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id)
     {
         throw new NotImplementedException();
     }

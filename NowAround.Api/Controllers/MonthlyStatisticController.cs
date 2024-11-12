@@ -29,7 +29,9 @@ public class MonthlyStatisticController : ControllerBase
     /// <response code="200"> Returns the monthly statistics for the specified year </response>
     /// <response code="400"> Returns an error message if the year is invalid </response>
     /// <response code="500"> Returns an error message if an exception occurs </response>
+    /*
     [Authorize(Roles = "Admin")]
+    */
     [HttpGet("{year}")]
     public async Task<IActionResult> GetMonthlyStatisticsByYearAsync(string year)
     {
