@@ -1,11 +1,11 @@
 ﻿namespace NowAround.Api.Models.Entities;
 
-public interface IEntity
+public interface IBaseEntity
 {
     public int Id { get; set; }
 }
 
-public abstract class BaseEntity : IEntity
+public abstract class BaseEntity : IBaseEntity
 {
     public int Id { get; set; }
 }

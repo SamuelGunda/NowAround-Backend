@@ -13,7 +13,7 @@ public interface IBaseRepository<TEntity> where TEntity : class
     Task DeleteAsync(int id);
 }
 
-public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class, IEntity
+public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class, IBaseEntity
 {
     protected AppDbContext Context { get; }
     protected DbSet<TEntity> DbSet { get; }
@@ -42,6 +42,13 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
         {
             await DbSet.AddAsync(entity);
             await Context.SaveChangesAsync();
+
+            if (entity.Id == 0)
+            {
+                Logger.LogError("Failed to create {EntityType}. Id is 0.", typeof(TEntity).Name);
+                throw new Exception($"Failed to create {typeof(TEntity).Name}. Id is 0.");
+            }
+            
             return entity.Id;
         }
         catch (Exception e)

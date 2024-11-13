@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NowAround.Api.Database;
-using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
 
 namespace NowAround.Api.Repositories;
@@ -11,7 +10,7 @@ public interface IUserRepository
     Task<int> GetUsersCountByCreatedAtBetweenDatesAsync(DateTime startDate, DateTime endDate);
 }
 
-public class UserRepository : BaseRepository<User>, IUserRepository
+public class UserRepository : BaseAccountRepository<User>, IUserRepository
 {
     public UserRepository(AppDbContext context, ILogger<User> logger) 
         : base(context, logger)
@@ -42,8 +41,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
         try
         {
             return await DbSet
-                .Where(u => u.CreatedAt >= startDate && u.CreatedAt <= endDate)
-                .CountAsync();
+                .CountAsync(u => u.CreatedAt >= startDate && u.CreatedAt <= endDate);
         }
         catch (Exception e)
         {

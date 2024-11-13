@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NowAround.Api.Interfaces;
+using NowAround.Api.Services;
 
 namespace NowAround.Api.Controllers;
 
