@@ -138,6 +138,7 @@ public class EstablishmentService : IEstablishmentService
         if (establishment == null)
         {
             _logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
+            //TODO: refactor to all accounts
             throw new EstablishmentNotFoundException($"Auth0ID: {auth0Id}");
         }
 

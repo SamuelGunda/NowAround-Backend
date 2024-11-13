@@ -12,6 +12,7 @@ namespace NowAround.Api.Services;
 public interface IUserService
 {
     Task CreateUserAsync(string auth0Id);
+    Task<User?> GetUserAsync(string auth0Id);
     Task<int> GetUsersCountCreatedInMonthAsync(DateTime startDate, DateTime endDate);
 }
 
@@ -40,14 +41,27 @@ public class UserService : IUserService
         
         try
         {
-            await _userRepository.CreateUserAsync(user);
-            await _auth0Service.AssignRoleToAccountAsync(auth0Id, "user");
+            await _userRepository.CreateAsync(user);
+            await _auth0Service.AssignRoleAsync(auth0Id, "user");
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Failed to create user");
             throw new Exception("Failed to create user", e);
         }
+    }
+    
+    public async Task<User?> GetUserAsync(string auth0Id)
+    {
+        var user = await _userRepository.GetByAuth0IdAsync(auth0Id);
+        
+        if (user == null)
+        {
+            _logger.LogWarning("User with Auth0 ID {Auth0Id} not found", auth0Id);
+            throw new Exception("User not found");
+        }
+        
+        return user;
     }
 
     /// <summary>
@@ -58,6 +72,6 @@ public class UserService : IUserService
     /// <returns> The task result contains the count of users created within the specified date range </returns>
     public async Task<int> GetUsersCountCreatedInMonthAsync(DateTime startDate, DateTime endDate)
     {
-        return await _userRepository.GetUsersCountByCreatedAtBetweenDatesAsync(startDate, endDate);
+        return await _userRepository.GetCountByCreatedAtBetweenDatesAsync(startDate, endDate);
     }
 }

@@ -4,7 +4,7 @@ using NowAround.Api.Models.Entities;
 
 namespace NowAround.Api.Repositories;
 
-public interface IBaseRepository<TEntity> where TEntity : class
+public interface IBaseRepository<TEntity> where TEntity : BaseEntity
 {
     Task<TEntity> GetByIdAsync(int id);
     Task<IEnumerable<TEntity>> GetAllAsync();
@@ -13,30 +13,53 @@ public interface IBaseRepository<TEntity> where TEntity : class
     Task DeleteAsync(int id);
 }
 
-public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class, IBaseEntity
+public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
 {
     protected AppDbContext Context { get; }
-    protected DbSet<TEntity> DbSet { get; }
-    protected ILogger<TEntity> Logger { get; }
+    protected DbSet<T> DbSet { get; }
+    protected ILogger<T> Logger { get; }
 
-    protected BaseRepository(AppDbContext context, ILogger<TEntity> logger)
+    protected BaseRepository(AppDbContext context, ILogger<T> logger)
     {
         Context = context;
-        DbSet = Context.Set<TEntity>();
+        DbSet = Context.Set<T>();
         Logger = logger;
     }
 
-    public async Task<TEntity> GetByIdAsync(int id)
+    public async Task<T> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var entity = await DbSet.FindAsync(id);
+            if (entity == null)
+            {
+                Logger.LogError("Failed to get {EntityType} by ID. Entity not found.", typeof(T).Name);
+                throw new Exception($"Failed to get {typeof(T).Name} by ID. Entity not found.");
+            }
+
+            return entity;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to get {EntityType} by ID", typeof(T).Name);
+            throw new Exception($"Failed to get {typeof(T).Name} by ID", e);
+        }
     }
 
-    public async Task<IEnumerable<TEntity>> GetAllAsync()
+    public async Task<IEnumerable<T>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        try
+        {
+            return await DbSet.ToListAsync();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to get all {EntityType}", typeof(T).Name);
+            throw new Exception($"Failed to get all {typeof(T).Name}", e);
+        }
     }
 
-    public async Task<int> CreateAsync(TEntity entity)
+    public async Task<int> CreateAsync(T entity)
     {
         try
         {
@@ -45,26 +68,51 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
 
             if (entity.Id == 0)
             {
-                Logger.LogError("Failed to create {EntityType}. Id is 0.", typeof(TEntity).Name);
-                throw new Exception($"Failed to create {typeof(TEntity).Name}. Id is 0.");
+                Logger.LogError("Failed to create {EntityType}. Id is 0.", typeof(T).Name);
+                throw new Exception($"Failed to create {typeof(T).Name}. Id is 0.");
             }
             
             return entity.Id;
         }
         catch (Exception e)
         {
-            Logger.LogError(e, "Failed to create entity of type {EntityType}", typeof(TEntity).Name);
-            throw new Exception($"Failed to create entity of type {typeof(TEntity).Name}", e);
+            Logger.LogError(e, "Failed to create entity of type {EntityType}", typeof(T).Name);
+            throw new Exception($"Failed to create entity of type {typeof(T).Name}", e);
         }
     }
 
-    public async Task UpdateAsync(TEntity entity)
+    public async Task UpdateAsync(T entity)
     {
-        throw new NotImplementedException();
+        try
+        {
+            DbSet.Update(entity);
+            await Context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to update entity of type {EntityType}", typeof(T).Name);
+            throw new Exception($"Failed to update entity of type {typeof(T).Name}", e);
+        }
     }
 
     public async Task DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var entity = await DbSet.FindAsync(id);
+            if (entity == null)
+            {
+                Logger.LogError("Failed to delete {EntityType} by ID. Entity not found.", typeof(T).Name);
+                throw new Exception($"Failed to delete {typeof(T).Name} by ID. Entity not found.");
+            }
+
+            DbSet.Remove(entity);
+            await Context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to delete {EntityType} by ID", typeof(T).Name);
+            throw new Exception($"Failed to delete {typeof(T).Name} by ID", e);
+        }
     }
 }

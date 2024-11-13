@@ -4,9 +4,8 @@ using NowAround.Api.Models.Domain;
 
 namespace NowAround.Api.Repositories;
 
-public interface IUserRepository
+public interface IUserRepository : IBaseAccountRepository<User>
 {
-    Task<int> CreateUserAsync(User user);
     Task<int> GetUsersCountByCreatedAtBetweenDatesAsync(DateTime startDate, DateTime endDate);
 }
 
@@ -16,18 +15,6 @@ public class UserRepository : BaseAccountRepository<User>, IUserRepository
         : base(context, logger)
     {
     }
-    
-    /// <summary>
-    /// Creates a new user in the database.
-    /// </summary>
-    /// <param name="user">The user entity to be created.</param>
-    /// <returns>The ID of the newly created user.</returns>
-    /// <exception cref="Exception">Thrown when database fails.</exception>
-    public async Task<int> CreateUserAsync(User user)
-    {
-        await CreateAsync(user);
-        return user.Id;
-    }
 
     /// <summary>
     /// Gets the count of users created between the specified start and end dates.
@@ -35,18 +22,8 @@ public class UserRepository : BaseAccountRepository<User>, IUserRepository
     /// <param name="startDate">The start date of the range.</param>
     /// <param name="endDate">The end date of the range.</param>
     /// <returns>The count of users created between the specified dates.</returns>
-    /// <exception cref="Exception">Thrown when there is an error retrieving the count of users.</exception>
     public async Task<int> GetUsersCountByCreatedAtBetweenDatesAsync(DateTime startDate, DateTime endDate)
     {
-        try
-        {
-            return await DbSet
-                .CountAsync(u => u.CreatedAt >= startDate && u.CreatedAt <= endDate);
-        }
-        catch (Exception e)
-        {
-            Logger.LogError(e, "Failed to get users count");
-            throw new Exception("Failed to get users count", e);
-        }
+        return await GetCountByCreatedAtBetweenDatesAsync(startDate, endDate);
     }
 }

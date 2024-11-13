@@ -92,7 +92,7 @@ public class Auth0Service : IAuth0Service
         // Deserialize response to get Auth0 user ID
         var user = JsonConvert.DeserializeObject<User>(responseBody) ?? throw new JsonException("Failed to deserialize Auth0 response");
         
-        await AssignRoleToAccountAsync(user.UserId, "establishment");
+        await AssignRoleAsync(user.UserId, "establishment");
         
         return user.UserId;
     }
@@ -131,20 +131,6 @@ public class Auth0Service : IAuth0Service
         return $"{user.FirstName} {user.LastName}";
     }
 
-    public Task<int> GetRegisteredAccountsCountByMonthAndRoleAsync(DateTime date, string role)
-    {
-        /*const int pageSize = 100;
-        
-        var totalCount = 0;
-        var page = 0;
-        var moreUsers = true;
-        
-        using var request = new HttpRequestMessage(HttpMethod.Get, $"https://{_domain}/api/v2/users?q=created_at:[]");*/
-        throw new NotImplementedException();
-        
-    }
-
-
     /// <summary>
     /// Deletes an establishment account.
     /// </summary>
@@ -182,7 +168,7 @@ public class Auth0Service : IAuth0Service
     /// </summary>
     /// <param name="auth0Id"> The Auth0 ID of the account </param>
     /// <param name="role"> The role to assign to the account </param>
-    public async Task AssignRoleToAccountAsync(string auth0Id, string role)
+    public async Task AssignRoleAsync(string auth0Id, string role)
     {
         if (auth0Id.IsNullOrEmpty())
         {

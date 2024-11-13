@@ -50,4 +50,11 @@ public class UserController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetUserAsync(string auth0Id)
+    {
+        var user = await _userService.GetUserAsync(auth0Id);
+        return Ok(user);
+    }
 }

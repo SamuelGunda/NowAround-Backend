@@ -34,15 +34,15 @@ public class UserServiceTests
         var auth0Id = "valid-auth0-id";
         var user = new User { Auth0Id = auth0Id };
 
-        _userRepositoryMock.Setup(r => r.CreateUserAsync(It.IsAny<User>())).ReturnsAsync(1);
-        _auth0ServiceMock.Setup(s => s.AssignRoleToAccountAsync(auth0Id, "user")).Returns(Task.CompletedTask);
+        _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>())).ReturnsAsync(1);
+        _auth0ServiceMock.Setup(s => s.AssignRoleAsync(auth0Id, "user")).Returns(Task.CompletedTask);
 
         // Act
         await _userService.CreateUserAsync(auth0Id);
 
         // Assert
-        _userRepositoryMock.Verify(r => r.CreateUserAsync(It.Is<User>(u => u.Auth0Id == auth0Id)), Times.Once);
-        _auth0ServiceMock.Verify(s => s.AssignRoleToAccountAsync(auth0Id, "user"), Times.Once);
+        _userRepositoryMock.Verify(r => r.CreateAsync(It.Is<User>(u => u.Auth0Id == auth0Id)), Times.Once);
+        _auth0ServiceMock.Verify(s => s.AssignRoleAsync(auth0Id, "user"), Times.Once);
     }
     
     [Fact]
@@ -52,7 +52,7 @@ public class UserServiceTests
         var auth0Id = "valid-auth0-id";
         var user = new User { Auth0Id = auth0Id };
 
-        _userRepositoryMock.Setup(r => r.CreateUserAsync(It.IsAny<User>())).ThrowsAsync(new Exception("User creation failed"));
+        _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>())).ThrowsAsync(new Exception("User creation failed"));
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<Exception>(() => _userService.CreateUserAsync(auth0Id));
@@ -66,8 +66,8 @@ public class UserServiceTests
         var auth0Id = "valid-auth0-id";
         var user = new User { Auth0Id = auth0Id };
 
-        _userRepositoryMock.Setup(r => r.CreateUserAsync(It.IsAny<User>())).ReturnsAsync(1);
-        _auth0ServiceMock.Setup(s => s.AssignRoleToAccountAsync(auth0Id, "user"))
+        _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>())).ReturnsAsync(1);
+        _auth0ServiceMock.Setup(s => s.AssignRoleAsync(auth0Id, "user"))
             .ThrowsAsync(new Exception("Role assignment failed"));
 
         // Act & Assert
