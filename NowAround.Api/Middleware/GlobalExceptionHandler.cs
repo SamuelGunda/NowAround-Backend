@@ -13,6 +13,8 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
+        
+        Console.WriteLine($"Exception caught by GlobalExceptionHandler: {exception.Message}");
 
         var problemDetails = exception switch
         {
@@ -28,15 +30,16 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
                 Title = "Establishment already exists",
                 Detail = establishmentAlreadyExistsException.Message
             },
-            EstablishmentNotFoundException establishmentNotFoundException => new ProblemDetails
+            EntityNotFoundException entityNotFoundException => new ProblemDetails
             {
                 Status = StatusCodes.Status404NotFound,
-                Title = "Establishment not found",
-                Detail = establishmentNotFoundException.Message
+                Title = "Not found",
+                Detail = entityNotFoundException.Message
             },
             _ => new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,
+                Title = "Internal server error",
                 Detail = "An unexpected error occurred. Please try again later."
             }
         };

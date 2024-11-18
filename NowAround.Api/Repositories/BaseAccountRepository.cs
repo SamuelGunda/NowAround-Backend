@@ -4,28 +4,20 @@ using NowAround.Api.Models.Entities;
 
 namespace NowAround.Api.Repositories;
 
-public interface IBaseAccountRepository<TEntity> : IBaseRepository<TEntity> where TEntity : BaseAccountEntity
+public abstract class BaseAccountRepository<T> : BaseRepository<T>, IBaseAccountRepository<T> where T : BaseAccountEntity
 {
-    public Task<TEntity?> GetByAuth0IdAsync(string auth0Id);
-    public Task<int> GetCountByCreatedAtBetweenDatesAsync(DateTime startDate, DateTime endDate);
-    public Task<bool> DeleteByAuth0IdAsync(string auth0Id);
-}
-
-public abstract class BaseAccountRepository<TEntity> : BaseRepository<TEntity>, IBaseAccountRepository<TEntity> where TEntity : BaseAccountEntity
-{
-    public BaseAccountRepository(AppDbContext context, ILogger<TEntity> logger) : base(context, logger)
+    public BaseAccountRepository(AppDbContext context, ILogger<T> logger) : base(context, logger)
     {
     }
 
-    public async Task<TEntity?> GetByAuth0IdAsync(string auth0Id)
+    public async Task<T?> GetByAuth0IdAsync(string auth0Id)
     {
         try
         {
-            var entity = await DbSet
-                .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
+            var entity = await DbSet.FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
             if (entity == null)
             {
-                Logger.LogError("Failed to get entity by Auth0 ID. Entity not found.");
+                Logger.LogWarning("{EntityType} with Auth0 ID: {auth0Id} does not exist", typeof(T).Name, auth0Id);
                 return null;
             }
             
@@ -33,8 +25,8 @@ public abstract class BaseAccountRepository<TEntity> : BaseRepository<TEntity>, 
         }
         catch (Exception e)
         {
-            Logger.LogError(e, "Failed to get {EntityType}  by Auth0 ID", typeof(TEntity).Name);
-            throw new Exception($"Failed to get {typeof(TEntity).Name} by Auth0 ID", e);
+            Logger.LogError(e, "Failed to get {EntityType} by Auth0 ID: {message}", typeof(T).Name, e.Message);
+            throw new Exception($"Failed to get {typeof(T).Name} by Auth0 ID", e);
         }
     }
     
@@ -47,10 +39,11 @@ public abstract class BaseAccountRepository<TEntity> : BaseRepository<TEntity>, 
         }
         catch (Exception e)
         {
-            Logger.LogError(e, "Failed to get {EntityType} count", typeof(TEntity).Name);
-            throw new Exception($"Failed to get {typeof(TEntity).Name} count", e);
+            Logger.LogError(e, "Failed to get {EntityType} count: {message}", typeof(T).Name, e.Message);
+            throw new Exception($"Failed to get {typeof(T).Name} count", e);
         }
     }
+    
     public async Task<bool> DeleteByAuth0IdAsync(string auth0Id)
     {
         try
@@ -60,7 +53,7 @@ public abstract class BaseAccountRepository<TEntity> : BaseRepository<TEntity>, 
                 .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
             if (establishment == null)
             {
-                Logger.LogWarning("{EntityType} with Auth0 ID {auth0Id} does not exist", typeof(TEntity).Name, auth0Id);
+                Logger.LogWarning("{EntityType} with Auth0 ID: {auth0Id} does not exist", typeof(T).Name, auth0Id);
                 return false;
             }
             
@@ -70,8 +63,8 @@ public abstract class BaseAccountRepository<TEntity> : BaseRepository<TEntity>, 
         }
         catch (Exception e)
         {
-            Logger.LogError(e, "Failed to delete {EntityType} by Auth0 ID", typeof(TEntity).Name);
-            throw new Exception($"Failed to delete {typeof(TEntity).Name} by Auth0 ID", e);
+            Logger.LogError(e, "Failed to delete {EntityType} by Auth0 ID: {message}", typeof(T).Name, e.Message);
+            throw new Exception($"Failed to delete {typeof(T).Name} by Auth0 ID", e);
         }
     }
     

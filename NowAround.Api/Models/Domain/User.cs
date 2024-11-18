@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using NowAround.Api.Models.Entities;
+﻿using NowAround.Api.Models.Entities;
 
 namespace NowAround.Api.Models.Domain;
 

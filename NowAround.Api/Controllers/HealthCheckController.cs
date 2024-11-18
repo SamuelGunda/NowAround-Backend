@@ -20,6 +20,12 @@ public class HealthCheckController : ControllerBase
         return Ok("Secure");
     }
     
+    [HttpGet("exception")]
+    public IActionResult TestException()
+    {
+        throw new InvalidOperationException("Test exception to verify global handler.");
+    }
+    
     /*
     [HttpGet("establishment")]
     [Authorize(Roles = "Establishment")]
@@ -42,5 +48,4 @@ public class HealthCheckController : ControllerBase
         return Task.FromResult<IActionResult>(Ok("Hello Admin"));
     }
     */
-    
 }

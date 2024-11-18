@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NowAround.Api.Database;
-using NowAround.Api.Interfaces.Repositories;
 using NowAround.Api.Models.Domain;
+using NowAround.Api.Repositories.Interfaces;
 
 namespace NowAround.Api.Repositories;
 
@@ -17,12 +17,6 @@ public class MonthlyStatisticRepository : IMonthlyStatisticRepository
         _logger = logger;
     }
 
-    /// <summary>
-    /// Creates a new monthly statistic.
-    /// </summary>
-    /// <param name="monthlyStatistic"> The monthly statistic to be created </param>
-    /// <returns> The task representing the asynchronous operation, containing the number of state entries written to the database </returns>
-    /// <exception cref="Exception"> Thrown when there is an error creating the monthly statistic </exception>
     public async Task CreateMonthlyStatisticAsync(MonthlyStatistic monthlyStatistic)
     {
         try
@@ -37,12 +31,6 @@ public class MonthlyStatisticRepository : IMonthlyStatisticRepository
         }
     }
 
-    /// <summary>
-    /// Retrieves the monthly statistics for a specific date.
-    /// </summary>
-    /// <param name="date"> The date to filter the monthly statistics by </param>
-    /// <returns> The monthly statistics for the specified date, or null if not found </returns>
-    /// <exception cref="Exception"> Thrown when there is an error retrieving the monthly statistics </exception>
     public async Task<MonthlyStatistic?> GetMonthlyStatisticByDateAsync(string date)
     {
         try

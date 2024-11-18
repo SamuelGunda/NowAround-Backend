@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NowAround.Api.Services;
+using NowAround.Api.Services.Interfaces;
 
 namespace NowAround.Api.Controllers;
 
@@ -33,22 +34,14 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateUserAsync(string auth0Id)
     {
-        if (!Request.Headers.ContainsKey("Auth0-Server-Token") || 
-            Request.Headers["Auth0-Server-Token"] != _M2MSecretKey)
-        {
-            return Unauthorized("Only the Auth0 server can call this endpoint.");
-        }
-        
-        try
+        if (Request.Headers.ContainsKey("Auth0-Server-Token") &&
+            Request.Headers["Auth0-Server-Token"] == _M2MSecretKey)
         {
             await _userService.CreateUserAsync(auth0Id);
-            return StatusCode(201);
+            return Created("", new { message = "User created successfully" });
         }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error creating user");
-            return BadRequest(e.Message);
-        }
+
+        return Unauthorized("Only the Auth0 server can call this endpoint.");
     }
     
     [HttpGet]

@@ -200,8 +200,8 @@ public class Auth0Service : IAuth0Service
         
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogError("Failed to assign role to establishment. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
-            throw new HttpRequestException($"Failed to assign role to establishment. Status Code: {response.StatusCode}, Response: {responseBody}");
+            _logger.LogError("Failed to assign role. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
+            throw new HttpRequestException($"Failed to assign role. Status Code: {response.StatusCode}, Response: {responseBody}");
         }
     }
 }

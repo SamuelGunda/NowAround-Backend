@@ -1,6 +1,6 @@
 ﻿using NowAround.Api.Models.Domain;
 
-namespace NowAround.Api.Interfaces.Repositories;
+namespace NowAround.Api.Repositories.Interfaces;
 
 public interface IMonthlyStatisticRepository
 {

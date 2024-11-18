@@ -1,6 +1,7 @@
-﻿using NowAround.Api.Interfaces;
-using NowAround.Api.Interfaces.Repositories;
-using NowAround.Api.Models.Domain;
+﻿using NowAround.Api.Models.Domain;
+using NowAround.Api.Repositories;
+using NowAround.Api.Repositories.Interfaces;
+using NowAround.Api.Services.Interfaces;
 using NowAround.Api.Utilities;
 
 namespace NowAround.Api.Services;
@@ -25,14 +26,6 @@ public class MonthlyStatisticService : IMonthlyStatisticService
         _logger = logger;
     }
     
-    /// <summary>
-    /// Retrieves the monthly statistics for a specific year.
-    /// </summary>
-    /// <param name="year"> The year to filter the monthly statistics by </param>
-    /// <returns> A list of monthly statistics for the specified year </returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown when the year is not in the correct format or is in the future.
-    /// </exception>
     public async Task<List<MonthlyStatistic>> GetMonthlyStatisticByYearAsync(string year)
     {
         var yearCheck = year + "-01-01";
@@ -69,7 +62,6 @@ public class MonthlyStatisticService : IMonthlyStatisticService
             
             var statistics = await _monthlyStatisticRepository.GetMonthlyStatisticByDateAsync(month);
             
-            // If the statistics for the month exist, add them to the list, else create them
             if (statistics != null)
             {
                 yearsStatistics.Add(statistics);
@@ -78,23 +70,27 @@ public class MonthlyStatisticService : IMonthlyStatisticService
             {
                var monthStartAndEnd = DateHelper.GetMonthStartAndEndDate(month); 
                
-               // Get the count of establishments and users created in the month
-                var establishmentsCount = await _establishmentService.GetEstablishmentsCountCreatedInMonthAsync(monthStartAndEnd.StartDate, monthStartAndEnd.EndDate);
-                var userCount = await _userService.GetUsersCountCreatedInMonthAsync(monthStartAndEnd.StartDate, monthStartAndEnd.EndDate);
-                
-                var newStatistic = new MonthlyStatistic
-                {
-                    Date = month,
-                    UsersCreatedCount = userCount,
-                    EstablishmentsCreatedCount = establishmentsCount
-                };
-                
-                // Create the new statistics, and add them to the list
-                await _monthlyStatisticRepository.CreateMonthlyStatisticAsync(newStatistic);
-                yearsStatistics.Add(newStatistic);
+               yearsStatistics.Add(await CreateMonthlyStatistic(month, monthStartAndEnd.StartDate, monthStartAndEnd.EndDate));
             }
         }
         
         return yearsStatistics;
+    }
+
+    private async Task<MonthlyStatistic> CreateMonthlyStatistic(string month, DateTime startDate, DateTime endDate)
+    {
+        var establishmentsCount = await _establishmentService.GetEstablishmentsCountCreatedInMonthAsync(startDate, endDate);
+        var userCount = await _userService.GetUsersCountCreatedInMonthAsync(startDate, endDate);
+        
+        var newStatistic = new MonthlyStatistic
+        {
+            Date = month,
+            UsersCreatedCount = userCount,
+            EstablishmentsCreatedCount = establishmentsCount
+        };
+        
+        await _monthlyStatisticRepository.CreateMonthlyStatisticAsync(newStatistic);
+
+        return newStatistic;
     }
 }

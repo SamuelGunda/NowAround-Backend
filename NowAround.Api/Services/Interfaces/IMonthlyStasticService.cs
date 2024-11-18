@@ -1,6 +1,6 @@
 ﻿using NowAround.Api.Models.Domain;
 
-namespace NowAround.Api.Interfaces;
+namespace NowAround.Api.Services.Interfaces;
 
 public interface IMonthlyStatisticService
 {

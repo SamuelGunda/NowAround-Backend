@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NowAround.Api.Apis.Auth0.Models.Requests;
-using NowAround.Api.Interfaces;
-using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;
 using NowAround.Api.Models.Responses;
+using NowAround.Api.Services;
+using NowAround.Api.Services.Interfaces;
 using NowAround.Api.Utilities;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace NowAround.Api.Controllers;
 
@@ -40,7 +39,7 @@ public class EstablishmentController : ControllerBase
         try
         {
             await _establishmentService.RegisterEstablishmentAsync(establishment);
-            return StatusCode(201);
+            return Created("", new { message = "Establishment created successfully" });
         }
         catch (Exception e)
         {
@@ -90,6 +89,10 @@ public class EstablishmentController : ControllerBase
         try
         {
             var establishments = await _establishmentService.GetPendingEstablishmentsAsync();
+            if (establishments.Count == 0)
+            {
+                return Ok(new { message = "No pending establishments were found" });
+            }
             return Ok(establishments);
         }
         catch (Exception e)
@@ -123,9 +126,9 @@ public class EstablishmentController : ControllerBase
         try
         {
             var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterAsync(name, priceCategory, categoryName, tagNamesList);
-            if (establishmentMarker == null)
+            if (establishmentMarker.Count == 0)
             {
-                return NotFound(new { message = "No establishments with these criteria were found" });
+                return Ok(new { message = "No establishments with these criteria were found" });
             }
             return Ok(establishmentMarker);
         }
@@ -176,9 +179,9 @@ public class EstablishmentController : ControllerBase
         try
         {
             var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterInAreaAsync(mapBounds, name, priceCategory, categoryName, tagNamesList);
-            if (establishmentMarker == null)
+            if (establishmentMarker.Count == 0)
             {
-                return NotFound(new { message = "No markers found for the specified location" });
+                return Ok(new { message = "No markers found for the specified location" });
             }
             return Ok(establishmentMarker);
         }
@@ -200,18 +203,18 @@ public class EstablishmentController : ControllerBase
     /// <response code="404"> No establishment with the given Auth0 ID was found </response>
     /// <response code="500"> An error occurred while updating the establishment </response>
     [HttpPut]
-    [Authorize]
+    /*[Authorize]*/
     public async Task<IActionResult> UpdateEstablishmentAsync(EstablishmentUpdateRequest establishmentUpdateRequest)
     {
         try
         {
-            if (AuthorizationHelper.HasAdminOrMatchingEstablishmentId(User, establishmentUpdateRequest.Auth0Id))
-            {
+            /*if (AuthorizationHelper.HasAdminOrMatchingEstablishmentId(User, establishmentUpdateRequest.Auth0Id))
+            {*/
                 await _establishmentService.UpdateEstablishmentAsync(establishmentUpdateRequest);
-                return Ok();
+                return Ok( new { message = "Establishment updated successfully" });/*
             }
 
-            return Forbid();
+            return Forbid();*/
         }
         catch (Exception e)
         {
@@ -236,30 +239,15 @@ public class EstablishmentController : ControllerBase
     [HttpPut("register-status")]
     public async Task<IActionResult> UpdateEstablishmentRegisterRequestAsync(string auth0Id, string action)
     {
-        //TODO: redo this
-        try
+        if (Enum.TryParse<RequestStatus>(action + "ed", true, out var status) && 
+            (status == RequestStatus.Accepted || status == RequestStatus.Rejected))
         {
-            if (action.Equals("accept", StringComparison.OrdinalIgnoreCase))
-            {
-                await _establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, RequestStatus.Accepted);
-            }
-            else if (action.Equals("reject", StringComparison.OrdinalIgnoreCase))
-            {
-                await _establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, RequestStatus.Rejected);
-            }
-            else
-            {
-                return BadRequest("Invalid action type");
-            }
+            await _establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, status);
+            return Ok(new { message = $"Request successfully {action.ToLower()}ed." });
+        }
 
-            return Ok();
-            
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error accepting establishment");
-            throw;
-        }
+        _logger.LogWarning("Invalid action type provided: {Action}", action);
+        return BadRequest(new { message = "Invalid action type. Please use 'accept' or 'reject'." });
     }
     
     /// <summary>
@@ -281,7 +269,7 @@ public class EstablishmentController : ControllerBase
             if (AuthorizationHelper.HasAdminOrMatchingEstablishmentId(User, auth0Id))
             {
                 await _establishmentService.DeleteEstablishmentAsync(auth0Id);
-                return Ok();
+                return Ok(new { message = "Establishment deleted successfully" });
             }
 
             return Forbid();

@@ -56,7 +56,7 @@ public class UserServiceTests
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<Exception>(() => _userService.CreateUserAsync(auth0Id));
-        Assert.Equal("Failed to create user", exception.Message);
+        Assert.Equal("User creation failed", exception.Message);
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class UserServiceTests
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<Exception>(() => _userService.CreateUserAsync(auth0Id));
-        Assert.Equal("Failed to create user", exception.Message);
+        Assert.Equal("Role assignment failed", exception.Message);
     }
     
     /*[Fact]
