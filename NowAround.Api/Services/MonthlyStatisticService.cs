@@ -1,8 +1,7 @@
 ﻿using NowAround.Api.Models.Domain;
-using NowAround.Api.Repositories;
 using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Services.Interfaces;
-using NowAround.Api.Utilities;
+using NowAround.Api.Utilities.Interface;
 
 namespace NowAround.Api.Services;
 
@@ -12,17 +11,20 @@ public class MonthlyStatisticService : IMonthlyStatisticService
     private readonly IMonthlyStatisticRepository _monthlyStatisticRepository;
     private readonly IEstablishmentService _establishmentService;
     private readonly IUserService _userService;
+    private readonly IDateHelper _dateHelper;
     private readonly ILogger<MonthlyStatisticService> _logger;
     
     public MonthlyStatisticService(
         IMonthlyStatisticRepository monthlyStatisticRepository, 
         IEstablishmentService establishmentService, 
         IUserService userService, 
+        IDateHelper dateHelper,
         ILogger<MonthlyStatisticService> logger)
     {
         _monthlyStatisticRepository = monthlyStatisticRepository;
         _establishmentService = establishmentService;
         _userService = userService;
+        _dateHelper = dateHelper;
         _logger = logger;
     }
     
@@ -42,7 +44,7 @@ public class MonthlyStatisticService : IMonthlyStatisticService
             return [];
         }
 
-        var months = DateHelper.GetMonthsInYear(year);
+        var months = _dateHelper.GetMonthsInYear(year);
         var yearsStatistics = new List<MonthlyStatistic>();
         
         foreach (var month in months)
@@ -68,7 +70,7 @@ public class MonthlyStatisticService : IMonthlyStatisticService
             }
             else
             {
-               var monthStartAndEnd = DateHelper.GetMonthStartAndEndDate(month); 
+               var monthStartAndEnd = _dateHelper.GetMonthStartAndEndDate(month); 
                
                yearsStatistics.Add(await CreateMonthlyStatistic(month, monthStartAndEnd.StartDate, monthStartAndEnd.EndDate));
             }

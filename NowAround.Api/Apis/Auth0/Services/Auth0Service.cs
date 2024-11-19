@@ -126,7 +126,8 @@ public class Auth0Service : IAuth0Service
             throw new HttpRequestException($"Failed to get establishment owner full name. Status Code: {response.StatusCode}, Response: {responseBody}");
         }
         
-        var user = JsonConvert.DeserializeObject<User>(responseBody) ?? throw new JsonException("Failed to deserialize Auth0 response");
+        var user = JsonConvert.DeserializeObject<User>(responseBody) 
+                   ?? throw new JsonException("Failed to deserialize Auth0 response");
         
         return $"{user.FirstName} {user.LastName}";
     }
@@ -155,7 +156,6 @@ public class Auth0Service : IAuth0Service
         var response = await _httpClient.SendAsync(request);
         var responseBody = await response.Content.ReadAsStringAsync();
         
-        Console.WriteLine(responseBody);
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogError("Failed to delete account. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);

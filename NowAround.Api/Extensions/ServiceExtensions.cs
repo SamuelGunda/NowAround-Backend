@@ -7,6 +7,8 @@ using NowAround.Api.Repositories;
 using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Services;
 using NowAround.Api.Services.Interfaces;
+using NowAround.Api.Utilities;
+using NowAround.Api.Utilities.Interface;
 
 namespace NowAround.Api.Extensions;
 
@@ -29,5 +31,8 @@ public static class ServiceExtensions
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<IMonthlyStatisticRepository, MonthlyStatisticRepository>();
+        
+        // Helpers
+        services.AddTransient<IDateHelper, DateHelper>();
     }
 }

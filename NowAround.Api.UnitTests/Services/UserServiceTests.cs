@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
 using NowAround.Api.Apis.Auth0.Interfaces;
+using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Repositories;
 using NowAround.Api.Services;
@@ -26,6 +27,8 @@ public class UserServiceTests
             _userRepositoryMock.Object, 
             _auth0ServiceMock.Object);
     }
+    
+    // CreateUserAsync tests
     
     [Fact]
     public async Task CreateUserAsync_CreatesUserAndAssignsRole_ForValidAuth0Id()
@@ -75,7 +78,9 @@ public class UserServiceTests
         Assert.Equal("Role assignment failed", exception.Message);
     }
     
-    /*[Fact]
+    // GetUsersCountCreatedInMonthAsync tests
+    
+    [Fact]
     public async Task GetUsersCountCreatedInMonthAsync_ReturnsCorrectCount_ForValidDateRange()
     {
         // Arrange
@@ -83,7 +88,7 @@ public class UserServiceTests
         var endDate = new DateTime(2023, 1, 31);
         var expectedCount = 10;
 
-        _userRepositoryMock.Setup(r => r.GetUsersCountByCreatedAtBetweenDatesAsync(startDate, endDate))
+        _userRepositoryMock.Setup(r => r.GetCountByCreatedAtBetweenDatesAsync(startDate, endDate))
             .ReturnsAsync(expectedCount);
 
         // Act
@@ -101,7 +106,7 @@ public class UserServiceTests
         var endDate = new DateTime(2023, 1, 31);
         var expectedCount = 0;
 
-        _userRepositoryMock.Setup(r => r.GetUsersCountByCreatedAtBetweenDatesAsync(startDate, endDate))
+        _userRepositoryMock.Setup(r => r.GetCountByCreatedAtBetweenDatesAsync(startDate, endDate))
             .ReturnsAsync(expectedCount);
 
         // Act
@@ -118,11 +123,42 @@ public class UserServiceTests
         var startDate = new DateTime(2023, 1, 31);
         var endDate = new DateTime(2023, 1, 1);
 
-        _userRepositoryMock.Setup(r => r.GetUsersCountByCreatedAtBetweenDatesAsync(startDate, endDate))
+        _userRepositoryMock.Setup(r => r.GetCountByCreatedAtBetweenDatesAsync(startDate, endDate))
             .ThrowsAsync(new ArgumentException("Invalid date range"));
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentException>(() => _userService.GetUsersCountCreatedInMonthAsync(startDate, endDate));
         Assert.Equal("Invalid date range", exception.Message);
-    }*/
+    }
+    
+    // GetUserAsync tests
+    
+    [Fact]
+    public async Task GetUserAsync_ReturnsUser_ForValidAuth0Id()
+    {
+        // Arrange
+        var auth0Id = "valid-auth0-id";
+        var user = new User { Auth0Id = auth0Id };
+
+        _userRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(user);
+
+        // Act
+        var result = await _userService.GetUserAsync(auth0Id);
+
+        // Assert
+        Assert.Equal(user, result);
+    }
+
+    [Fact]
+    public async Task GetUserAsync_ThrowsException_ForInvalidAuth0Id()
+    {
+        // Arrange
+        var auth0Id = "invalid-auth";
+        User? user = null;
+        
+        _userRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(user);
+        
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.GetUserAsync(auth0Id));
+    }
 }

@@ -8,7 +8,6 @@ using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Repositories;
 using NowAround.Api.UnitTests.Database;
-using Xunit.Abstractions;
 
 namespace NowAround.Api.UnitTests.Repositories;
 

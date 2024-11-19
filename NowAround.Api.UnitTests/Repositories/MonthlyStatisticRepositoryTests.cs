@@ -4,6 +4,7 @@ using Moq;
 using NowAround.Api.Database;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Repositories;
+using NowAround.Api.Services;
 using NowAround.Api.UnitTests.Database;
 
 namespace NowAround.Api.UnitTests.Repositories;
@@ -12,7 +13,7 @@ public class MonthlyStatisticRepositoryTests
 {
     private readonly TestAppDbContext _context;
     private readonly MonthlyStatisticRepository _repository;
-    private readonly Mock<ILogger<MonthlyStatisticRepository>> _logger;
+    private readonly LoggerMock<MonthlyStatisticService> _logger;
     
     public MonthlyStatisticRepositoryTests()
     {
