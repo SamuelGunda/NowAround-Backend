@@ -44,7 +44,6 @@ public class MapboxService : IMapboxService
             throw new InvalidOperationException("Unable to deserialize the API response.");
         }
         
-        // Get coordinates from the API response, if they are valid
         var coordinates = responseJson["features"]?[0]?["geometry"]?["coordinates"];
         
         if (coordinates == null || coordinates.Count() < 2)

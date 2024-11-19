@@ -4,48 +4,36 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
-using NUnit.Framework;
 using NowAround.Api.Apis.Mapbox.Services;
-using Assert = Xunit.Assert;
 
 namespace NowAround.Api.UnitTests.Apis.Mapbox.Services;
 
-[TestFixture]
 public class MapboxServiceTests
 {
-    private MapboxService _mapboxService;
-    private LoggerMock<MapboxService> _logger;
-    private IConfiguration _configuration;
     private Mock<HttpMessageHandler> _mockHttpMessageHandler;
-
-    [SetUp]
-    public void SetUp()
+    private MapboxService _mapboxService;
+    
+    public MapboxServiceTests()
     {
-        var configData = new Dictionary<string, string>
-        {
-            { "Mapbox:AccessToken", "mock-access-token" }
-        };
-        _configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(configData)
-            .Build();
-
-        _logger = new LoggerMock<MapboxService>();
-
+        Mock<IConfiguration> mockConfiguration = new();
+        mockConfiguration.Setup(c => c["Mapbox:AccessToken"]).Returns("test-access-token");
+        
+        LoggerMock<MapboxService> logger = new();
+        
         _mockHttpMessageHandler = new Mock<HttpMessageHandler>();
-        var httpClient = new HttpClient(_mockHttpMessageHandler.Object);
 
-        _mapboxService = new MapboxService(httpClient, _configuration, _logger.Object);
+        _mapboxService = new MapboxService(new HttpClient(_mockHttpMessageHandler.Object), mockConfiguration.Object, logger.Object);
     }
 
     // GetCoordinatesFromAddressAsync tests
     
-    [Test]
+    [Fact]
     public async Task GetCoordinatesFromAddressAsync_ShouldReturnCoordinates_WhenResponseIsValid()
     {
         // Arrange
-        var address = "Some Street 123";
-        var postalCode = "12345";
-        var city = "Some City";
+        const string address = "Some Street 123";
+        const string postalCode = "12345";
+        const string city = "Some City";
         var mockResponse = new
         {
             features = new[]
@@ -81,13 +69,13 @@ public class MapboxServiceTests
         Assert.Equal(19.12345, lng);
     }
 
-    [Test]
+    [Fact]
     public void GetCoordinatesFromAddressAsync_ShouldThrowException_WhenResponseIsInvalid()
     {
         // Arrange
-        var address = "Some Street 123";
-        var postalCode = "12345";
-        var city = "Some City";
+        const string address = "Some Street 123";
+        const string postalCode = "12345";
+        const string city = "Some City";
 
         var invalidResponse = new { invalid = "data" };
         var jsonResponse = JsonConvert.SerializeObject(invalidResponse);
@@ -111,13 +99,13 @@ public class MapboxServiceTests
         Assert.Equal("Unable to retrieve valid coordinates from the API response.", exception.Result.Message);
     }
     
-    [Test]
+    [Fact]
     public void GetCoordinatesFromAddressAsync_ShouldThrowException_WhenResponseIsNull()
     {
         // Arrange
-        var address = "Some Street 123";
-        var postalCode = "12345";
-        var city = "Some City";
+        const string address = "Some Street 123";
+        const string postalCode = "12345";
+        const string city = "Some City";
 
         _mockHttpMessageHandler
             .Protected()

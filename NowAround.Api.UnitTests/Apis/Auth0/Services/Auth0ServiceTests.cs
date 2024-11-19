@@ -7,36 +7,34 @@ using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Auth0.Models.Requests;
 using NowAround.Api.Apis.Auth0.Services;
-using NUnit.Framework;
-using Assert = Xunit.Assert;
 
 namespace NowAround.Api.UnitTests.Apis.Auth0.Services;
 
-[TestFixture]
 public class Auth0ServiceTests
 {
     private Mock<ITokenService> _mockTokenService;
-    private Mock<IConfiguration> _mockConfiguration;
-    private LoggerMock<Auth0Service> _logger;
-    private string _auth0Domain;
-
-    [SetUp]
-    public void SetUp()
+    private Mock<HttpMessageHandler> _mockHttpMessageHandler;
+    private Auth0Service _auth0Service;
+    
+    public Auth0ServiceTests()
     {
+        Mock<IConfiguration> mockConfiguration = new();
+        mockConfiguration.Setup(config => config["Auth0:Domain"]).Returns("test-domain.auth0.com");
+        mockConfiguration.Setup(config => config["Auth0:Roles:Establishment"]).Returns("establishment-role-id");
+        mockConfiguration.Setup(config => config["Auth0:Roles:User"]).Returns("user-role-id");
+        
+        LoggerMock<Auth0Service> logger = new();
+        
         _mockTokenService = new Mock<ITokenService>();
-        _mockConfiguration = new Mock<IConfiguration>();
-        _logger = new LoggerMock<Auth0Service>();
-
-        _mockConfiguration.Setup(config => config["Auth0:Domain"]).Returns("test-domain.auth0.com");
-        _mockConfiguration.Setup(config => config["Auth0:Roles:Establishment"]).Returns("establishment-role-id");
-        _mockConfiguration.Setup(config => config["Auth0:Roles:User"]).Returns("user-role-id");
-
-        _auth0Domain = "test-domain.auth0.com";
+        
+        _mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        
+        _auth0Service = new Auth0Service(new HttpClient(_mockHttpMessageHandler.Object), _mockTokenService.Object, mockConfiguration.Object, logger.Object);
     }
     
     // RegisterEstablishmentAccountAsync tests
     
-    [Test]
+    [Fact]
     public async Task RegisterEstablishmentAccountAsync_ShouldReturnAuth0UserId()
     {
         // Arrange
@@ -53,8 +51,7 @@ public class Auth0ServiceTests
             .Setup(service => service.GetManagementAccessTokenAsync())
             .ReturnsAsync(mockToken);
         
-        var mockHttpHandler = new Mock<HttpMessageHandler>();
-        mockHttpHandler
+        _mockHttpMessageHandler
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync", 
@@ -69,17 +66,14 @@ public class Auth0ServiceTests
                 }))
             });
         
-        var httpClient = new HttpClient(mockHttpHandler.Object);
-        var service = new Auth0Service(httpClient, _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-        
         // Act
-        var auth0Id = await service.RegisterEstablishmentAccountAsync(personalInfo);
+        var auth0Id = await _auth0Service.RegisterEstablishmentAccountAsync(personalInfo);
         
         // Assert
         Assert.Equal("auth0|12345", auth0Id);
     }
 
-    [Test]
+    [Fact]
     public async Task RegisterEstablishmentAccountAsync_WhenEmailIsAlreadyInUse_ShouldThrowEmailAlreadyInUseException()
     {
         // Arrange
@@ -96,8 +90,7 @@ public class Auth0ServiceTests
             .Setup(service => service.GetManagementAccessTokenAsync())
             .ReturnsAsync(mockToken);
         
-        var mockHttpHandler = new Mock<HttpMessageHandler>();
-        mockHttpHandler
+        _mockHttpMessageHandler
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync", 
@@ -106,14 +99,12 @@ public class Auth0ServiceTests
             )
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Conflict));
         
-        var httpClient = new HttpClient(mockHttpHandler.Object);
-        var service = new Auth0Service(httpClient, _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-        
+   
         // Act & Assert
-        await Assert.ThrowsAsync<EmailAlreadyInUseException>(() => service.RegisterEstablishmentAccountAsync(personalInfo));
+        await Assert.ThrowsAsync<EmailAlreadyInUseException>(() => _auth0Service.RegisterEstablishmentAccountAsync(personalInfo));
     }
 
-    [Test]
+    [Fact]
     public async Task RegisterEstablishmentAccountAsync_WhenRequestFails_ShouldThrowHttpRequestException()
     {
         // Arrange
@@ -130,8 +121,7 @@ public class Auth0ServiceTests
             .Setup(service => service.GetManagementAccessTokenAsync())
             .ReturnsAsync(mockToken);
 
-        var mockHttpHandler = new Mock<HttpMessageHandler>();
-        mockHttpHandler
+        _mockHttpMessageHandler
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync", 
@@ -140,16 +130,13 @@ public class Auth0ServiceTests
             )
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest));
         
-        var httpClient = new HttpClient(mockHttpHandler.Object);
-        var service = new Auth0Service(httpClient, _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-        
         // Act & Assert
-        await Assert.ThrowsAsync<HttpRequestException>(() => service.RegisterEstablishmentAccountAsync(personalInfo));
+        await Assert.ThrowsAsync<HttpRequestException>(() => _auth0Service.RegisterEstablishmentAccountAsync(personalInfo));
     }
 
     // GetEstablishmentOwnerFullNameAsync tests
     
-    [Test]
+    [Fact]
     public async Task GetEstablishmentOwnerFullNameAsync_ShouldReturnFullName()
     {
         // Arrange
@@ -160,8 +147,7 @@ public class Auth0ServiceTests
             .Setup(service => service.GetManagementAccessTokenAsync())
             .ReturnsAsync(mockToken);
 
-        var mockHttpHandler = new Mock<HttpMessageHandler>();
-        mockHttpHandler
+        _mockHttpMessageHandler
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync", 
@@ -176,18 +162,15 @@ public class Auth0ServiceTests
                     family_name = "User"
                 }))
             });
-
-        var httpClient = new HttpClient(mockHttpHandler.Object);
-        var service = new Auth0Service(httpClient, _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-
+        
         // Act
-        var fullName = await service.GetEstablishmentOwnerFullNameAsync(auth0Id);
+        var fullName = await _auth0Service.GetEstablishmentOwnerFullNameAsync(auth0Id);
 
         // Assert
         Assert.Equal("Test User", fullName);
     }
 
-    [Test]
+    [Fact]
     public async Task GetEstablishmentOwnerFullNameAsync_WhenUserNotFound_ShouldThrowHttpRequestException()
     {
         // Arrange
@@ -198,8 +181,7 @@ public class Auth0ServiceTests
             .Setup(service => service.GetManagementAccessTokenAsync())
             .ReturnsAsync(mockToken);
         
-        var mockHttpHandler = new Mock<HttpMessageHandler>();
-        mockHttpHandler
+        _mockHttpMessageHandler
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync", 
@@ -208,14 +190,11 @@ public class Auth0ServiceTests
             )
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound));
         
-        var httpClient = new HttpClient(mockHttpHandler.Object);
-        var service = new Auth0Service(httpClient, _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-        
         // Act & Assert
-        await Assert.ThrowsAsync<HttpRequestException>(() => service.GetEstablishmentOwnerFullNameAsync(auth0Id));
+        await Assert.ThrowsAsync<HttpRequestException>(() => _auth0Service.GetEstablishmentOwnerFullNameAsync(auth0Id));
     }
 
-    [Test]
+    [Fact]
     public async Task GetEstablishmentOwnerFullNameAsync_WhenResponseCannotBeDeserialized_ShouldThrowJsonException()
     {
         // Arrange
@@ -226,8 +205,7 @@ public class Auth0ServiceTests
             .Setup(service => service.GetManagementAccessTokenAsync())
             .ReturnsAsync(mockToken);
         
-        var mockHttpHandler = new Mock<HttpMessageHandler>();
-        mockHttpHandler
+        _mockHttpMessageHandler            
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync", 
@@ -238,27 +216,22 @@ public class Auth0ServiceTests
             {
                 Content = new StringContent("invalid-json")
             });
-        
-        var httpClient = new HttpClient(mockHttpHandler.Object);
-        var service = new Auth0Service(httpClient, _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-        
+
         // Act & Assert
-        await Assert.ThrowsAsync<JsonReaderException>(() => service.GetEstablishmentOwnerFullNameAsync(auth0Id));
+        await Assert.ThrowsAsync<JsonReaderException>(() => _auth0Service.GetEstablishmentOwnerFullNameAsync(auth0Id));
     }
 
-    [Test]
+    [Fact]
     public async Task GetEstablishmentOwnerFullNameAsync_WhenAuth0IdIsNull_ShouldThrowArgumentNullException()
     {
-        // Arrange
-        var service = new Auth0Service(new HttpClient(), _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-        
+
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => service.GetEstablishmentOwnerFullNameAsync(null));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _auth0Service.GetEstablishmentOwnerFullNameAsync(null));
     }
     
     // DeleteAccountAsync tests
 
-    [Test]
+    [Fact]
     public async Task DeleteAccountAsync_ShouldDeleteAccount()
     {
         // Arrange
@@ -269,8 +242,7 @@ public class Auth0ServiceTests
             .Setup(service => service.GetManagementAccessTokenAsync())
             .ReturnsAsync(mockToken);
         
-        var mockHttpHandler = new Mock<HttpMessageHandler>();
-        mockHttpHandler
+        _mockHttpMessageHandler
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync", 
@@ -278,28 +250,23 @@ public class Auth0ServiceTests
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NoContent));
-        
-        var httpClient = new HttpClient(mockHttpHandler.Object);
-        var service = new Auth0Service(httpClient, _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-        
+
         // Act
-        await service.DeleteAccountAsync(auth0Id);
+        await _auth0Service.DeleteAccountAsync(auth0Id);
         
         // Assert
         Assert.True(true);
     }
     
-    [Test]
+    [Fact]
     public async Task DeleteAccountAsync_WhenAuth0IdIsNull_ShouldThrowArgumentNullException()
     {
-        // Arrange
-        var service = new Auth0Service(new HttpClient(), _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-        
+
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => service.DeleteAccountAsync(null));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _auth0Service.DeleteAccountAsync(null));
     }
 
-    [Test]
+    [Fact]
     public async Task DeleteAccountAsync_WhenRequestFails_ShouldThrowHttpRequestException()
     {
         // Arrange
@@ -310,9 +277,7 @@ public class Auth0ServiceTests
             .Setup(service => service.GetManagementAccessTokenAsync())
             .ReturnsAsync(mock);
         
-        var mockHttpHandler = new Mock<HttpMessageHandler>();
-        
-        mockHttpHandler
+        _mockHttpMessageHandler
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync", 
@@ -320,17 +285,14 @@ public class Auth0ServiceTests
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest));
-        
-        var httpClient = new HttpClient(mockHttpHandler.Object);
-        var service = new Auth0Service(httpClient, _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-        
+
         // Act & Assert
-        await Assert.ThrowsAsync<HttpRequestException>(() => service.DeleteAccountAsync(auth0Id));
+        await Assert.ThrowsAsync<HttpRequestException>(() => _auth0Service.DeleteAccountAsync(auth0Id));
     }
     
     // AssignRoleAsync tests
 
-    [Test]
+    [Fact]
     public async Task AssignRoleAsync_ShouldAssignRole()
     {
         // Arrange
@@ -342,8 +304,7 @@ public class Auth0ServiceTests
             .Setup(service => service.GetManagementAccessTokenAsync())
             .ReturnsAsync(mockToken);
         
-        var mockHttpHandler = new Mock<HttpMessageHandler>();
-        mockHttpHandler
+        _mockHttpMessageHandler
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync", 
@@ -351,38 +312,31 @@ public class Auth0ServiceTests
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NoContent));
-        
-        var httpClient = new HttpClient(mockHttpHandler.Object);
-        var service = new Auth0Service(httpClient, _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-        
+
         // Act
-        await service.AssignRoleAsync(auth0Id, role);
+        await _auth0Service.AssignRoleAsync(auth0Id, role);
         
         // Assert
         Assert.True(true);
     }
     
-    [Test]
+    [Fact]
     public async Task AssignRoleAsync_WhenAuth0IdIsNull_ShouldThrowArgumentNullException()
     {
-        // Arrange
-        var service = new Auth0Service(new HttpClient(), _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-        
+
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => service.AssignRoleAsync(null, "user"));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _auth0Service.AssignRoleAsync(null, "user"));
     }
     
-    [Test]
+    [Fact]
     public async Task AssignRoleAsync_WhenRoleIsInvalid_ShouldThrowArgumentException()
     {
-        // Arrange
-        var service = new Auth0Service(new HttpClient(), _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-        
+
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => service.AssignRoleAsync("auth0|12345", "invalid-role"));
+        await Assert.ThrowsAsync<ArgumentException>(() => _auth0Service.AssignRoleAsync("auth0|12345", "invalid-role"));
     }
 
-    [Test]
+    [Fact]
     public async Task AssignRoleAsync_WhenRequestFails_ShouldThrowHttpRequestException()
     {
         // Arrange
@@ -394,8 +348,7 @@ public class Auth0ServiceTests
             .Setup(service => service.GetManagementAccessTokenAsync())
             .ReturnsAsync(mockToken);
 
-        var mockHttpHandler = new Mock<HttpMessageHandler>();
-        mockHttpHandler
+        _mockHttpMessageHandler
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
@@ -404,10 +357,7 @@ public class Auth0ServiceTests
             )
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest));
 
-        var httpClient = new HttpClient(mockHttpHandler.Object);
-        var service = new Auth0Service(httpClient, _mockTokenService.Object, _mockConfiguration.Object, _logger.Object);
-
         // Act & Assert
-        await Assert.ThrowsAsync<HttpRequestException>(() => service.AssignRoleAsync(auth0Id, role));
+        await Assert.ThrowsAsync<HttpRequestException>(() => _auth0Service.AssignRoleAsync(auth0Id, role));
     }
 }

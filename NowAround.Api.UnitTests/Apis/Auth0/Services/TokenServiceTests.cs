@@ -7,37 +7,27 @@ using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
 using NowAround.Api.Apis.Auth0.Services;
-using NUnit.Framework;
-using Assert = Xunit.Assert;
 
 namespace NowAround.Api.UnitTests.Apis.Auth0.Services;
 
 public class TokenServiceTests
 {
-    private Mock<IConfiguration> _mockConfiguration;
     private Mock<IMemoryCache> _mockMemoryCache;
-    private Mock<ILogger<TokenService>> _mockLogger;
     private Mock<HttpMessageHandler> _mockHttpMessageHandler;
     private TokenService _tokenService;
-    private string _auth0Domain = "test-domain.auth0.com";
-    private string _clientId = "test-client-id";
-    private string _clientSecret = "test-client-secret";
-    private string _managementScopes = "test-scope";
-
-    [SetUp]
-    public void SetUp()
+    
+    public TokenServiceTests()
     {
-        // Mock dependencies
-        _mockConfiguration = new Mock<IConfiguration>();
-        _mockConfiguration.Setup(c => c["Auth0:Domain"]).Returns(_auth0Domain);
-        _mockConfiguration.Setup(c => c["Auth0:ClientId"]).Returns(_clientId);
-        _mockConfiguration.Setup(c => c["Auth0:ClientSecret"]).Returns(_clientSecret);
-        _mockConfiguration.Setup(c => c["Auth0:ManagementScopes"]).Returns(_managementScopes);
+        Mock<IConfiguration> mockConfiguration = new();
+        mockConfiguration.Setup(c => c["Auth0:Domain"]).Returns("test-domain.auth0.com");
+        mockConfiguration.Setup(c => c["Auth0:ClientId"]).Returns("test-client-id");
+        mockConfiguration.Setup(c => c["Auth0:ClientSecret"]).Returns("test-client-secret");
+        mockConfiguration.Setup(c => c["Auth0:ManagementScopes"]).Returns("test-scope");
 
         _mockMemoryCache = new Mock<IMemoryCache>();
-        _mockLogger = new Mock<ILogger<TokenService>>();
-
-        // Mock the HttpClient behavior
+        
+        LoggerMock<TokenService> logger = new();
+        
         _mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         _mockHttpMessageHandler
             .Protected()
@@ -50,12 +40,11 @@ public class TokenServiceTests
                     expires_in = 3600
                 }), Encoding.UTF8, "application/json")
             });
-
-        var httpClient = new HttpClient(_mockHttpMessageHandler.Object);
-        _tokenService = new TokenService(httpClient, _mockConfiguration.Object, _mockMemoryCache.Object, _mockLogger.Object);
+        
+        _tokenService = new TokenService(new HttpClient(_mockHttpMessageHandler.Object), mockConfiguration.Object, _mockMemoryCache.Object, logger.Object);
     }
     
-    [Test]
+    [Fact]
     public async Task GetManagementAccessTokenAsync_WhenNotAvailableInCache_ShouldReturnTokenFromApi()
     {
         // Arrange
@@ -75,7 +64,7 @@ public class TokenServiceTests
     }
 
 
-    [Test]
+    [Fact]
     public async Task GetManagementAccessTokenAsync_WhenAvailable_ShouldReturnTokenFromCache()
     {
         // Arrange
@@ -90,7 +79,7 @@ public class TokenServiceTests
         Assert.Equal("cached-token", token);
     }
 
-    [Test]
+    [Fact]
     public async Task GetManagementAccessTokenAsync_WhenApiFails_ShouldThrowException()
     {
         // Arrange
