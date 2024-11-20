@@ -19,9 +19,9 @@ public class Auth0ServiceTests
     public Auth0ServiceTests()
     {
         Mock<IConfiguration> mockConfiguration = new();
-        mockConfiguration.Setup(config => config["Auth0:Domain"]).Returns("test-domain.auth0.com");
-        mockConfiguration.Setup(config => config["Auth0:Roles:Establishment"]).Returns("establishment-role-id");
-        mockConfiguration.Setup(config => config["Auth0:Roles:User"]).Returns("user-role-id");
+        mockConfiguration.Setup(c => c["Auth0:Domain"]).Returns("test-domain.auth0.com");
+        mockConfiguration.Setup(c => c["Auth0:Roles:Establishment"]).Returns("establishment-role-id");
+        mockConfiguration.Setup(c => c["Auth0:Roles:User"]).Returns("user-role-id");
         
         LoggerMock<Auth0Service> logger = new();
         

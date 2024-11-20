@@ -28,6 +28,11 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=1f833f22_002D62d9_002D405b_002D8e05_002Dbbbbd1ffe464/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;NowAround.Api.UnitTests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Project Location="C:\Users\samue\Desktop\NowAround\NowAround.Api.UnitTests" Presentation="&amp;lt;NowAround.Api.UnitTests&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2ce67a40_002Dfe38_002D4a58_002Db227_002D12d0b736eef6/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetEstablishmentByAuth0IdAsync_WithValidAuth0Id_ReturnsEstablishment" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::D42EA0A4-B91B-4659-B20B-0457B7E25A88::net8.0::NowAround.Api.IntegrationTests.Controllers.EstablishmentControllerTests.GetEstablishmentByAuth0IdAsync_WithValidAuth0Id_ReturnsEstablishment&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3d2aedaf_002D7221_002D4405_002Dbef5_002Df91d3e48d639/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>

@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NowAround.Api", "NowAround.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NowAround.Api.UnitTests", "NowAround.Api.UnitTests\NowAround.Api.UnitTests.csproj", "{D5353132-2A8B-47EC-86CF-50DB54220608}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NowAround.Api.IntegrationTests", "NowAround.Api.IntegrationTests\NowAround.Api.IntegrationTests.csproj", "{D42EA0A4-B91B-4659-B20B-0457B7E25A88}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{D5353132-2A8B-47EC-86CF-50DB54220608}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5353132-2A8B-47EC-86CF-50DB54220608}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5353132-2A8B-47EC-86CF-50DB54220608}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D42EA0A4-B91B-4659-B20B-0457B7E25A88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D42EA0A4-B91B-4659-B20B-0457B7E25A88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D42EA0A4-B91B-4659-B20B-0457B7E25A88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D42EA0A4-B91B-4659-B20B-0457B7E25A88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

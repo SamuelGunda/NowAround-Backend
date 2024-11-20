@@ -35,4 +35,13 @@ public class LoggerMock<T> : Mock<ILogger<T>>
     }
 
     public List<LogMessage> LoggedMessages => _loggedMessages;
+    
+    public void VerifyLog(LogLevel logLevel, Exception exception)
+    {
+        var logMessage = _loggedMessages.FirstOrDefault(log => log.LogLevel == logLevel && log.Exception == exception);
+        if (logMessage == null)
+        {
+            throw new Exception($"Expected log with level {logLevel} and exception {exception} was not found.");
+        }
+    }
 }
