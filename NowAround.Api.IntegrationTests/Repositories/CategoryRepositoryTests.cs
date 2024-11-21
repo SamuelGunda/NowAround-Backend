@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NowAround.Api.Database;
@@ -12,18 +13,21 @@ public class CategoryRepositoryTests
 {
     private readonly TestAppDbContext _context;
     private readonly CategoryRepository _repository;
-    private readonly Mock<ILogger<CategoryRepository>> _logger;
+    private readonly SqliteConnection _connection;
     
     public CategoryRepositoryTests()
     {
+        _connection = new SqliteConnection("DataSource=:memory:");
+        _connection.Open();
+        
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: "NowAround")
+            .UseSqlite(_connection)
             .Options;
         
         _context = new TestAppDbContext(options);
         _repository = new CategoryRepository(_context, Mock.Of<ILogger<Category>>());
         
-        _context.Database.EnsureDeleted();
+        _context.Database.EnsureCreated();
     }
     
     // GetByNameWithTagsAsync tests

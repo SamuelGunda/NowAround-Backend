@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NowAround.Api.Database;
@@ -13,18 +14,21 @@ public class MonthlyStatisticRepositoryTests
 {
     private readonly TestAppDbContext _context;
     private readonly MonthlyStatisticRepository _repository;
-    private readonly LoggerMock<MonthlyStatisticService> _logger;
+    private readonly SqliteConnection _connection;
     
     public MonthlyStatisticRepositoryTests()
     {
+        _connection = new SqliteConnection("DataSource=:memory:");
+        _connection.Open();
+        
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: "NowAround")
+            .UseSqlite(_connection)
             .Options;
         
         _context = new TestAppDbContext(options);
         _repository = new MonthlyStatisticRepository(_context, Mock.Of<ILogger<MonthlyStatisticRepository>>());
         
-        _context.Database.EnsureDeleted();
+        _context.Database.EnsureCreated();
     }
     
     // CreateMonthlyStatisticAsync tests

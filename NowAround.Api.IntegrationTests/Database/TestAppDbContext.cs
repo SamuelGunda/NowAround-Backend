@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NowAround.Api.Database;
-using NowAround.Api.Models.Domain;
 using NowAround.Api.UnitTests.Repositories;
 
 namespace NowAround.Api.UnitTests.Database;
