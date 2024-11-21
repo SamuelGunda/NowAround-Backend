@@ -32,7 +32,7 @@ jobs:
         Auth0__Roles__User: ${{ secrets.AUTH0_ROLES_USER }}
         Auth0__Roles__Admin: ${{ secrets.AUTH0_ROLES_ADMIN }}
         Mapbox__AccessToken: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
-        run: echo "Environment variables set for appsettings.json substitution"
+      run: echo "Environment variables set for appsettings.json substitution"
 
     - name: App Settings Variable Substitution
       uses: microsoft/variable-substitution@v1
