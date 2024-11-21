@@ -20,6 +20,8 @@ jobs:
       Auth0__ManagementScopes: ${{ secrets.AUTH0_MANAGEMENT_SCOPES }}
       Auth0__Roles__Establishment: ${{ secrets.AUTH0_ROLES_ESTABLISHMENT }}
       Auth0__Roles__User: ${{ secrets.AUTH0_ROLES_USER }}
+      Auth0__Roles__Admin: ${{ secrets.AUTH0_ROLES_ADMIN }}
+      Mapbox__AccessToken: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
       
     steps:
     - name: Checkout code
