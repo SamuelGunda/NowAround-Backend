@@ -34,14 +34,13 @@ public class UserServiceTests
     public async Task CreateUserAsync_CreatesUserAndAssignsRole_ForValidAuth0Id()
     {
         // Arrange
-        var auth0Id = "valid-auth0-id";
-        var user = new User { Auth0Id = auth0Id };
-
+        const string auth0Id = "auth0|valid";
+        
         _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>())).ReturnsAsync(1);
         _auth0ServiceMock.Setup(s => s.AssignRoleAsync(auth0Id, "user")).Returns(Task.CompletedTask);
 
         // Act
-        await _userService.CreateUserAsync(auth0Id);
+        await _userService.CreateUserAsync(auth0Id, "Samuel Pačút");
 
         // Assert
         _userRepositoryMock.Verify(r => r.CreateAsync(It.Is<User>(u => u.Auth0Id == auth0Id)), Times.Once);
@@ -52,13 +51,12 @@ public class UserServiceTests
     public async Task CreateUserAsync_LogsErrorAndThrowsException_WhenUserCreationFails()
     {
         // Arrange
-        var auth0Id = "valid-auth0-id";
-        var user = new User { Auth0Id = auth0Id };
+        const string auth0Id = "auth0|valid";
 
         _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>())).ThrowsAsync(new Exception("User creation failed"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<Exception>(() => _userService.CreateUserAsync(auth0Id));
+        var exception = await Assert.ThrowsAsync<Exception>(() => _userService.CreateUserAsync(auth0Id, "Samuel Pačút"));
         Assert.Equal("User creation failed", exception.Message);
     }
 
@@ -66,15 +64,14 @@ public class UserServiceTests
     public async Task CreateUserAsync_LogsErrorAndThrowsException_WhenRoleAssignmentFails()
     {
         // Arrange
-        var auth0Id = "valid-auth0-id";
-        var user = new User { Auth0Id = auth0Id };
+        const string auth0Id = "auth0|valid";
 
         _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>())).ReturnsAsync(1);
         _auth0ServiceMock.Setup(s => s.AssignRoleAsync(auth0Id, "user"))
             .ThrowsAsync(new Exception("Role assignment failed"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<Exception>(() => _userService.CreateUserAsync(auth0Id));
+        var exception = await Assert.ThrowsAsync<Exception>(() => _userService.CreateUserAsync(auth0Id, "Samuel Pačút"));
         Assert.Equal("Role assignment failed", exception.Message);
     }
     
@@ -86,7 +83,7 @@ public class UserServiceTests
         // Arrange
         var startDate = new DateTime(2023, 1, 1);
         var endDate = new DateTime(2023, 1, 31);
-        var expectedCount = 10;
+        const int expectedCount = 10;
 
         _userRepositoryMock.Setup(r => r.GetCountByCreatedAtBetweenDatesAsync(startDate, endDate))
             .ReturnsAsync(expectedCount);
@@ -137,8 +134,8 @@ public class UserServiceTests
     public async Task GetUserAsync_ReturnsUser_ForValidAuth0Id()
     {
         // Arrange
-        var auth0Id = "valid-auth0-id";
-        var user = new User { Auth0Id = auth0Id };
+        const string auth0Id = "auth0|valid";
+        var user = new User { Auth0Id = auth0Id, FullName = "Samuel Pačút" };
 
         _userRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(user);
 
@@ -153,12 +150,12 @@ public class UserServiceTests
     public async Task GetUserAsync_ThrowsException_ForInvalidAuth0Id()
     {
         // Arrange
-        var auth0Id = "invalid-auth";
+        const string auth0Id = "auth0|invalid";
         User? user = null;
         
         _userRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(user);
         
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.GetUserAsync(auth0Id));
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.GetUserAsync(auth0Id));
     }
 }

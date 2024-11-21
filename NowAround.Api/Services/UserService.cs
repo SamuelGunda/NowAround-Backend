@@ -19,9 +19,9 @@ public class UserService : IUserService
         _auth0Service = auth0Service;
     }
     
-    public async Task CreateUserAsync(string auth0Id)
+    public async Task CreateUserAsync(string auth0Id, string fullName)
     {
-        var user = new User { Auth0Id = auth0Id };
+        var user = new User { Auth0Id = auth0Id, FullName = fullName };
         
         await _auth0Service.AssignRoleAsync(auth0Id, "user");
         await _userRepository.CreateAsync(user);
