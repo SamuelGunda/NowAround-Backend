@@ -20,13 +20,13 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
         {
             EmailAlreadyInUseException emailAlreadyInUseException => new ProblemDetails
             {
-                Status = StatusCodes.Status400BadRequest,
+                Status = StatusCodes.Status409Conflict,
                 Title = "Email already in use",
                 Detail = emailAlreadyInUseException.Message
             },
             EstablishmentAlreadyExistsException establishmentAlreadyExistsException => new ProblemDetails
             {
-                Status = StatusCodes.Status400BadRequest,
+                Status = StatusCodes.Status409Conflict,
                 Title = "Establishment already exists",
                 Detail = establishmentAlreadyExistsException.Message
             },

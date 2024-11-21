@@ -29,8 +29,14 @@ public static class EstablishmentFilterQueryBuilder
 
         if (tagNames != null && tagNames.Count != 0)
         {
-            query = query.Where(e => e.EstablishmentTags.Any(et => tagNames.Contains(et.Tag.Name)));
-
+            if (tagNames.Count == 1)
+            {
+                query = query.Where(e => e.EstablishmentTags.Any(et => tagNames.Contains(et.Tag.Name)));
+            }
+            else
+            {
+                query = query.Where(e => tagNames.All(tag => e.EstablishmentTags.Any(et => et.Tag.Name == tag)));
+            }
         }
         return query;
     }

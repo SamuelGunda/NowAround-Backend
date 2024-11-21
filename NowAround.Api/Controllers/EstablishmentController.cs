@@ -34,7 +34,7 @@ public class EstablishmentController : ControllerBase
     /// <response code="400"> Establishment already exists or Email already in use </response>
     /// <response code="500"> An error occurred while creating the establishment </response>
     [HttpPost]
-    public async Task<IActionResult> CreateEstablishmentAsync(EstablishmentRegisterRequest establishment)
+    public async Task<IActionResult> RegisterEstablishmentAsync(EstablishmentRegisterRequest establishment)
     {
         try
         {
@@ -203,18 +203,18 @@ public class EstablishmentController : ControllerBase
     /// <response code="404"> No establishment with the given Auth0 ID was found </response>
     /// <response code="500"> An error occurred while updating the establishment </response>
     [HttpPut]
-    /*[Authorize]*/
+    [Authorize]
     public async Task<IActionResult> UpdateEstablishmentAsync(EstablishmentUpdateRequest establishmentUpdateRequest)
     {
         try
         {
-            /*if (AuthorizationHelper.HasAdminOrMatchingEstablishmentId(User, establishmentUpdateRequest.Auth0Id))
-            {*/
+            if (AuthorizationHelper.HasAdminOrMatchingEstablishmentId(User, establishmentUpdateRequest.Auth0Id))
+            {
                 await _establishmentService.UpdateEstablishmentAsync(establishmentUpdateRequest);
-                return Ok( new { message = "Establishment updated successfully" });/*
+                return Ok( new { message = "Establishment updated successfully" });
             }
 
-            return Forbid();*/
+            return Forbid();
         }
         catch (Exception e)
         {

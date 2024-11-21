@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace NowAround.Api.Controllers;
 
+[ExcludeFromCodeCoverage]
 [ApiController]
 [Route("api/[controller]")]
 public class HealthCheckController : ControllerBase

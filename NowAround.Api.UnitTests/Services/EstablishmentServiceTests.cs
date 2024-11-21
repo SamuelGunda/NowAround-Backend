@@ -46,7 +46,7 @@ public class EstablishmentServiceTests
             _loggerMock.Object);
     }
     
-    // RegisterEstablishmentAsync tests
+    // RegisterEstablishmentAsync Tests
     
     [Fact]
     public async Task RegisterEstablishmentAsync_ValidRequest_ShouldReturnEstablishmentId()
@@ -438,7 +438,7 @@ public class EstablishmentServiceTests
     {
         var establishments = new List<Establishment>
         {
-            new Establishment
+            new()
             {
                 Id = 1,
                 Auth0Id = "test-auth0-id",
@@ -470,7 +470,7 @@ public class EstablishmentServiceTests
     {
         var establishments = new List<Establishment>
         {
-            new Establishment
+            new()
             {
                 Id = 1,
                 Auth0Id = "test-auth0-id",

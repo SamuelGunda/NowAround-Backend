@@ -20,7 +20,6 @@ public class MapboxService : IMapboxService
     }
     
     /// <summary>
-    /// Get coordinates from address asynchronously.
     /// Mapbox API is called to get coordinates from the address.
     /// The country is hard coded for the time being (Slovakia).
     /// TODO: In future, the country should be passed as a parameter

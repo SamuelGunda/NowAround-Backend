@@ -22,17 +22,11 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=0e067275_002Dc3f6_002D4652_002Dbe0c_002Db1d7dc99e000/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=0e284a8b_002Dab01_002D4371_002D977f_002D40db54131f43/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;Solution /&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
+	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=1f833f22_002D62d9_002D405b_002D8e05_002Dbbbbd1ffe464/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;NowAround.Api.UnitTests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Project Location="C:\Users\samue\Desktop\NowAround\NowAround.Api.UnitTests" Presentation="&amp;lt;NowAround.Api.UnitTests&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2ce67a40_002Dfe38_002D4a58_002Db227_002D12d0b736eef6/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetEstablishmentByAuth0IdAsync_WithValidAuth0Id_ReturnsEstablishment" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::D42EA0A4-B91B-4659-B20B-0457B7E25A88::net8.0::NowAround.Api.IntegrationTests.Controllers.EstablishmentControllerTests.GetEstablishmentByAuth0IdAsync_WithValidAuth0Id_ReturnsEstablishment&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
+	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3d2aedaf_002D7221_002D4405_002Dbef5_002Df91d3e48d639/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
@@ -45,6 +39,11 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=475e8f01_002Da4a9_002D4d5d_002Db973_002D58c4d29c4f8e/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="RegisterEstablishmentAsync_EstablishmentRepositoryThrowsException_ShouldThrowException" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::D5353132-2A8B-47EC-86CF-50DB54220608::net8.0::NowAround.Api.UnitTests.Services.EstablishmentServiceTests.RegisterEstablishmentAsync_EstablishmentRepositoryThrowsException_ShouldThrowException&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=51fb4594_002D8f09_002D4f56_002D932e_002Da790bf4ac825/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="GetPendingEstablishmentsAsync_WithNoPendingEstablishments_ReturnsEmptyList" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::D42EA0A4-B91B-4659-B20B-0457B7E25A88::net8.0::NowAround.Api.IntegrationTests.Controllers.EstablishmentControllerTests.GetPendingEstablishmentsAsync_WithNoPendingEstablishments_ReturnsEmptyList&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=58c56b00_002Df81e_002D48fd_002Da74f_002Dc8e84271fcf4/@EntryIndexedValue">&lt;SessionState ContinuousTestingIsOn="True" ContinuousTestingMode="1" Name="Continuous Testing" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
@@ -60,6 +59,12 @@
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::D5353132-2A8B-47EC-86CF-50DB54220608::net8.0::NowAround.Api.UnitTests.Services.UserServiceTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=7d08ed54_002D5eb4_002D47d3_002D8fb0_002Dfbff605580d8/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Or&gt;&#xD;
+    &lt;Project Location="C:\Users\samue\Desktop\NowAround\NowAround.Api.IntegrationTests" Presentation="&amp;lt;NowAround.Api.IntegrationTests&amp;gt;" /&gt;&#xD;
+    &lt;Project Location="C:\Users\samue\Desktop\NowAround\NowAround.Api.UnitTests" Presentation="&amp;lt;NowAround.Api.UnitTests&amp;gt;" /&gt;&#xD;
+  &lt;/Or&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=7dbd09ea_002D5145_002D431b_002D800d_002De05cbf0adfd7/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="EstablishmentServiceTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
@@ -81,29 +86,14 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=8c461e9f_002De777_002D4aa0_002D9618_002Dd44c49a79945/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=9419ee29_002Dc61c_002D4a54_002D8ad3_002D88e49756107b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="GetManagementAccessTokenAsync_WhenAvailable_ShouldReturnTokenFromCache #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::D5353132-2A8B-47EC-86CF-50DB54220608::net8.0::NowAround.Api.UnitTests.Apis.Auth0.Services.TokenServiceTests.GetManagementAccessTokenAsync_WhenAvailable_ShouldReturnTokenFromCache&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
+	
 	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=95916bac_002D8a1f_002D4961_002Daf51_002D110dac1ad8cc/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="UpdateAsync_WhenEntityExists_ShouldUpdateEntity #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::D5353132-2A8B-47EC-86CF-50DB54220608::net8.0::NowAround.Api.UnitTests.Repositories.EstablishmentRepositoryTests.UpdateAsync_WhenEntityExists_ShouldUpdateEntity&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a8f7f432_002D359a_002D4be2_002D9c64_002Dac767cd0347d/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;Solution /&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=c2be1eb2_002Dd133_002D431b_002D80b9_002Df2cede5ddbb3/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;Solution /&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
 	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=dda267e1_002Dcba6_002D45f4_002D91b7_002D64032158a17c/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="CreateAsync_Should_Add_Entity" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::D5353132-2A8B-47EC-86CF-50DB54220608::net8.0::NowAround.Api.UnitTests.Repositories.BaseRepositoryTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::D5353132-2A8B-47EC-86CF-50DB54220608::net8.0::NowAround.Api.UnitTests.Repositories.BaseAccountRepositoryTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::D5353132-2A8B-47EC-86CF-50DB54220608::net8.0::NowAround.Api.UnitTests.Repositories.EstablishmentRepositoryTests.GetEstablishmentsWithPendingRegisterStatusAsync_ShouldReturnEstablishments&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::D5353132-2A8B-47EC-86CF-50DB54220608::net8.0::NowAround.Api.UnitTests.Repositories.EstablishmentRepositoryTests&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+	
+	
+	</wpf:ResourceDictionary>

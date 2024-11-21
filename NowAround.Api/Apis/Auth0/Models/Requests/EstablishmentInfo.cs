@@ -10,7 +10,7 @@ public class EstablishmentInfo
     public string City { get; set; }
     public int PriceCategory { get; set; }
     public ICollection<string> Category { get; set; }
-    public ICollection<string>? Tags { get; set; }
+    public ICollection<string> Tags { get; set; }
 
     public void ValidateProperties()
     {
@@ -19,7 +19,8 @@ public class EstablishmentInfo
             || string.IsNullOrEmpty(City)
             || string.IsNullOrEmpty(PostalCode)
             || PriceCategory < 0 || PriceCategory >= 3
-            || Category == null || Category.Count == 0)
+            || Category == null || Category.Count == 0
+            || Tags == null || Tags.Count == 0)
         {
             throw new ArgumentNullException();
         }
