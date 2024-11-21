@@ -13,15 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      Auth0_Audience: ${{ secrets.AUTH0_AUDIENCE }}
-      Auth0_ClientId: ${{ secrets.AUTH0_CLIENT_ID }}
-      Auth0_ClientSecret: ${{ secrets.AUTH0_CLIENT_SECRET }}
-      Auth0_Domain: ${{ secrets.AUTH0_DOMAIN }}
-      Auth0_ManagementScopes: ${{ secrets.AUTH0_MANAGEMENT_SCOPES }}
-      Auth0_Roles_Establishment: ${{ secrets.AUTH0_ROLES_ESTABLISHMENT }}
-      Auth0_Roles_User: ${{ secrets.AUTH0_ROLES_USER }}
-      Auth0_Roles_Admin: ${{ secrets.AUTH0_ROLES_ADMIN }}
-      Mapbox_AccessToken: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+      Auth0.Audience: ${{ secrets.AUTH0_AUDIENCE }}
+      Auth0.ClientId: ${{ secrets.AUTH0_CLIENT_ID }}
+      Auth0.ClientSecret: ${{ secrets.AUTH0_CLIENT_SECRET }}
+      Auth0.Domain: ${{ secrets.AUTH0_DOMAIN }}
+      Auth0.ManagementScopes: ${{ secrets.AUTH0_MANAGEMENT_SCOPES }}
+      Auth0.Roles.Establishment: ${{ secrets.AUTH0_ROLES_ESTABLISHMENT }}
+      Auth0.Roles.User: ${{ secrets.AUTH0_ROLES_USER }}
+      Auth0.Roles.Admin: ${{ secrets.AUTH0_ROLES_ADMIN }}
+      Mapbox.AccessToken: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
 
     steps:
     - name: Checkout code
