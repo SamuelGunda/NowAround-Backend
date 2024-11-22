@@ -21,6 +21,24 @@ jobs:
       with:
         dotnet-version: ${{ secrets.AZURE_DOTNET_VERSION }}
 
+    - name: Set environment variables for appsettings.json substitution
+      env:
+        Auth0__Audience: ${{ secrets.AUTH0_AUDIENCE }}
+        Auth0__ClientId: ${{ secrets.AUTH0_CLIENT_ID }}
+        Auth0__ClientSecret: ${{ secrets.AUTH0_CLIENT_SECRET }}
+        Auth0__Domain: ${{ secrets.AUTH0_DOMAIN }}
+        Auth0__ManagementScopes: ${{ secrets.AUTH0_MANAGEMENT_SCOPES }}
+        Auth0__Roles__Establishment: ${{ secrets.AUTH0_ROLES_ESTABLISHMENT }}
+        Auth0__Roles__User: ${{ secrets.AUTH0_ROLES_USER }}
+        Auth0__Roles__Admin: ${{ secrets.AUTH0_ROLES_ADMIN }}
+        Mapbox__AccessToken: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+      run: echo "Environment variables set for appsettings.json substitution"
+
+    - name: App Settings Variable Substitution
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: 'NowAround.Api/appsettings.json'
+
     - name: Set up dependency caching for faster builds
       uses: actions/cache@v4
       with:
