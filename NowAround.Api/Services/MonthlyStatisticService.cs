@@ -58,7 +58,6 @@ public class MonthlyStatisticService : IMonthlyStatisticService
                     UsersCreatedCount = 0,
                     EstablishmentsCreatedCount = 0
                 });
-                
                 continue;
             }
             
