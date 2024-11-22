@@ -20,7 +20,6 @@ public class MapboxService : IMapboxService
     }
     
     /// <summary>
-    /// Get coordinates from address asynchronously.
     /// Mapbox API is called to get coordinates from the address.
     /// The country is hard coded for the time being (Slovakia).
     /// TODO: In future, the country should be passed as a parameter
@@ -44,7 +43,6 @@ public class MapboxService : IMapboxService
             throw new InvalidOperationException("Unable to deserialize the API response.");
         }
         
-        // Get coordinates from the API response, if they are valid
         var coordinates = responseJson["features"]?[0]?["geometry"]?["coordinates"];
         
         if (coordinates == null || coordinates.Count() < 2)

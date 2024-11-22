@@ -1,21 +1,10 @@
-﻿namespace NowAround.Api.Utilities;
+﻿using NowAround.Api.Utilities.Interface;
 
-public static class DateHelper
+namespace NowAround.Api.Utilities;
+
+public class DateHelper : IDateHelper
 {
-    public static void ValidateDate(string date)
-    {
-        if (!DateTime.TryParse(date, out _))
-        {
-            throw new ArgumentException("Invalid date format");
-        }
-        
-        if (DateTime.Parse(date) > DateTime.Now)
-        {
-            throw new ArgumentException("Date cannot be in the future");
-        }
-    }
-    
-    public static List<string> GetMonthsInYear(string year)
+    public List<string> GetMonthsInYear(string year)
     {
         var start = DateTime.Parse(year + "-01");
         var end = DateTime.Parse(year + "-12");
@@ -30,7 +19,7 @@ public static class DateHelper
         return months;
     }
     
-    public static (DateTime StartDate, DateTime EndDate) GetMonthStartAndEndDate(string date)
+    public (DateTime StartDate, DateTime EndDate) GetMonthStartAndEndDate(string date)
     {
         var year = date.Split('-').Select(int.Parse).ToArray()[0];
         var month = date.Split('-').Select(int.Parse).ToArray()[1];

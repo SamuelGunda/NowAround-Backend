@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using NowAround.Api.Models.Entities;
 
 namespace NowAround.Api.Models.Domain;
 
-public class Category
+public class Category : BaseEntity
 {
-    public int Id { get; init; }
-    
     [MaxLength(32)]
-    public required string Name { get; init; }
+    public required string Name { get; set; }
 
-    public virtual ICollection<Tag> Tags { get; } = new List<Tag>();
-    public virtual ICollection<EstablishmentCategory> EstablishmentCategories { get; } = new List<EstablishmentCategory>();
+    public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
+    public virtual ICollection<EstablishmentCategory> EstablishmentCategories { get; set; } = new List<EstablishmentCategory>();
 }

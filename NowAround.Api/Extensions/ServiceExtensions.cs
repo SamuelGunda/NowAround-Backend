@@ -2,10 +2,13 @@
 using NowAround.Api.Apis.Auth0.Services;
 using NowAround.Api.Apis.Mapbox.Interfaces;
 using NowAround.Api.Apis.Mapbox.Services;
-using NowAround.Api.Interfaces;
-using NowAround.Api.Interfaces.Repositories;
+using NowAround.Api.Models.Domain;
 using NowAround.Api.Repositories;
+using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Services;
+using NowAround.Api.Services.Interfaces;
+using NowAround.Api.Utilities;
+using NowAround.Api.Utilities.Interface;
 
 namespace NowAround.Api.Extensions;
 
@@ -23,10 +26,13 @@ public static class ServiceExtensions
         services.AddSingleton<IMapboxService, MapboxService>();
 
         // Repositories
+        services.AddScoped<IBaseAccountRepository<User>, UserRepository>();
         services.AddScoped<IEstablishmentRepository, EstablishmentRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
-        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IMonthlyStatisticRepository, MonthlyStatisticRepository>();
+        
+        // Helpers
+        services.AddTransient<IDateHelper, DateHelper>();
     }
 }

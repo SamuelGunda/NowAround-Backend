@@ -12,6 +12,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Auth0Id).IsRequired();
         builder.HasIndex(e => e.Auth0Id).IsUnique();
         
+        builder.Property(u => u.FullName).IsRequired();
+        
         builder.Property(u => u.CreatedAt).IsRequired();
         builder.Property(u => u.UpdatedAt).IsRequired();
 

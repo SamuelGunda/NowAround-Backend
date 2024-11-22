@@ -28,7 +28,7 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddCustomCors();
 builder.Services.AddApplicationInsightsTelemetry();
 
-builder.Logging.AddLogging();
+/*builder.Logging.AddLogging();*/
 
 var app = builder.Build();
 
@@ -39,9 +39,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseExceptionHandler("/Home/Error");
-app.UseHsts();
-
 
 app.UseCors("AllowSpecificOrigin");
 

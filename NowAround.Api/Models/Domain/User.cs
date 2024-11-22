@@ -1,13 +1,11 @@
-﻿using NowAround.Api.Models.Enum;
+﻿using System.ComponentModel.DataAnnotations;
+using NowAround.Api.Models.Entities;
 
 namespace NowAround.Api.Models.Domain;
 
-public class User
+public class User : BaseAccountEntity
 {
-    public int Id { get; set; }
-    public required string Auth0Id { get; set; }
-    
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public DateTime UpdatedAt { get; set; } = DateTime.Now;
+    [MaxLength(32)]
+    public required string FullName { get; set; }
     public virtual ICollection<Friend> Friends { get; set; } = new List<Friend>();
 }

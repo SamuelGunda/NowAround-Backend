@@ -6,11 +6,8 @@ using NowAround.Api.Models.Responses;
 
 namespace NowAround.Api.Models.Domain;
 
-public class Establishment
+public class Establishment : BaseAccountEntity
 {
-    public int Id { get; init; }
-    [MaxLength(32)]
-    public required string Auth0Id { get; init; }
     
     [MaxLength(32)]
     public required string Name { get; set; }
@@ -26,8 +23,6 @@ public class Establishment
     public required PriceCategory PriceCategory { get; set; }
     public RequestStatus RequestStatus { get; set; }
     
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public DateTime UpdatedAt { get; set; } = DateTime.Now;
     
     public virtual ICollection<SocialLink> SocialLinks { get; set; } = new List<SocialLink>();
     public virtual ICollection<EstablishmentCategory> EstablishmentCategories { get; set; } = new List<EstablishmentCategory>();

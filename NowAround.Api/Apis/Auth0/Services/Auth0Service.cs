@@ -92,7 +92,7 @@ public class Auth0Service : IAuth0Service
         // Deserialize response to get Auth0 user ID
         var user = JsonConvert.DeserializeObject<User>(responseBody) ?? throw new JsonException("Failed to deserialize Auth0 response");
         
-        await AssignRoleToAccountAsync(user.UserId, "establishment");
+        await AssignRoleAsync(user.UserId, "establishment");
         
         return user.UserId;
     }
@@ -126,24 +126,11 @@ public class Auth0Service : IAuth0Service
             throw new HttpRequestException($"Failed to get establishment owner full name. Status Code: {response.StatusCode}, Response: {responseBody}");
         }
         
-        var user = JsonConvert.DeserializeObject<User>(responseBody) ?? throw new JsonException("Failed to deserialize Auth0 response");
+        var user = JsonConvert.DeserializeObject<User>(responseBody) 
+                   ?? throw new JsonException("Failed to deserialize Auth0 response");
         
         return $"{user.FirstName} {user.LastName}";
     }
-
-    public Task<int> GetRegisteredAccountsCountByMonthAndRoleAsync(DateTime date, string role)
-    {
-        /*const int pageSize = 100;
-        
-        var totalCount = 0;
-        var page = 0;
-        var moreUsers = true;
-        
-        using var request = new HttpRequestMessage(HttpMethod.Get, $"https://{_domain}/api/v2/users?q=created_at:[]");*/
-        throw new NotImplementedException();
-        
-    }
-
 
     /// <summary>
     /// Deletes an establishment account.
@@ -169,7 +156,6 @@ public class Auth0Service : IAuth0Service
         var response = await _httpClient.SendAsync(request);
         var responseBody = await response.Content.ReadAsStringAsync();
         
-        Console.WriteLine(responseBody);
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogError("Failed to delete account. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
@@ -182,7 +168,7 @@ public class Auth0Service : IAuth0Service
     /// </summary>
     /// <param name="auth0Id"> The Auth0 ID of the account </param>
     /// <param name="role"> The role to assign to the account </param>
-    public async Task AssignRoleToAccountAsync(string auth0Id, string role)
+    public async Task AssignRoleAsync(string auth0Id, string role)
     {
         if (auth0Id.IsNullOrEmpty())
         {
@@ -214,8 +200,8 @@ public class Auth0Service : IAuth0Service
         
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogError("Failed to assign role to establishment. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
-            throw new HttpRequestException($"Failed to assign role to establishment. Status Code: {response.StatusCode}, Response: {responseBody}");
+            _logger.LogError("Failed to assign role. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
+            throw new HttpRequestException($"Failed to assign role. Status Code: {response.StatusCode}, Response: {responseBody}");
         }
     }
 }
