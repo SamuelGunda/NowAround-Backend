@@ -103,6 +103,7 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
             Longitude = 0,
             PriceCategory = PriceCategory.Affordable,
             RequestStatus = RequestStatus.Accepted,
+            CreatedAt = new DateTime(2024, 1, 1)
         };
 
         var establishmentCafe = new Establishment
@@ -116,6 +117,7 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
             Longitude = 2,
             PriceCategory = PriceCategory.Affordable,
             RequestStatus = RequestStatus.Accepted,
+            CreatedAt = new DateTime(2024, 1, 1)
         };
         
         dbContext.Establishments.AddRange(establishmentRestaurant, establishmentCafe);
