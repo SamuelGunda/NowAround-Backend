@@ -1,7 +1,4 @@
-﻿using System.Security.Claims;
-using System.Text.Encodings.Web;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -9,8 +6,6 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Mapbox.Interfaces;
@@ -81,15 +76,22 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
 
     private static void SeedDatabase(AppDbContext dbContext)
     {
+        
+        // Categories
+        
         var restaurantCategory = new Category { Name = "RESTAURANT" };
         var barCategory = new Category { Name = "BAR" };
         var cafeCategory = new Category { Name = "CAFE" };
         dbContext.Categories.AddRange(restaurantCategory, barCategory, cafeCategory);
 
+        // Tags
+        
         var petFriendlyTag = new Tag { Name = "PET_FRIENDLY" };
         var familyFriendlyTag = new Tag { Name = "FAMILY_FRIENDLY" };
         dbContext.Tags.AddRange(petFriendlyTag, familyFriendlyTag);
 
+        // Establishments
+        
         var establishmentRestaurant = new Establishment
         {
             Auth0Id = "auth0|valid",
@@ -118,6 +120,8 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
         
         dbContext.Establishments.AddRange(establishmentRestaurant, establishmentCafe);
         dbContext.SaveChanges();
+        
+        // Establishment Categories
 
         dbContext.EstablishmentCategories.Add(new EstablishmentCategory
         {
@@ -130,6 +134,8 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
             EstablishmentId = establishmentCafe.Id,
             CategoryId = cafeCategory.Id
         });
+        
+        // Establishment Tags
 
         dbContext.EstablishmentTags.Add(new EstablishmentTag
         {
@@ -148,7 +154,12 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
             EstablishmentId = establishmentCafe.Id,
             TagId = familyFriendlyTag.Id
         });
-
+        
+        // Users
+        
+        var user = new User { Auth0Id = "auth0|valid", FullName = "Test User" };
+        dbContext.Users.Add(user);
+        
         dbContext.SaveChanges();
     }
 }

@@ -4,13 +4,13 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NowAround.Api.Database;
 using NowAround.Api.Exceptions;
+using NowAround.Api.IntegrationTests.Database;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Repositories;
-using NowAround.Api.UnitTests.Database;
 
-namespace NowAround.Api.UnitTests.Repositories;
+namespace NowAround.Api.IntegrationTests.Repositories;
 
 public class EstablishmentRepositoryTests
 {

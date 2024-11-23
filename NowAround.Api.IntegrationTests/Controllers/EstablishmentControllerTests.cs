@@ -188,7 +188,7 @@ public class EstablishmentControllerTests
     // GetEstablishmentByAuth0IdAsync Tests
     
     [Fact]
-    public async Task GetEstablishmentByAuth0IdAsync_WithValidAuth0Id_ReturnsEstablishment()
+    public async Task GetEstablishmentByAuth0IdAsync_WithValidAuth0Id_ShouldReturnEstablishment()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -229,7 +229,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task GetEstablishmentByAuth0IdAsync_WithInvalidAuth0Id_ReturnsNotFound()
+    public async Task GetEstablishmentByAuth0IdAsync_WithInvalidAuth0Id_ShouldReturnNotFound()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -247,7 +247,7 @@ public class EstablishmentControllerTests
     // GetPendingEstablishmentsAsync Tests
     
     [Fact]
-    public async Task GetPendingEstablishmentsAsync_WithPendingEstablishments_ReturnsEstablishments()
+    public async Task GetPendingEstablishmentsAsync_WithPendingEstablishments_ShouldReturnEstablishments()
     {
         // Arrange
         _auth0ServiceMock
@@ -291,7 +291,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task GetPendingEstablishmentsAsync_WithNoPendingEstablishments_ReturnsEmptyList()
+    public async Task GetPendingEstablishmentsAsync_WithNoPendingEstablishments_ShouldReturnNoContent()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -304,13 +304,11 @@ public class EstablishmentControllerTests
 
         // Assert
         response.EnsureSuccessStatusCode();
-        var responseContent = await response.Content.ReadAsStringAsync();
-        
-        Assert.Equal("{\"message\":\"No pending establishments were found\"}", responseContent);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
     
     [Fact]
-    public async Task GetPendingEstablishmentsAsync_IncorrectRole_ReturnsForbidden()
+    public async Task GetPendingEstablishmentsAsync_IncorrectRole_ShouldReturnForbidden()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -326,7 +324,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task GetPendingEstablishmentsAsync_WithUnauthorizedUser_ReturnsUnauthorized()
+    public async Task GetPendingEstablishmentsAsync_WithUnauthorizedUser_ShouldReturnUnauthorized()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -343,7 +341,7 @@ public class EstablishmentControllerTests
     // GetEstablishmentMarkersWithFilterAsync Tests
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterAsync_WithValidCategory_ReturnsEstablishment()
+    public async Task GetEstablishmentMarkersWithFilterAsync_WithValidCategory_ShouldReturnEstablishment()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -363,7 +361,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterAsync_WithValidTags_ReturnsEstablishment()
+    public async Task GetEstablishmentMarkersWithFilterAsync_WithValidTags_ShouldReturnEstablishment()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -383,7 +381,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterAsync_WithValidName_ReturnsEstablishments()
+    public async Task GetEstablishmentMarkersWithFilterAsync_WithValidName_ShouldReturnEstablishments()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -403,7 +401,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterAsync_WithUnknownName_ReturnsEmptyList()
+    public async Task GetEstablishmentMarkersWithFilterAsync_WithNoMatchingName_ShouldReturnNoContent()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -415,13 +413,11 @@ public class EstablishmentControllerTests
 
         // Assert
         response.EnsureSuccessStatusCode();
-        var responseContent = await response.Content.ReadAsStringAsync();
-        
-        Assert.Equal("{\"message\":\"No establishments with these criteria were found\"}", responseContent);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterAsync_WithInvalidPriceCategory_ReturnsInternalServerError()
+    public async Task GetEstablishmentMarkersWithFilterAsync_WithInvalidPriceCategory_ShouldReturnInternalServerError()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -436,7 +432,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterAsync_WithNoFilters_ReturnsInternalServerError()
+    public async Task GetEstablishmentMarkersWithFilterAsync_WithNoFilters_ShouldReturnInternalServerError()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -453,7 +449,7 @@ public class EstablishmentControllerTests
     // GetEstablishmentMarkersWithFilterInAreaAsync Tests
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_WithValidBounds_ReturnsEstablishments()
+    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_WithValidBounds_ShouldReturnEstablishments()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -473,7 +469,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_WhenNoEstablishmentsInArea_ReturnsEmptyList()
+    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_WhenNoEstablishmentsInArea_ShouldReturnNoContent()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -484,14 +480,11 @@ public class EstablishmentControllerTests
         var response = await client.GetAsync("/api/establishment/search-area?northWestLat=50&northWestLong=49&southEastLat=49&southEastLong=50");
 
         // Assert
-        response.EnsureSuccessStatusCode();
-        var responseContent = await response.Content.ReadAsStringAsync();
-        
-        Assert.Equal("{\"message\":\"No markers found for the specified location\"}", responseContent);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_WithInvalidBounds_ReturnsInternalServerError()
+    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_WithInvalidBounds_ShouldReturnInternalServerError()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -506,7 +499,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_WithValidBoundsAndFilters_ReturnsEstablishments()
+    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_WithValidBoundsAndFilters_ShouldReturnEstablishments()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -528,7 +521,7 @@ public class EstablishmentControllerTests
     // UpdateEstablishmentAsync Tests
     
     [Fact]
-    public async Task UpdateEstablishmentAsync_WithValidRequest_ReturnsNoContent()
+    public async Task UpdateEstablishmentAsync_WithValidRequest_ShouldReturnNoContent()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -552,11 +545,11 @@ public class EstablishmentControllerTests
         var response = await client.PutAsync("/api/establishment", content);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
     
     [Fact]
-    public async Task UpdateEstablishmentAsync_WithInvalidRequest_ReturnsBadRequest()
+    public async Task UpdateEstablishmentAsync_WithInvalidRequest_ShouldReturnNoContent()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -580,11 +573,11 @@ public class EstablishmentControllerTests
         var response = await client.PutAsync("/api/establishment", content);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
     
     [Fact]
-    public async Task UpdateEstablishmentAsync_WithUnauthorizedUser_ReturnsUnauthorized()
+    public async Task UpdateEstablishmentAsync_WithUnauthorizedUser_ShouldReturnUnauthorized()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -611,7 +604,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task UpdateEstablishmentAsync_WithInvalidSub_ReturnForbidden()
+    public async Task UpdateEstablishmentAsync_WithInvalidSub_ShouldReturnForbidden()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -639,7 +632,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task UpdateEstablishmentAsync_WithInvalidAuth0Id_ReturnsNotFound()
+    public async Task UpdateEstablishmentAsync_WithInvalidAuth0Id_ShouldReturnNotFound()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -669,7 +662,7 @@ public class EstablishmentControllerTests
     // UpdateEstablishmentRegisterRequestAsync Tests
     
     [Fact]
-    public async Task UpdateEstablishmentRegisterRequestAsync_WithValidRequest_ReturnsOK()
+    public async Task UpdateEstablishmentRegisterRequestAsync_WithValidRequest_ShouldReturnNoContent()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -701,11 +694,11 @@ public class EstablishmentControllerTests
         var response = await client.PutAsync("/api/establishment/register-status?auth0Id=auth0|pending&action=accept", null);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
     
     [Fact]
-    public async Task UpdateEstablishmentRegisterRequestAsync_WithInvalidAuth0Id_ReturnsNotFound()
+    public async Task UpdateEstablishmentRegisterRequestAsync_WithInvalidAuth0Id_ShouldReturnNotFound()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -721,7 +714,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task UpdateEstablishmentRegisterRequestAsync_WithInvalidAction_ReturnsBadRequest()
+    public async Task UpdateEstablishmentRegisterRequestAsync_WithInvalidAction_ShouldReturnBadRequest()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -737,7 +730,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task UpdateEstablishmentRegisterRequestAsync_WithUnauthorizedUser_ReturnsUnauthorized()
+    public async Task UpdateEstablishmentRegisterRequestAsync_WithUnauthorizedUser_ShouldReturnUnauthorized()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -752,7 +745,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task UpdateEstablishmentRegisterRequestAsync_WithInvalidRole_ReturnsForbidden()
+    public async Task UpdateEstablishmentRegisterRequestAsync_WithInvalidRole_ShouldReturnForbidden()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -770,7 +763,7 @@ public class EstablishmentControllerTests
     // DeleteEstablishmentAsync Tests
     
     [Fact]
-    public async Task DeleteEstablishmentAsync_WithValidAuth0Id_ReturnsOK()
+    public async Task DeleteEstablishmentAsync_WithValidAuth0Id_ShouldReturnNoContent()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -782,11 +775,11 @@ public class EstablishmentControllerTests
         var response = await client.DeleteAsync("/api/establishment?auth0Id=auth0|valid");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
     
     [Fact]
-    public async Task DeleteEstablishmentAsync_WithValidSub_ReturnsOK()
+    public async Task DeleteEstablishmentAsync_WithValidSub_ShouldReturnNoContent()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -798,11 +791,11 @@ public class EstablishmentControllerTests
         var response = await client.DeleteAsync("/api/establishment?auth0Id=auth0|valid");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
     
     [Fact]
-    public async Task DeleteEstablishmentAsync_WithInvalidAuth0Id_ReturnsNotFound()
+    public async Task DeleteEstablishmentAsync_WithInvalidAuth0Id_ShouldReturnNotFound()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -818,7 +811,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task DeleteEstablishmentAsync_WithUnauthorizedUser_ReturnsUnauthorized()
+    public async Task DeleteEstablishmentAsync_WithUnauthorizedUser_ShouldReturnUnauthorized()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -833,7 +826,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task DeleteEstablishmentAsync_WithInvalidSub_ReturnsForbidden()
+    public async Task DeleteEstablishmentAsync_WithInvalidSub_ShouldReturnForbidden()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();

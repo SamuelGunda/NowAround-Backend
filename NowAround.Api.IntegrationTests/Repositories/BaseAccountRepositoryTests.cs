@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NowAround.Api.Database;
+using NowAround.Api.IntegrationTests.Database;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Repositories;
-using NowAround.Api.UnitTests.Database;
 
-namespace NowAround.Api.UnitTests.Repositories;
+namespace NowAround.Api.IntegrationTests.Repositories;
 
 public class TestAccountEntity : BaseAccountEntity
 {

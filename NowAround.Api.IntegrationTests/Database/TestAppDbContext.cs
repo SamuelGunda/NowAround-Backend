@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NowAround.Api.Database;
-using NowAround.Api.UnitTests.Repositories;
+using NowAround.Api.IntegrationTests.Repositories;
 
-namespace NowAround.Api.UnitTests.Database;
+namespace NowAround.Api.IntegrationTests.Database;
 
 public class TestAppDbContext : AppDbContext
 {

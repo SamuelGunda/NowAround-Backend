@@ -5,7 +5,7 @@ using NowAround.Api.Database;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Repositories;
 
-namespace NowAround.Api.UnitTests.Repositories;
+namespace NowAround.Api.IntegrationTests.Repositories;
 
 public class UserRepositoryTests
 {

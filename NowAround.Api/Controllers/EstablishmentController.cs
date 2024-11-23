@@ -91,7 +91,7 @@ public class EstablishmentController : ControllerBase
             var establishments = await _establishmentService.GetPendingEstablishmentsAsync();
             if (establishments.Count == 0)
             {
-                return Ok(new { message = "No pending establishments were found" });
+                return NoContent();
             }
             return Ok(establishments);
         }
@@ -128,7 +128,7 @@ public class EstablishmentController : ControllerBase
             var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterAsync(name, priceCategory, categoryName, tagNamesList);
             if (establishmentMarker.Count == 0)
             {
-                return Ok(new { message = "No establishments with these criteria were found" });
+                return NoContent();
             }
             return Ok(establishmentMarker);
         }
@@ -181,7 +181,7 @@ public class EstablishmentController : ControllerBase
             var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterInAreaAsync(mapBounds, name, priceCategory, categoryName, tagNamesList);
             if (establishmentMarker.Count == 0)
             {
-                return Ok(new { message = "No markers found for the specified location" });
+                return NoContent();
             }
             return Ok(establishmentMarker);
         }
@@ -211,7 +211,7 @@ public class EstablishmentController : ControllerBase
             if (AuthorizationHelper.HasAdminOrMatchingEstablishmentId(User, establishmentUpdateRequest.Auth0Id))
             {
                 await _establishmentService.UpdateEstablishmentAsync(establishmentUpdateRequest);
-                return Ok( new { message = "Establishment updated successfully" });
+                return NoContent();
             }
 
             return Forbid();
@@ -240,10 +240,10 @@ public class EstablishmentController : ControllerBase
     public async Task<IActionResult> UpdateEstablishmentRegisterRequestAsync(string auth0Id, string action)
     {
         if (Enum.TryParse<RequestStatus>(action + "ed", true, out var status) && 
-            (status == RequestStatus.Accepted || status == RequestStatus.Rejected))
+            status is RequestStatus.Accepted or RequestStatus.Rejected)
         {
             await _establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, status);
-            return Ok(new { message = $"Request successfully {action.ToLower()}ed." });
+            return NoContent();
         }
 
         _logger.LogWarning("Invalid action type provided: {Action}", action);
@@ -269,7 +269,7 @@ public class EstablishmentController : ControllerBase
             if (AuthorizationHelper.HasAdminOrMatchingEstablishmentId(User, auth0Id))
             {
                 await _establishmentService.DeleteEstablishmentAsync(auth0Id);
-                return Ok(new { message = "Establishment deleted successfully" });
+                return NoContent();
             }
 
             return Forbid();
