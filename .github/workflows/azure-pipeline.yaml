@@ -79,7 +79,7 @@ jobs:
           --key "Auth0:ClientId" \
           --value "${{ secrets.AUTH0_CLIENT_ID }}" \
           --yes
-          az appconfig kv set --name${{ secrets.AZURE_APPCONFIG_NAME }} \
+          az appconfig kv set --name ${{ secrets.AZURE_APPCONFIG_NAME }} \
           --key "Auth0:ClientSecret" \
           --value "${{ secrets.AUTH0_CLIENT_SECRET }}" \
           --yes
