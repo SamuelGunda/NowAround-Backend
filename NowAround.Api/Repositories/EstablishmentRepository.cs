@@ -3,6 +3,7 @@ using NowAround.Api.Database;
 using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
+using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Utilities;
@@ -39,43 +40,13 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
         }
     }
     
-    public async Task<List<Establishment>> GetRangeWithFilterAsync(string? name, int? priceCategory, string? categoryName, List<string>? tagNames)
+    public async Task<List<Establishment>> GetRangeWithFilterAsync(FilterValues filterValues)
     {
         try
         {
             var query = DbSet.AsQueryable();
             
-            query = EstablishmentFilterQueryBuilder.ApplyFilters(query, name, priceCategory, categoryName, tagNames);
-            
-            var establishments = await query.ToListAsync();
-            
-            if (establishments.Count == 0)
-            {
-                Logger.LogInformation("Establishments with filter not found");
-                return [];
-            }
-            
-            return establishments;
-        }
-        catch (Exception e)
-        {
-            Logger.LogError("Failed to get establishments by filter: {Message}", e.Message);
-            throw new Exception("Failed to get establishments by filter", e);
-        }
-    }
-    
-    public async Task<List<Establishment>> GetRangeWithFilterInAreaAsync(
-        double nwLat, double nwLong,
-        double seLat, double seLong, 
-        string? name, int? priceCategory, string? categoryName, List<string>? tagNames)
-    {
-        try
-        {
-            var query = DbSet
-                .Where(e => e.Latitude <= nwLat && e.Latitude >= seLat)
-                .Where(e => e.Longitude >= nwLong && e.Longitude <= seLong);
-            
-            query = EstablishmentFilterQueryBuilder.ApplyFilters(query, name, priceCategory, categoryName, tagNames);
+            query = EstablishmentFilteredSearchQueryBuilder.ApplyFilters(query, filterValues);
             
             var establishments = await query.ToListAsync();
             

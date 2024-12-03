@@ -7,6 +7,7 @@ using NowAround.Api.Exceptions;
 using NowAround.Api.IntegrationTests.Database;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
+using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Repositories;
 
@@ -89,9 +90,9 @@ public class EstablishmentRepositoryTests
         await Assert.ThrowsAsync<Exception>(() => _repository.GetAllWhereRegisterStatusPendingAsync());
     }
     
-    // GetRangeWithFilterAsync tests
+    // GetRangeWithFilterAsync DEPRECATED tests
     
-    [Fact]
+    /*[Fact]
     public async Task GetRangeWithFilterAsync_ByName_ShouldReturnEstablishments()
     {
         // Arrange
@@ -239,9 +240,9 @@ public class EstablishmentRepositoryTests
 
         // Act & Assert
         await Assert.ThrowsAsync<Exception>(() => _repository.GetRangeWithFilterAsync("Test Name 1", 1, "Test Category", new List<string> { "Test Tag" }));
-    }
+    }*/
     
-    // GetRangeWithFilterInAreaAsync tests
+    // GetRangeWithFilterAsync tests
     
     [Fact]
     public async Task GetRangeWithFilterInAreaAsync_ShouldReturnEstablishments()
@@ -260,12 +261,17 @@ public class EstablishmentRepositoryTests
             City = "Test City", Address = "Test Address", Latitude = 2.0, Longitude = 2.0,
             PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|1234"
         };
+
+        var filterValues = new FilterValues
+        {
+            MapBounds = new MapBounds { NwLat = 10.0, NwLong = -5, SeLat = -5, SeLong = 10.0 }
+        };
         
         await _context.Set<Establishment>().AddRangeAsync(establishment1, establishment2);
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _repository.GetRangeWithFilterInAreaAsync(3.0, 0.0, 0.0, 3.0, null, null, null, null);
+        var result = await _repository.GetRangeWithFilterAsync(filterValues);
 
         // Assert
         Assert.NotNull(result);
@@ -277,8 +283,15 @@ public class EstablishmentRepositoryTests
     [Fact]
     public async Task GetRangeWithFilterInAreaAsync_IfNoEstablishments_ShouldReturnEmptyList()
     {
+        // Arrange
+        
+        var filterValues = new FilterValues
+        {
+            MapBounds = new MapBounds { NwLat = 3.0, NwLong = 0.0, SeLat = 0.0, SeLong = 3.0 }
+        };
+        
         // Act
-        var result = await _repository.GetRangeWithFilterInAreaAsync(3.0, 0.0, 0.0, 3.0, null, null, null, null);
+        var result = await _repository.GetRangeWithFilterAsync(filterValues);
 
         // Assert
         Assert.NotNull(result);
@@ -289,10 +302,17 @@ public class EstablishmentRepositoryTests
     public async Task GetRangeWithFilterInAreaAsync_IfSomethingGoesWrong_ShouldThrowException()
     {
         // Arrange
+        
+        var filterValues = new FilterValues
+        {
+            MapBounds = new MapBounds { NwLat = 3.0, NwLong = 0.0, SeLat = 0.0, SeLong = 3.0 }
+        };
+        
+        // Arrange
         await _context.DisposeAsync();
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _repository.GetRangeWithFilterInAreaAsync(3.0, 0.0, 0.0, 3.0, null, null, null, null));
+        await Assert.ThrowsAsync<Exception>(() => _repository.GetRangeWithFilterAsync(filterValues));
     }
     
     // UpdateAsync tests

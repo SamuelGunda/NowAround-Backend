@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NowAround.Api.Models.Entities;
 
 namespace NowAround.Api.Controllers;
 
@@ -20,12 +21,6 @@ public class HealthCheckController : ControllerBase
     public IActionResult GetSecure()
     {
         return Ok("Secure");
-    }
-    
-    [HttpGet("exception")]
-    public IActionResult TestException()
-    {
-        throw new InvalidOperationException("Test exception to verify global handler.");
     }
     
     /*

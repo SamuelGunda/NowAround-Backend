@@ -431,8 +431,40 @@ public class EstablishmentServiceTests
         Assert.Equal(establishments.Count, result.Count);
     }
     
-    // GetEstablishmentMarkersWithFilterAsync
+    // GetEstablishmentMarkersWithFilterAsync DEPRECATED
     
+    /*[Fact]
+    public async Task GetEstablishmentMarkersWithFilterAsync_ValidRequest_ShouldReturnListOfEstablishmentMarkerDto()
+    {
+        var establishments = new List<Establishment>
+        {
+            new()
+            {
+                Id = 1,
+                Auth0Id = "test-auth0-id",
+                Name = "test-name",
+                Description = "test-description",
+                City = "test-city",
+                Address = "test-address",
+                Latitude = 1.0,
+                Longitude = 1.0,
+                PriceCategory = PriceCategory.Moderate,
+                RequestStatus = RequestStatus.Pending,
+                EstablishmentCategories = new List<EstablishmentCategory>(),
+                EstablishmentTags = new List<EstablishmentTag>()
+            }
+        };
+        
+        _establishmentRepositoryMock.Setup(r => r.GetRangeWithFilterDeprecatedAsync(
+            It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<List<string>>())).ReturnsAsync(establishments);
+        
+        var result = await _establishmentService.GetEstablishmentMarkersWithFilterAsyncDeprecated("test-name", null, null, null);
+        
+        Assert.NotNull(result);
+    }*/
+    
+    // GetEstablishmentMarkersWithFilterAsync
+
     [Fact]
     public async Task GetEstablishmentMarkersWithFilterAsync_ValidRequest_ShouldReturnListOfEstablishmentMarkerDto()
     {
@@ -455,51 +487,25 @@ public class EstablishmentServiceTests
             }
         };
         
-        _establishmentRepositoryMock.Setup(r => r.GetRangeWithFilterAsync(
-            It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<List<string>>())).ReturnsAsync(establishments);
-        
-        var result = await _establishmentService.GetEstablishmentMarkersWithFilterAsync("test-name", null, null, null);
-        
-        Assert.NotNull(result);
-    }
-    
-    // GetEstablishmentMarkersWithFilterInAreaAsync
-
-    [Fact]
-    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_ValidRequest_ShouldReturnListOfEstablishmentMarkerDto()
-    {
-        var establishments = new List<Establishment>
+        FilterValues filterValues = new()
         {
-            new()
+            Name = "test-name",
+            PriceCategory = 1,/*
+            CategoryName = "Restaurant",
+            TagNames = ["PET_FRIENDLY"],*/
+            
+            MapBounds = new MapBounds
             {
-                Id = 1,
-                Auth0Id = "test-auth0-id",
-                Name = "test-name",
-                Description = "test-description",
-                City = "test-city",
-                Address = "test-address",
-                Latitude = 1.0,
-                Longitude = 1.0,
-                PriceCategory = PriceCategory.Moderate,
-                RequestStatus = RequestStatus.Pending,
-                EstablishmentCategories = new List<EstablishmentCategory>(),
-                EstablishmentTags = new List<EstablishmentTag>()
+                        NwLat = 1.0,
+                        NwLong = 1.0,
+                        SeLat = 1.0,
+                        SeLong = 1.0
             }
         };
         
-        MapBounds mapBounds = new()
-        {
-            NwLat = 1.0,
-            NwLong = 1.0,
-            SeLat = 1.0,
-            SeLong = 1.0
-        };
+        _establishmentRepositoryMock.Setup(r => r.GetRangeWithFilterAsync(filterValues)).ReturnsAsync(establishments);
         
-        _establishmentRepositoryMock.Setup(r => r.GetRangeWithFilterInAreaAsync(
-            It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>(), 
-            It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<List<string>>())).ReturnsAsync(establishments);
-        
-        var result = await _establishmentService.GetEstablishmentMarkersWithFilterInAreaAsync(mapBounds, null, null, null, null);
+        var result = await _establishmentService.GetEstablishmentMarkersWithFilterAsync(filterValues);
         
         Assert.NotNull(result);
     }

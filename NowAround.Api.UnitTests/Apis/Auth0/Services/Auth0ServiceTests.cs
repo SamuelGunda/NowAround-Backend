@@ -1,6 +1,7 @@
-﻿using Moq;
-using System.Net;
+﻿using System.Net;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
 using NowAround.Api.Apis.Auth0.Exceptions;
@@ -23,13 +24,11 @@ public class Auth0ServiceTests
         mockConfiguration.Setup(c => c["Auth0:Roles:Establishment"]).Returns("establishment-role-id");
         mockConfiguration.Setup(c => c["Auth0:Roles:User"]).Returns("user-role-id");
         
-        LoggerMock<Auth0Service> logger = new();
-        
         _mockTokenService = new Mock<ITokenService>();
         
         _mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         
-        _auth0Service = new Auth0Service(new HttpClient(_mockHttpMessageHandler.Object), _mockTokenService.Object, mockConfiguration.Object, logger.Object);
+        _auth0Service = new Auth0Service(new HttpClient(_mockHttpMessageHandler.Object), _mockTokenService.Object, mockConfiguration.Object, Mock.Of<ILogger<Auth0Service>>());
     }
     
     // RegisterEstablishmentAccountAsync tests

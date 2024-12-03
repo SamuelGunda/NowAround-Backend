@@ -26,8 +26,6 @@ public class TokenServiceTests
 
         _mockMemoryCache = new Mock<IMemoryCache>();
         
-        LoggerMock<TokenService> logger = new();
-        
         _mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         _mockHttpMessageHandler
             .Protected()
@@ -41,7 +39,7 @@ public class TokenServiceTests
                 }), Encoding.UTF8, "application/json")
             });
         
-        _tokenService = new TokenService(new HttpClient(_mockHttpMessageHandler.Object), mockConfiguration.Object, _mockMemoryCache.Object, logger.Object);
+        _tokenService = new TokenService(new HttpClient(_mockHttpMessageHandler.Object), mockConfiguration.Object, _mockMemoryCache.Object, Mock.Of<ILogger<TokenService>>());
     }
     
     [Fact]

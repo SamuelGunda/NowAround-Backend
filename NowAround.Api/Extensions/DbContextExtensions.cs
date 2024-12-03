@@ -11,7 +11,7 @@ public static class DbContextExtensions
         {
             options.UseSqlServer(configuration
                     .GetSection("ConnectionStrings")
-                    .GetValue<string>("default"),
+                    .GetValue<string>("Default"),
                 sqlOptions => sqlOptions.EnableRetryOnFailure(
                     maxRetryCount: 5, 
                     maxRetryDelay: TimeSpan.FromSeconds(30), 

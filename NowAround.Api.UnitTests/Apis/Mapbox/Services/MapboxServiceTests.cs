@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -18,11 +19,9 @@ public class MapboxServiceTests
         Mock<IConfiguration> mockConfiguration = new();
         mockConfiguration.Setup(c => c["Mapbox:AccessToken"]).Returns("test-access-token");
         
-        LoggerMock<MapboxService> logger = new();
-        
         _mockHttpMessageHandler = new Mock<HttpMessageHandler>();
 
-        _mapboxService = new MapboxService(new HttpClient(_mockHttpMessageHandler.Object), mockConfiguration.Object, logger.Object);
+        _mapboxService = new MapboxService(new HttpClient(_mockHttpMessageHandler.Object), mockConfiguration.Object, Mock.Of<ILogger<MapboxService>>());
     }
 
     // GetCoordinatesFromAddressAsync tests

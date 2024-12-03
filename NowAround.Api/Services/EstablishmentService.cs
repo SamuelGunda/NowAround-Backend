@@ -130,21 +130,10 @@ public class EstablishmentService : IEstablishmentService
         return pendingEstablishments;
     }
 
-    public async Task<List<EstablishmentResponse>> GetEstablishmentMarkersWithFilterAsync(string? name, int? priceCategory, string? categoryName, List<string>? tagNames)
-    {
-        var establishments = await _establishmentRepository.GetRangeWithFilterAsync(name, priceCategory, categoryName, tagNames);
-        
-        return establishments.Select(e => e.ToMarker()).ToList();
-    }
-
-    public async Task<List<EstablishmentResponse>> GetEstablishmentMarkersWithFilterInAreaAsync(
-        MapBounds mapBounds, string? name, int? priceCategory, string? categoryName, List<string>? tagNames)
+    public async Task<List<EstablishmentResponse>> GetEstablishmentMarkersWithFilterAsync(FilterValues filterValues)
     {
         
-        var establishments = await _establishmentRepository.GetRangeWithFilterInAreaAsync(
-            mapBounds.NwLat, mapBounds.NwLong,
-            mapBounds.SeLat, mapBounds.SeLong,
-            name, priceCategory, categoryName, tagNames);
+        var establishments = await _establishmentRepository.GetRangeWithFilterAsync(filterValues);
         
         return establishments.Select(e => e.ToMarker()).ToList();
     }

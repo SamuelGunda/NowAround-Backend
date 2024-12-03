@@ -103,43 +103,6 @@ public class EstablishmentController : ControllerBase
     }
     
     /// <summary>
-    /// Returns all establishments that match the given filter criteria.
-    /// At least one of the filter criteria must be provided.
-    /// RETURNS ONLY APPROVED ESTABLISHMENTS.
-    /// </summary>
-    /// <param name="name"> The name of the establishment to filter by </param>
-    /// <param name="priceCategory"> The price category of the establishment to filter by </param>
-    /// <param name="categoryName"> The category name of the establishment to filter by </param>
-    /// <param name="tagNames"> The list of tag names to filter by </param>
-    /// <returns> An IActionResult containing a list of establishment markers if found, or a 404 status code if not found </returns>
-    /// <response code="200"> Returns the establishment markers that match the given filter criteria </response>
-    /// <response code="404"> No establishments with these criteria were found </response>
-    /// <response code="500"> An error occurred while retrieving the establishments </response>
-    [HttpGet("search")]
-    public async Task<IActionResult> GetEstablishmentMarkersWithFilterAsync(string? name, int? priceCategory, string? categoryName, string? tagNames)
-    {
-        
-        var tagNamesList = tagNames?.Split(',').ToList();
-        
-        SearchValidator.ValidateFilterValues(name, priceCategory, categoryName, tagNamesList, true);
-        
-        try
-        {
-            var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterAsync(name, priceCategory, categoryName, tagNamesList);
-            if (establishmentMarker.Count == 0)
-            {
-                return NoContent();
-            }
-            return Ok(establishmentMarker);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error getting establishments in area");
-            throw;
-        }
-    }
-    
-    /// <summary>
     /// Returns all establishments that match the given filter criteria and are within the given map bounds,
     /// filter criteria are optional.
     /// RETURNS ONLY APPROVED ESTABLISHMENTS
@@ -156,29 +119,37 @@ public class EstablishmentController : ControllerBase
     /// <response code="200"> Returns the establishment markers that match the given filter criteria and are within the given map bounds </response>
     /// <response code="404"> No markers found for the specified location </response>
     /// <response code="500"> An error occurred while retrieving the establishments </response>
-    [HttpGet("search-area")]
-    public async Task<IActionResult> GetEstablishmentMarkersWithFilterInAreaAsync(
-        double northWestLat, double northWestLong, 
-        double southEastLat, double southEastLong, 
+    [HttpGet("search")]
+    public async Task<IActionResult> GetEstablishmentMarkersWithFilterAsync(
+        double? northWestLat, double? northWestLong, 
+        double? southEastLat, double? southEastLong, 
         string? name, int? priceCategory, string? categoryName, string? tagNames)
     {
-        
         var tagNamesList = tagNames?.Split(',').ToList();
-     
-        SearchValidator.ValidateFilterValues(name, priceCategory, categoryName, tagNamesList, false);
-        SearchValidator.ValidateMapBounds(northWestLat, northWestLong, southEastLat, southEastLong);
-        
-        var mapBounds = new MapBounds
+        var filterValues = new FilterValues
         {
-            NwLat = northWestLat,
-            NwLong = northWestLong,
-            SeLat = southEastLat,
-            SeLong = southEastLong
+            Name = name,
+            PriceCategory = priceCategory,
+            CategoryName = categoryName,
+            TagNames = tagNamesList,
+            
+            MapBounds = new MapBounds
+            {
+                NwLat = northWestLat ?? 0,
+                NwLong = northWestLong ?? 0,
+                SeLat = southEastLat ?? 0,
+                SeLong = southEastLong ?? 0
+            }
         };
+        
+        if (!filterValues.ValidateProperties())
+        {
+            return BadRequest(new { message = "At least one filter value must be provided" });
+        }
         
         try
         {
-            var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterInAreaAsync(mapBounds, name, priceCategory, categoryName, tagNamesList);
+            var establishmentMarker = await _establishmentService.GetEstablishmentMarkersWithFilterAsync(filterValues);
             if (establishmentMarker.Count == 0)
             {
                 return NoContent();
