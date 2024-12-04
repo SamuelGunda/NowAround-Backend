@@ -13,17 +13,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Tag> Tags { get; set; }
     
     public DbSet<Establishment> Establishments { get; set; }
+    public DbSet<BusinessHours> BusinessHours { get; set; }
+    public DbSet<BusinessHoursException> BusinessHoursExceptions { get; set; }
+    public DbSet<MenuItem> MenuItems { get; set; }
+    public DbSet<SocialLink> SocialLinks { get; set; }
     public DbSet<EstablishmentCategory> EstablishmentCategories { get; set; }
     public DbSet<EstablishmentTag> EstablishmentTags { get; set; }
-    public DbSet<SocialLink> SocialLinks { get; set; }
     
     public DbSet<User> Users { get; set; }
     public DbSet<Friend> Friends { get; set; }
     public DbSet<FriendRequest> FriendRequests { get; set; }
-    
-    /*public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }*/
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

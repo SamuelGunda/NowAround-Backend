@@ -23,7 +23,9 @@ public class Establishment : BaseAccountEntity
     public required PriceCategory PriceCategory { get; set; }
     public RequestStatus RequestStatus { get; set; }
     
-    
+    public int BusinessHoursId { get; set; }
+    public virtual BusinessHours BusinessHours { get; set; }
+    public virtual ICollection<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
     public virtual ICollection<SocialLink> SocialLinks { get; set; } = new List<SocialLink>();
     public virtual ICollection<EstablishmentCategory> EstablishmentCategories { get; set; } = new List<EstablishmentCategory>();
     public virtual ICollection<EstablishmentTag> EstablishmentTags { get; set; } = new List<EstablishmentTag>();
