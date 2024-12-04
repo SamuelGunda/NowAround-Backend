@@ -4,16 +4,15 @@ using NowAround.Api.Models.Enum;
 
 namespace NowAround.Api.Utilities;
 
-public static class EstablishmentFilteredSearchQueryBuilder
+public static class EstablishmentSearchQueryBuilder
 {
-    public static IQueryable<Establishment> ApplyFilters(IQueryable<Establishment> query, FilterValues filterValues)
+    public static IQueryable<Establishment> ApplyFilters(IQueryable<Establishment> query, SearchValues searchValues)
     {
-        
-        var name = filterValues.Name;
-        var priceCategory = filterValues.PriceCategory;
-        var categoryName = filterValues.CategoryName;
-        var tagNames = filterValues.TagNames;
-        var mapBounds = filterValues.MapBounds;
+        var name = searchValues.Name;
+        var priceCategory = searchValues.PriceCategory;
+        var categoryName = searchValues.CategoryName;
+        var tagNames = searchValues.TagNames;
+        var mapBounds = searchValues.MapBounds;
         
         if (mapBounds is not { NwLat: 0, NwLong: 0, SeLat: 0, SeLong: 0 })
         {

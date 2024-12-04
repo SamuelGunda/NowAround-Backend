@@ -90,162 +90,10 @@ public class EstablishmentRepositoryTests
         await Assert.ThrowsAsync<Exception>(() => _repository.GetAllWhereRegisterStatusPendingAsync());
     }
     
-    // GetRangeWithFilterAsync DEPRECATED tests
-    
-    /*[Fact]
-    public async Task GetRangeWithFilterAsync_ByName_ShouldReturnEstablishments()
-    {
-        // Arrange
-        var establishment1 = new Establishment
-        {
-            Name = "Test Name 1", RequestStatus = RequestStatus.Accepted,
-            City = "Test City", Address = "Test Address", Latitude = 1.0, Longitude = 1.0,
-            PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|123"
-        };
-        
-        var establishment2 = new Establishment
-        {
-            Name = "Test Name 2", RequestStatus = RequestStatus.Accepted,
-            City = "Test City", Address = "Test Address", Latitude = 1.0, Longitude = 1.0,
-            PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|1234"
-        };
-        
-        await _context.Set<Establishment>().AddRangeAsync(establishment1, establishment2);
-        await _context.SaveChangesAsync();
-
-        // Act
-        var result = await _repository.GetRangeWithFilterAsync("Test Name 1", null, null, null);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Single(result);
-        Assert.Equal("Test Name 1", result[0].Name);
-    }
-    
-    [Fact]
-    public async Task GetRangeWithFilterAsync_ByNameAndPriceCategory_ShouldReturnEstablishments()
-    {
-        // Arrange
-        var establishment1 = new Establishment
-        {
-            Name = "Test Name 1", RequestStatus = RequestStatus.Accepted,
-            City = "Test City", Address = "Test Address", Latitude = 1.0, Longitude = 1.0,
-            PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|123"
-        };
-        
-        var establishment2 = new Establishment
-        {
-            Name = "Test Name 2", RequestStatus = RequestStatus.Accepted,
-            City = "Test City", Address = "Test Address", Latitude = 1.0, Longitude = 1.0,
-            PriceCategory = PriceCategory.Expensive, Auth0Id = "auth0|1234"
-        };
-        
-        await _context.Set<Establishment>().AddRangeAsync(establishment1, establishment2);
-        await _context.SaveChangesAsync();
-
-        // Act
-        var result = await _repository.GetRangeWithFilterAsync("Test Name 1", 0, null, null);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Single(result);
-        Assert.Equal("Test Name 1", result[0].Name);
-    }
-    
-    [Fact]
-    public async Task GetRangeWithFilterAsync_ByNamePriceCategoryAndCategory_ShouldReturnEstablishments()
-    {
-        var category = new Category { Name = "Test Category" };
-        
-        // Arrange
-        var establishment1 = new Establishment
-        {
-            Name = "Test Name 1", RequestStatus = RequestStatus.Accepted,
-            City = "Test City", Address = "Test Address", Latitude = 1.0, Longitude = 1.0,
-            PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|123",
-            EstablishmentCategories = new List<EstablishmentCategory>( new [] { new EstablishmentCategory { Category = category } })
-        };
-        
-        var establishment2 = new Establishment
-        {
-            Name = "Test Name 2", RequestStatus = RequestStatus.Accepted,
-            City = "Test City", Address = "Test Address", Latitude = 1.0, Longitude = 1.0,
-            PriceCategory = PriceCategory.Expensive, Auth0Id = "auth0|1234"
-        };
-        
-        await _context.Set<Establishment>().AddRangeAsync(establishment1, establishment2);
-        await _context.SaveChangesAsync();
-
-        // Act
-        var result = await _repository.GetRangeWithFilterAsync("Test Name 1", 0, "Test Category", null);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Single(result);
-        Assert.Equal("Test Name 1", result[0].Name);
-    }
-
-    [Fact]
-    public async Task GetRangeWithFilterAsync_ByNamePriceCategoryCategoryAndTag_ShouldReturnEstablishments()
-    {
-        var category = new Category { Name = "Test Category" };
-        var tag = new Tag { Name = "Test Tag" };
-        
-        // Arrange
-        var establishment1 = new Establishment
-        {
-            Name = "Test Name 1", RequestStatus = RequestStatus.Accepted,
-            City = "Test City", Address = "Test Address", Latitude = 1.0, Longitude = 1.0,
-            PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|123",
-            EstablishmentCategories = new List<EstablishmentCategory>( new [] { new EstablishmentCategory { Category = category } }),
-            EstablishmentTags = new List<EstablishmentTag>( new [] { new EstablishmentTag { Tag = tag } })
-        };
-        
-        var establishment2 = new Establishment
-        {
-            Name = "Test Name 2", RequestStatus = RequestStatus.Accepted,
-            City = "Test City", Address = "Test Address", Latitude = 1.0, Longitude = 1.0,
-            PriceCategory = PriceCategory.Expensive, Auth0Id = "auth0|1234"
-        };
-        
-        await _context.Set<Establishment>().AddRangeAsync(establishment1, establishment2);
-        await _context.SaveChangesAsync();
-
-        // Act
-        var result = await _repository.GetRangeWithFilterAsync("Test Name 1", 0, "Test Category", ["Test Tag"]);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Single(result);
-        Assert.Equal("Test Name 1", result[0].Name);
-    }
-    
-    
-    [Fact]
-    public async Task GetRangeWithFilterAsync_IfNoEstablishments_ShouldReturnEmptyList()
-    {
-        // Act
-        var result = await _repository.GetRangeWithFilterAsync("Test Name 1", 1, "Test Category", new List<string> { "Test Tag" });
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Empty(result);
-    }
-    
-    [Fact]
-    public async Task GetRangeWithFilterAsync_IfSomethingGoesWrong_ShouldThrowException()
-    {
-        // Arrange
-        await _context.DisposeAsync();
-
-        // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _repository.GetRangeWithFilterAsync("Test Name 1", 1, "Test Category", new List<string> { "Test Tag" }));
-    }*/
-    
     // GetRangeWithFilterAsync tests
     
     [Fact]
-    public async Task GetRangeWithFilterInAreaAsync_ShouldReturnEstablishments()
+    public async Task GetRangeWithFilterAsync_ShouldReturnEstablishments()
     {
         // Arrange
         var establishment1 = new Establishment
@@ -262,7 +110,7 @@ public class EstablishmentRepositoryTests
             PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|1234"
         };
 
-        var filterValues = new FilterValues
+        var filterValues = new SearchValues
         {
             MapBounds = new MapBounds { NwLat = 10.0, NwLong = -5, SeLat = -5, SeLong = 10.0 }
         };
@@ -271,7 +119,7 @@ public class EstablishmentRepositoryTests
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _repository.GetRangeWithFilterAsync(filterValues);
+        var result = await _repository.GetRangeWithFilterAsync(filterValues, 0);
 
         // Assert
         Assert.NotNull(result);
@@ -279,19 +127,97 @@ public class EstablishmentRepositoryTests
         Assert.Equal("Test Name 1", result[0].Name);
         Assert.Equal("Test Name 2", result[1].Name);
     }
+
+    [Fact]
+    public async Task GetRangeWithFilterAsync_WithPage_ShouldReturnEstablishments()
+    {
+        // Arrange
+        var establishment1 = new Establishment
+        {
+            Name = "Same Test Name 1", RequestStatus = RequestStatus.Accepted,
+            City = "Test City", Address = "Test Address", Latitude = 1.0, Longitude = 1.0,
+            PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|123"
+        };
+        
+        var establishment2 = new Establishment
+        {
+            Name = "Same Test Name 2", RequestStatus = RequestStatus.Accepted,
+            City = "Test City", Address = "Test Address", Latitude = 2.0, Longitude = 2.0,
+            PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|1234"
+        };
+        
+        var establishment3 = new Establishment
+        {
+            Name = "Different Test Name 3", RequestStatus = RequestStatus.Accepted,
+            City = "Test City", Address = "Test Address", Latitude = 3.0, Longitude = 3.0,
+            PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|12345"
+        };
+
+        var filterValues = new SearchValues
+        {
+            Name = "Same",
+            
+            MapBounds = new MapBounds { NwLat = 10.0, NwLong = -5, SeLat = -5, SeLong = 10.0 }
+        };
+        
+        await _context.Set<Establishment>().AddRangeAsync(establishment1, establishment2, establishment3);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = await _repository.GetRangeWithFilterAsync(filterValues, 1);
+        
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Count);
+    }
+
+    [Fact]
+    public async Task GetRangeWithFilterAsync_EmptyPage_ShouldReturnEmptyList()
+    {
+        // Arrange
+        var establishment1 = new Establishment
+        {
+            Name = "Same Test Name 1", RequestStatus = RequestStatus.Accepted,
+            City = "Test City", Address = "Test Address", Latitude = 1.0, Longitude = 1.0,
+            PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|123"
+        };
+        
+        var establishment2 = new Establishment
+        {
+            Name = "Different Test Name 2", RequestStatus = RequestStatus.Accepted,
+            City = "Test City", Address = "Test Address", Latitude = 2.0, Longitude = 2.0,
+            PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|1234"
+        };
+
+        var filterValues = new SearchValues
+        {
+            Name = "Same",
+            
+            MapBounds = new MapBounds { NwLat = 10.0, NwLong = -5, SeLat = -5, SeLong = 10.0 }
+        };
+        
+        await _context.Set<Establishment>().AddRangeAsync(establishment1, establishment2);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = await _repository.GetRangeWithFilterAsync(filterValues, 2);
+        
+        // Assert
+        Assert.Empty(result);
+    }
     
     [Fact]
-    public async Task GetRangeWithFilterInAreaAsync_IfNoEstablishments_ShouldReturnEmptyList()
+    public async Task GetRangeWithFilterAsync_IfNoEstablishments_ShouldReturnEmptyList()
     {
         // Arrange
         
-        var filterValues = new FilterValues
+        var filterValues = new SearchValues
         {
             MapBounds = new MapBounds { NwLat = 3.0, NwLong = 0.0, SeLat = 0.0, SeLong = 3.0 }
         };
         
         // Act
-        var result = await _repository.GetRangeWithFilterAsync(filterValues);
+        var result = await _repository.GetRangeWithFilterAsync(filterValues, 0);
 
         // Assert
         Assert.NotNull(result);
@@ -299,11 +225,11 @@ public class EstablishmentRepositoryTests
     }
     
     [Fact]
-    public async Task GetRangeWithFilterInAreaAsync_IfSomethingGoesWrong_ShouldThrowException()
+    public async Task GetRangeWithFilterAsync_IfSomethingGoesWrong_ShouldThrowException()
     {
         // Arrange
         
-        var filterValues = new FilterValues
+        var filterValues = new SearchValues
         {
             MapBounds = new MapBounds { NwLat = 3.0, NwLong = 0.0, SeLat = 0.0, SeLong = 3.0 }
         };
@@ -312,7 +238,7 @@ public class EstablishmentRepositoryTests
         await _context.DisposeAsync();
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _repository.GetRangeWithFilterAsync(filterValues));
+        await Assert.ThrowsAsync<Exception>(() => _repository.GetRangeWithFilterAsync(filterValues, 0));
     }
     
     // UpdateAsync tests

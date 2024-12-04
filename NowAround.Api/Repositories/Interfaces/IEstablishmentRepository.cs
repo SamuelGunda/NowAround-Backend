@@ -7,7 +7,6 @@ namespace NowAround.Api.Repositories.Interfaces;
 public interface IEstablishmentRepository : IBaseAccountRepository<Establishment>
 {
     Task<List<Establishment>> GetAllWhereRegisterStatusPendingAsync();
-    /*Task<List<Establishment>> GetRangeWithFilterDeprecatedAsync(string? name, int? priceCategory, string? categoryName, List<string>? tagNames);*/
-    Task<List<Establishment>> GetRangeWithFilterAsync(FilterValues filterValues);
+    Task<List<EstablishmentDto>> GetRangeWithFilterAsync(SearchValues searchValues, int page);
     Task UpdateAsync(EstablishmentDto establishmentDto);
 }

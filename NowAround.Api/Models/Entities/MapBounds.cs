@@ -16,12 +16,12 @@ public class MapBounds
         
         if (NwLat < -90 || NwLat > 90 || NwLong < -180 || NwLong > 180)
         {
-            throw new ArgumentException("Invalid coordinates");
+            throw new ArgumentException("Coordinates are invalid");
         }
         
         if (SeLat < -90 || SeLat > 90 || SeLong < -180 || SeLong > 180)
         {
-            throw new ArgumentException("Invalid coordinates");
+            throw new ArgumentException("Coordinates are invalid");
         }
         
         if (NwLat <= SeLat)

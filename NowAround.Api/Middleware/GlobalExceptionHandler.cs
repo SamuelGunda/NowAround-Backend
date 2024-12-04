@@ -36,6 +36,12 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
                 Title = "Not found",
                 Detail = entityNotFoundException.Message
             },
+            InvalidSearchActionException invalidSearchActionException => new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Invalid search action",
+                Detail = invalidSearchActionException.Message
+            },
             _ => new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,

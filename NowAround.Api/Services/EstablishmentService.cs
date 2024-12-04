@@ -13,8 +13,6 @@ using NowAround.Api.Models.Responses;
 using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Services.Interfaces;
 
-// ReSharper disable InvertIf
-
 namespace NowAround.Api.Services;
 
 public class EstablishmentService : IEstablishmentService
@@ -61,11 +59,6 @@ public class EstablishmentService : IEstablishmentService
         
         // Check if categories and tags exist by their name and get them from the database
         var catsAndTags = await SetCategoriesAndTagsAsync(establishmentInfo.Category, establishmentInfo.Tags);
-        if (catsAndTags.categories.Length == 0 || catsAndTags.tags.Length == 0)
-        {
-            _logger.LogWarning("At least one valid category and tag is required");
-            throw new ArgumentException("At least one valid category and tag is required");
-        }
         
         var auth0Id = await _auth0Service.RegisterEstablishmentAccountAsync(personalInfo);
 
@@ -99,7 +92,7 @@ public class EstablishmentService : IEstablishmentService
         var establishment = await _establishmentRepository.GetByIdAsync(id);
         if (establishment == null)
         {
-            throw new EntityNotFoundException($"Establishment","ID", id.ToString());
+            throw new EntityNotFoundException("Establishment","ID", id.ToString());
         }
 
         return establishment.ToDetailedResponse();
@@ -130,12 +123,14 @@ public class EstablishmentService : IEstablishmentService
         return pendingEstablishments;
     }
 
-    public async Task<List<EstablishmentResponse>> GetEstablishmentMarkersWithFilterAsync(FilterValues filterValues)
+    public async Task<List<EstablishmentDto>> GetEstablishmentsWithFilterAsync(SearchValues searchValues, int page)
     {
+        searchValues.ValidateProperties();
+        page = page >= 0 ? page : throw new InvalidSearchActionException("Page must be greater than 0");
         
-        var establishments = await _establishmentRepository.GetRangeWithFilterAsync(filterValues);
+        var establishmentDtos = await _establishmentRepository.GetRangeWithFilterAsync(searchValues, page);
         
-        return establishments.Select(e => e.ToMarker()).ToList();
+        return establishmentDtos;
     }
 
     public async Task<int> GetEstablishmentsCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd)

@@ -40,19 +40,43 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
         }
     }
     
-    public async Task<List<Establishment>> GetRangeWithFilterAsync(FilterValues filterValues)
+    public async Task<List<EstablishmentDto>> GetRangeWithFilterAsync(SearchValues searchValues, int page)
     {
         try
         {
             var query = DbSet.AsQueryable();
             
-            query = EstablishmentFilteredSearchQueryBuilder.ApplyFilters(query, filterValues);
+            query = EstablishmentSearchQueryBuilder.ApplyFilters(query, searchValues);
+
+            var establishments = new List<EstablishmentDto>();
             
-            var establishments = await query.ToListAsync();
+            if (page > 0)
+            {
+                establishments = await query
+                    .Skip((page - 1) * 5).Take(5)
+                    .Select(e => new EstablishmentDto
+                    {
+                        Auth0Id = e.Auth0Id,
+                        Name = e.Name
+                    })
+                    .ToListAsync();
+            }
+            else
+            {
+                establishments = await query
+                    .Select(e => new EstablishmentDto
+                    {
+                        Auth0Id = e.Auth0Id,
+                        Name = e.Name,
+                        Latitude = e.Latitude,
+                        Longitude = e.Longitude
+                    })
+                    .ToListAsync();
+            }
             
             if (establishments.Count == 0)
             {
-                Logger.LogInformation("Establishments with filter in area not found");
+                Logger.LogInformation("No establishments were found with the given filter values");
                 return [];
             }
             
