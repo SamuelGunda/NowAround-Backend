@@ -11,10 +11,5 @@ public class SocialLinkConfiguration : IEntityTypeConfiguration<SocialLink>
         builder.HasKey(sl => sl.Id);
         builder.Property(sl => sl.Name).IsRequired();
         builder.Property(sl => sl.Url).IsRequired();
-        
-        builder.HasOne(sl => sl.Establishment)
-            .WithMany(e => e.SocialLinks)
-            .HasForeignKey(sl => sl.EstablishmentId)
-            .OnDelete(DeleteBehavior.NoAction);
     }
 }

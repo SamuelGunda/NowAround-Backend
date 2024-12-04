@@ -1,8 +1,9 @@
-﻿namespace NowAround.Api.Models.Domain;
+﻿using NowAround.Api.Models.Entities;
 
-public class SocialLink
+namespace NowAround.Api.Models.Domain;
+
+public class SocialLink : BaseEntity
 {
-    public int Id { get; init; }
     public string Name { get; set; }
     public string Url { get; set; }
     public int EstablishmentId { get; set; }

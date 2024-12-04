@@ -23,6 +23,21 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
         builder.Property(e => e.CreatedAt).IsRequired();
         builder.Property(e => e.UpdatedAt).IsRequired();
         
+        builder.HasOne(e => e.BusinessHours)
+            .WithOne(bh => bh.Establishment)
+            .HasForeignKey<BusinessHours>(bh => bh.EstablishmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasMany(e => e.MenuItems)
+            .WithOne(mi => mi.Establishment)
+            .HasForeignKey(mi => mi.EstablishmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasMany(e => e.SocialLinks)
+            .WithOne(sl => sl.Establishment)
+            .HasForeignKey(sl => sl.EstablishmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+                
         builder.HasMany(e => e.EstablishmentCategories)
             .WithOne(ec => ec.Establishment)
             .HasForeignKey(ec => ec.EstablishmentId)
@@ -31,11 +46,6 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
         builder.HasMany(e => e.EstablishmentTags)
             .WithOne(et => et.Establishment)
             .HasForeignKey(et => et.EstablishmentId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
-        builder.HasMany(e => e.SocialLinks)
-            .WithOne(sl => sl.Establishment)
-            .HasForeignKey(sl => sl.EstablishmentId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(e => e.RequestStatus)
