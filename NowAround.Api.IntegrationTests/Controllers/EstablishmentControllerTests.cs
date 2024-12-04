@@ -432,7 +432,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterAsync_WithNoFilters_ShouldReturnInternalServerError()
+    public async Task GetEstablishmentMarkersWithFilterAsync_WithNoFilters_ShouldReturnBadRequest()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -443,13 +443,11 @@ public class EstablishmentControllerTests
         var response = await client.GetAsync("/api/establishment/search");
 
         // Assert
-        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
     
-    // GetEstablishmentMarkersWithFilterInAreaAsync Tests
-    
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_WithValidBounds_ShouldReturnEstablishments()
+    public async Task GetEstablishmentMarkersWithFilterAsync_WithValidBounds_ShouldReturnEstablishments()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -457,7 +455,7 @@ public class EstablishmentControllerTests
         var client = factory.CreateClient();
         
         // Act
-        var response = await client.GetAsync("/api/establishment/search-area?northWestLat=3&northWestLong=0&southEastLat=0&southEastLong=3");
+        var response = await client.GetAsync("/api/establishment/search?northWestLat=3&northWestLong=0&southEastLat=0&southEastLong=3");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -469,7 +467,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_WhenNoEstablishmentsInArea_ShouldReturnNoContent()
+    public async Task GetEstablishmentMarkersWithFilterAsync_WhenNoEstablishmentsInArea_ShouldReturnNoContent()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -477,14 +475,14 @@ public class EstablishmentControllerTests
         var client = factory.CreateClient();
         
         // Act
-        var response = await client.GetAsync("/api/establishment/search-area?northWestLat=50&northWestLong=49&southEastLat=49&southEastLong=50");
+        var response = await client.GetAsync("/api/establishment/search?northWestLat=50&northWestLong=49&southEastLat=49&southEastLong=50");
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_WithInvalidBounds_ShouldReturnInternalServerError()
+    public async Task GetEstablishmentMarkersWithFilterAsync_WithInvalidBounds_ShouldReturnBadRequest()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -492,14 +490,14 @@ public class EstablishmentControllerTests
         var client = factory.CreateClient();
         
         // Act
-        var response = await client.GetAsync("/api/establishment/search-area?northWestLat=0&northWestLong=0&southEastLat=0&southEastLong=0");
+        var response = await client.GetAsync("/api/establishment/search?northWestLat=0&northWestLong=0&southEastLat=0&southEastLong=0");
 
         // Assert
-        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_WithValidBoundsAndFilters_ShouldReturnEstablishments()
+    public async Task GetEstablishmentMarkersWithFilterAsync_WithAllFilterValues_ShouldReturnEstablishments()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -507,7 +505,7 @@ public class EstablishmentControllerTests
         var client = factory.CreateClient();
         
         // Act
-        var response = await client.GetAsync("/api/establishment/search-area?northWestLat=3&northWestLong=0&southEastLat=0&southEastLong=3&name=Test&priceCategory=0&categoryName=RESTAURANT&tagNames=PET_FRIENDLY");
+        var response = await client.GetAsync("/api/establishment/search?northWestLat=3&northWestLong=0&southEastLat=0&southEastLong=3&name=Test&priceCategory=0&categoryName=RESTAURANT&tagNames=PET_FRIENDLY");
 
         // Assert
         response.EnsureSuccessStatusCode();

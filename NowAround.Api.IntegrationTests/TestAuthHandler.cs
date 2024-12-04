@@ -14,9 +14,8 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
     public TestAuthHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
-        UrlEncoder encoder,
-        ISystemClock clock)
-        : base(options, logger, encoder, clock) { }
+        UrlEncoder encoder)
+        : base(options, logger, encoder) { }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
@@ -31,8 +30,8 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
 
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Role, role),
-            new Claim("roles", role)
+            new(ClaimTypes.Role, role),
+            new("roles", role)
         };
 
         if (authHeaderParts.Length >= 3)

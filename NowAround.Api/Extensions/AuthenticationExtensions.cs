@@ -38,11 +38,9 @@ public static class AuthenticationExtensions
             };
         });
         
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy("EstablishmentOnly", policy => policy.RequireRole("Establishment"));
-            options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
-            options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-        });
+        services.AddAuthorizationBuilder()
+                    .AddPolicy("EstablishmentOnly", policy => policy.RequireRole("Establishment"))
+                    .AddPolicy("UserOnly", policy => policy.RequireRole("User"))
+                    .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
     }
 }

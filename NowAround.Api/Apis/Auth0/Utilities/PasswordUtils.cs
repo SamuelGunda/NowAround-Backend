@@ -4,7 +4,7 @@ namespace NowAround.Api.Apis.Auth0.Utilities;
 
 public static class PasswordUtils
 {
-    private static readonly Random Random = new Random();
+    private static readonly Random Random = new();
     private const string LowerCase = "abcdefghijklmnopqrstuvwxyz";
     private const string UpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private const string Numbers = "0123456789";
@@ -15,7 +15,7 @@ public static class PasswordUtils
         if (length < 10)
             throw new ArgumentException("Password length must be at least 10 characters.");
 
-        var allChars = LowerCase + UpperCase + Numbers + SpecialChars;
+        const string allChars = LowerCase + UpperCase + Numbers + SpecialChars;
         var password = new StringBuilder();
 
         password.Append(LowerCase[Random.Next(LowerCase.Length)]);
@@ -23,7 +23,7 @@ public static class PasswordUtils
         password.Append(Numbers[Random.Next(Numbers.Length)]);
         password.Append(SpecialChars[Random.Next(SpecialChars.Length)]);
 
-        for (int i = 4; i < length; i++)
+        for (var i = 4; i < length; i++)
         {
             password.Append(allChars[Random.Next(allChars.Length)]);
         }

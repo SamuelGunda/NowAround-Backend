@@ -6,7 +6,7 @@ namespace NowAround.Api.Repositories;
 
 public abstract class BaseAccountRepository<T> : BaseRepository<T>, IBaseAccountRepository<T> where T : BaseAccountEntity
 {
-    public BaseAccountRepository(AppDbContext context, ILogger<T> logger) : base(context, logger)
+    protected BaseAccountRepository(AppDbContext context, ILogger<T> logger) : base(context, logger)
     {
     }
 

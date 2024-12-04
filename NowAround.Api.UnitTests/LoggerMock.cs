@@ -12,7 +12,7 @@ public class LogMessage
 
 public class LoggerMock<T> : Mock<ILogger<T>>
 {
-    private readonly List<LogMessage> _loggedMessages = new();
+    private readonly List<LogMessage> _loggedMessages = [];
 
     public LoggerMock()
     {

@@ -10,7 +10,6 @@ using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;
-using NowAround.Api.Repositories;
 using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Services;
 
@@ -24,8 +23,7 @@ public class EstablishmentServiceTests
     private readonly Mock<IMapboxService> _mapboxServiceMock;
     private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
     private readonly Mock<ITagRepository> _tagRepositoryMock;
-    private readonly Mock<ILogger<EstablishmentService>> _loggerMock;
-    
+
     private readonly EstablishmentService _establishmentService;
     
     public EstablishmentServiceTests()
@@ -35,7 +33,7 @@ public class EstablishmentServiceTests
         _mapboxServiceMock = new Mock<IMapboxService>();
         _categoryRepositoryMock = new Mock<ICategoryRepository>();
         _tagRepositoryMock = new Mock<ITagRepository>();
-        _loggerMock = new Mock<ILogger<EstablishmentService>>();
+        Mock<ILogger<EstablishmentService>> loggerMock = new();
         
         _establishmentService = new EstablishmentService(
             _auth0ServiceMock.Object,
@@ -43,7 +41,7 @@ public class EstablishmentServiceTests
             _establishmentRepositoryMock.Object,
             _categoryRepositoryMock.Object,
             _tagRepositoryMock.Object,
-            _loggerMock.Object);
+            loggerMock.Object);
     }
     
     // RegisterEstablishmentAsync Tests
@@ -251,7 +249,7 @@ public class EstablishmentServiceTests
     }
 
     [Fact]
-    public async Task RegisterEstablishmentAsync_CategoryRepositoryThrowsException_ShouldThrowException()
+    public async Task RegisterEstablishmentAsync_InvalidCategoryThrowsException_ShouldThrowException()
     {
         // Arrange
         var establishmentRequest = new EstablishmentRegisterRequest
@@ -282,13 +280,49 @@ public class EstablishmentServiceTests
         _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(coordinates);
         _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<PersonalInfo>())).ReturnsAsync(auth0Id);
-        _categoryRepositoryMock.Setup(r => r.GetByNameWithTagsAsync(It.IsAny<string>())).ThrowsAsync(new Exception());
+        _categoryRepositoryMock.Setup(r => r.GetByNameWithTagsAsync(It.IsAny<string>())).ReturnsAsync( null as Category);
+        
+        await Assert.ThrowsAsync<ArgumentException>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
+    }
+
+    [Fact]
+    public async Task RegisterEstablishmentAsync_InvalidTagThrowsException_ShouldThrowException()
+    {
+        // Arrange
+        var establishmentRequest = new EstablishmentRegisterRequest
+        {
+            EstablishmentInfo = new EstablishmentInfo
+            {
+                Name = "Test Establishment",
+                Address = "123 Test St",
+                City = "Test City",
+                PostalCode = "12345",
+                PriceCategory = 1,
+                Category = new List<string> { "RESTAURANT" },
+                Tags = new List<string> { "test" }
+            },
+            PersonalInfo = new PersonalInfo
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Email = "john.doe@example.com"
+            }
+        };
+        
+        var coordinates = (lat: 1.0, lng: 1.0);
+        const string auth0Id = "auth0|123";
+        var categories = new[] { new Category { Name = "RESTAURANT"} };
+        
+        // Act & Assert
+        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
+        _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(coordinates);
+        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<PersonalInfo>())).ReturnsAsync(auth0Id);
+        _categoryRepositoryMock.Setup(r => r.GetByNameWithTagsAsync(It.IsAny<string>())).ReturnsAsync(categories[0]);
         _tagRepositoryMock
             .Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>()))
-            .ReturnsAsync((string property, string value) =>
-                tags.FirstOrDefault(t => t.Name == value));
+            .ReturnsAsync(null as Tag);
         
-        await Assert.ThrowsAsync<Exception>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
+        await Assert.ThrowsAsync<ArgumentException>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
     }
 
     // GetEstablishmentByIdAsync tests
@@ -404,7 +438,7 @@ public class EstablishmentServiceTests
         // Arrange
         var establishments = new List<Establishment>
         {
-            new Establishment
+            new()
             {
                 Id = 1,
                 Auth0Id = "test-auth0-id",
@@ -431,48 +465,15 @@ public class EstablishmentServiceTests
         Assert.Equal(establishments.Count, result.Count);
     }
     
-    // GetEstablishmentMarkersWithFilterAsync
-    
-    [Fact]
-    public async Task GetEstablishmentMarkersWithFilterAsync_ValidRequest_ShouldReturnListOfEstablishmentMarkerDto()
-    {
-        var establishments = new List<Establishment>
-        {
-            new()
-            {
-                Id = 1,
-                Auth0Id = "test-auth0-id",
-                Name = "test-name",
-                Description = "test-description",
-                City = "test-city",
-                Address = "test-address",
-                Latitude = 1.0,
-                Longitude = 1.0,
-                PriceCategory = PriceCategory.Moderate,
-                RequestStatus = RequestStatus.Pending,
-                EstablishmentCategories = new List<EstablishmentCategory>(),
-                EstablishmentTags = new List<EstablishmentTag>()
-            }
-        };
-        
-        _establishmentRepositoryMock.Setup(r => r.GetRangeWithFilterAsync(
-            It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<List<string>>())).ReturnsAsync(establishments);
-        
-        var result = await _establishmentService.GetEstablishmentMarkersWithFilterAsync("test-name", null, null, null);
-        
-        Assert.NotNull(result);
-    }
-    
-    // GetEstablishmentMarkersWithFilterInAreaAsync
+    // GetEstablishmentWithFilterAsync
 
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterInAreaAsync_ValidRequest_ShouldReturnListOfEstablishmentMarkerDto()
+    public async Task GetEstablishmentsWithFilterAsync_ValidRequest_ShouldReturnListOfEstablishmentMarkerDto()
     {
-        var establishments = new List<Establishment>
+        var establishmentDtos = new List<EstablishmentDto>
         {
             new()
             {
-                Id = 1,
                 Auth0Id = "test-auth0-id",
                 Name = "test-name",
                 Description = "test-description",
@@ -487,19 +488,23 @@ public class EstablishmentServiceTests
             }
         };
         
-        MapBounds mapBounds = new()
+        SearchValues searchValues = new()
         {
-            NwLat = 1.0,
-            NwLong = 1.0,
-            SeLat = 1.0,
-            SeLong = 1.0
+            Name = "test-name",
+            PriceCategory = 1,
+            
+            MapBounds = new MapBounds
+            {
+                        NwLat = 1.0,
+                        NwLong = 1.0,
+                        SeLat = 1.0,
+                        SeLong = 1.0
+            }
         };
         
-        _establishmentRepositoryMock.Setup(r => r.GetRangeWithFilterInAreaAsync(
-            It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>(), 
-            It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<List<string>>())).ReturnsAsync(establishments);
+        _establishmentRepositoryMock.Setup(r => r.GetRangeWithFilterAsync(searchValues, 0)).ReturnsAsync(establishmentDtos);
         
-        var result = await _establishmentService.GetEstablishmentMarkersWithFilterInAreaAsync(mapBounds, null, null, null, null);
+        var result = await _establishmentService.GetEstablishmentsWithFilterAsync(searchValues, 0);
         
         Assert.NotNull(result);
     }
@@ -513,7 +518,7 @@ public class EstablishmentServiceTests
         // Arrange
         var monthStart = new DateTime(2023, 1, 1);
         var monthEnd = new DateTime(2023, 1, 31);
-        var expectedCount = 5;
+        const int expectedCount = 5;
         
         // Act
         _establishmentRepositoryMock.Setup(r => r.GetCountByCreatedAtBetweenDatesAsync(monthStart, monthEnd)).ReturnsAsync(expectedCount);

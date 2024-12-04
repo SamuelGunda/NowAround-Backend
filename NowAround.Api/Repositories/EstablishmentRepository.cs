@@ -3,6 +3,7 @@ using NowAround.Api.Database;
 using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
+using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Utilities;
@@ -39,49 +40,43 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
         }
     }
     
-    public async Task<List<Establishment>> GetRangeWithFilterAsync(string? name, int? priceCategory, string? categoryName, List<string>? tagNames)
+    public async Task<List<EstablishmentDto>> GetRangeWithFilterAsync(SearchValues searchValues, int page)
     {
         try
         {
             var query = DbSet.AsQueryable();
             
-            query = EstablishmentFilterQueryBuilder.ApplyFilters(query, name, priceCategory, categoryName, tagNames);
+            query = EstablishmentSearchQueryBuilder.ApplyFilters(query, searchValues);
+
+            var establishments = new List<EstablishmentDto>();
             
-            var establishments = await query.ToListAsync();
-            
-            if (establishments.Count == 0)
+            if (page > 0)
             {
-                Logger.LogInformation("Establishments with filter not found");
-                return [];
+                establishments = await query
+                    .Skip((page - 1) * 5).Take(5)
+                    .Select(e => new EstablishmentDto
+                    {
+                        Auth0Id = e.Auth0Id,
+                        Name = e.Name
+                    })
+                    .ToListAsync();
+            }
+            else
+            {
+                establishments = await query
+                    .Select(e => new EstablishmentDto
+                    {
+                        Auth0Id = e.Auth0Id,
+                        Name = e.Name,
+                        Latitude = e.Latitude,
+                        Longitude = e.Longitude
+                    })
+                    .ToListAsync();
             }
             
-            return establishments;
-        }
-        catch (Exception e)
-        {
-            Logger.LogError("Failed to get establishments by filter: {Message}", e.Message);
-            throw new Exception("Failed to get establishments by filter", e);
-        }
-    }
-    
-    public async Task<List<Establishment>> GetRangeWithFilterInAreaAsync(
-        double nwLat, double nwLong,
-        double seLat, double seLong, 
-        string? name, int? priceCategory, string? categoryName, List<string>? tagNames)
-    {
-        try
-        {
-            var query = DbSet
-                .Where(e => e.Latitude <= nwLat && e.Latitude >= seLat)
-                .Where(e => e.Longitude >= nwLong && e.Longitude <= seLong);
-            
-            query = EstablishmentFilterQueryBuilder.ApplyFilters(query, name, priceCategory, categoryName, tagNames);
-            
-            var establishments = await query.ToListAsync();
-            
             if (establishments.Count == 0)
             {
-                Logger.LogInformation("Establishments with filter in area not found");
+                Logger.LogInformation("No establishments were found with the given filter values");
                 return [];
             }
             
