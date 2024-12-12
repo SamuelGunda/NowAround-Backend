@@ -37,7 +37,7 @@ public class Auth0ServiceTests
     public async Task RegisterEstablishmentAccountAsync_ShouldReturnAuth0UserId()
     {
         // Arrange
-        var personalInfo = new PersonalInfo
+        var personalInfo = new OwnerInfo
         {
             Email = "test@test.com",
             FirstName = "Test",
@@ -76,7 +76,7 @@ public class Auth0ServiceTests
     public async Task RegisterEstablishmentAccountAsync_WhenEmailIsAlreadyInUse_ShouldThrowEmailAlreadyInUseException()
     {
         // Arrange
-        var personalInfo = new PersonalInfo
+        var personalInfo = new OwnerInfo
         {
             Email = "test@test.com",
             FirstName = "Test",
@@ -107,7 +107,7 @@ public class Auth0ServiceTests
     public async Task RegisterEstablishmentAccountAsync_WhenRequestFails_ShouldThrowHttpRequestException()
     {
         // Arrange
-        var personalInfo = new PersonalInfo
+        var personalInfo = new OwnerInfo
         {
             Email = "test@test.com",
             FirstName = "Test",

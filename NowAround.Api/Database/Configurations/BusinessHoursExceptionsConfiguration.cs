@@ -9,12 +9,7 @@ public class BusinessHoursExceptionsConfiguration : IEntityTypeConfiguration<Bus
     public void Configure(EntityTypeBuilder<BusinessHoursException> builder)
     {
         builder.HasKey(bhe => bhe.Id);
-        
-        builder.Property(bhe => bhe.Date)
-            .IsRequired();
-        
-        builder.Property(bhe => bhe.Status)
-            .IsRequired()
-            .HasMaxLength(16);
+        builder.Property(bhe => bhe.Date).IsRequired();
+        builder.Property(bhe => bhe.Status).IsRequired();
     }
 }

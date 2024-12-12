@@ -28,7 +28,12 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
             .HasForeignKey<BusinessHours>(bh => bh.EstablishmentId)
             .OnDelete(DeleteBehavior.Cascade);
         
-        builder.HasMany(e => e.MenuItems)
+        builder.HasOne(e => e.RatingStatistic)
+            .WithOne(rc => rc.Establishment)
+            .HasForeignKey<RatingStatistic>(rc => rc.EstablishmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasMany(e => e.Menus)
             .WithOne(mi => mi.Establishment)
             .HasForeignKey(mi => mi.EstablishmentId)
             .OnDelete(DeleteBehavior.Cascade);
@@ -46,6 +51,16 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
         builder.HasMany(e => e.EstablishmentTags)
             .WithOne(et => et.Establishment)
             .HasForeignKey(et => et.EstablishmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasMany(e => e.EstablishmentCuisines)
+            .WithOne(ec => ec.Establishment)
+            .HasForeignKey(ec => ec.EstablishmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasMany(e => e.Posts)
+            .WithOne(p => p.Establishment)
+            .HasForeignKey(p => p.EstablishmentId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(e => e.RequestStatus)

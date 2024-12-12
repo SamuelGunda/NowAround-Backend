@@ -32,7 +32,7 @@ public class EstablishmentControllerTests
     public async Task RegisterEstablishmentAsync_WithValidRequest_ShouldReturnCreated()
     {
         _auth0ServiceMock
-            .Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<PersonalInfo>()))
+            .Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>()))
             .ReturnsAsync("auth0|valid_register");
 
         _mapboxServiceMock
@@ -56,7 +56,7 @@ public class EstablishmentControllerTests
                 Category = new List<string> { "BAR" },
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            PersonalInfo = new PersonalInfo
+            OwnerInfo = new OwnerInfo
             {
                 FirstName = "Test",
                 LastName = "Bar",
@@ -92,7 +92,7 @@ public class EstablishmentControllerTests
                 Category = new List<string> { "BAR" },
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            PersonalInfo = new PersonalInfo
+            OwnerInfo = new OwnerInfo
             {
                 FirstName = "Test",
                 LastName = "Bar"
@@ -127,7 +127,7 @@ public class EstablishmentControllerTests
                 Category = new List<string> { "BAR" },
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            PersonalInfo = new PersonalInfo
+            OwnerInfo = new OwnerInfo
             {
                 FirstName = "Test",
                 LastName = "Bar",
@@ -148,7 +148,7 @@ public class EstablishmentControllerTests
     public async Task RegisterEstablishmentAsync_WithEmailTaken_ShouldReturnConflict()
     {
         _auth0ServiceMock
-            .Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<PersonalInfo>()))
+            .Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>()))
             .ThrowsAsync(new EmailAlreadyInUseException("Email already in use"));
 
         var factory = new NowAroundWebApplicationFactory(_auth0ServiceMock);
@@ -167,7 +167,7 @@ public class EstablishmentControllerTests
                 Category = new List<string> { "BAR" },
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            PersonalInfo = new PersonalInfo
+            OwnerInfo = new OwnerInfo
             {
                 FirstName = "Test",
                 LastName = "Bar",

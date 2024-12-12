@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NowAround.Api.Database;
 
@@ -11,9 +12,11 @@ using NowAround.Api.Database;
 namespace NowAround.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241210115136_PostReviewCuisineAdditions")]
+    partial class PostReviewCuisineAdditions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,7 +95,8 @@ namespace NowAround.Api.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
 
                     b.HasKey("Id");
 
@@ -183,9 +187,6 @@ namespace NowAround.Api.Migrations
                         .HasColumnType("nvarchar(32)");
 
                     b.Property<int>("PriceCategory")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RatingCollectionId")
                         .HasColumnType("int");
 
                     b.Property<int>("RequestStatus")
@@ -438,40 +439,6 @@ namespace NowAround.Api.Migrations
                     b.ToTable("PostLikes");
                 });
 
-            modelBuilder.Entity("NowAround.Api.Models.Domain.RatingStatistic", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EstablishmentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FiveStars")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FourStars")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OneStar")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ThreeStars")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TwoStars")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EstablishmentId")
-                        .IsUnique();
-
-                    b.ToTable("RatingStatistics");
-                });
-
             modelBuilder.Entity("NowAround.Api.Models.Domain.Review", b =>
                 {
                     b.Property<int>("Id")
@@ -488,10 +455,10 @@ namespace NowAround.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Rating")
+                    b.Property<int>("EstablishmentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RatingCollectionId")
+                    b.Property<int>("Rating")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -502,7 +469,7 @@ namespace NowAround.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RatingCollectionId");
+                    b.HasIndex("EstablishmentId");
 
                     b.HasIndex("UserId");
 
@@ -759,23 +726,12 @@ namespace NowAround.Api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("NowAround.Api.Models.Domain.RatingStatistic", b =>
-                {
-                    b.HasOne("NowAround.Api.Models.Domain.Establishment", "Establishment")
-                        .WithOne("RatingStatistic")
-                        .HasForeignKey("NowAround.Api.Models.Domain.RatingStatistic", "EstablishmentId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Establishment");
-                });
-
             modelBuilder.Entity("NowAround.Api.Models.Domain.Review", b =>
                 {
-                    b.HasOne("NowAround.Api.Models.Domain.RatingStatistic", "RatingStatistic")
+                    b.HasOne("NowAround.Api.Models.Domain.Establishment", "Establishment")
                         .WithMany("Reviews")
-                        .HasForeignKey("RatingCollectionId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasForeignKey("EstablishmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("NowAround.Api.Models.Domain.User", "User")
@@ -784,7 +740,7 @@ namespace NowAround.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("RatingStatistic");
+                    b.Navigation("Establishment");
 
                     b.Navigation("User");
                 });
@@ -842,8 +798,7 @@ namespace NowAround.Api.Migrations
 
                     b.Navigation("Posts");
 
-                    b.Navigation("RatingStatistic")
-                        .IsRequired();
+                    b.Navigation("Reviews");
 
                     b.Navigation("SocialLinks");
                 });
@@ -856,11 +811,6 @@ namespace NowAround.Api.Migrations
             modelBuilder.Entity("NowAround.Api.Models.Domain.Post", b =>
                 {
                     b.Navigation("PostLikes");
-                });
-
-            modelBuilder.Entity("NowAround.Api.Models.Domain.RatingStatistic", b =>
-                {
-                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("NowAround.Api.Models.Domain.Tag", b =>

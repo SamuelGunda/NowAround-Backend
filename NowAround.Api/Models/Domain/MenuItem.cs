@@ -9,6 +9,6 @@ public class MenuItem : BaseEntity
     public string Description { get; set; }
     public string Price { get; set; }
     
-    public int EstablishmentId { get; set; }
-    public virtual Establishment Establishment { get; set; }
+    public int MenuId { get; set; }
+    public virtual Menu Menu { get; set; }
 }

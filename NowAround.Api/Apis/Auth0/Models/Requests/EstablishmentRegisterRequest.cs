@@ -4,7 +4,7 @@ public class EstablishmentRegisterRequest
 {
     public EstablishmentInfo EstablishmentInfo { get; set; }
     
-    public PersonalInfo PersonalInfo { get; set; }
+    public OwnerInfo OwnerInfo { get; set; }
     
     public void ValidateProperties()
     {
@@ -13,12 +13,12 @@ public class EstablishmentRegisterRequest
             throw new ArgumentNullException(nameof(EstablishmentInfo));
         }
         
-        if (PersonalInfo == null)
+        if (OwnerInfo == null)
         {
-            throw new ArgumentNullException(nameof(PersonalInfo));
+            throw new ArgumentNullException(nameof(OwnerInfo));
         }
         
         EstablishmentInfo.ValidateProperties();
-        PersonalInfo.ValidateProperties();
+        OwnerInfo.ValidateProperties();
     }
 }

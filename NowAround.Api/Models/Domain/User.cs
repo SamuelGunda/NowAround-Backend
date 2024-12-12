@@ -5,7 +5,9 @@ namespace NowAround.Api.Models.Domain;
 
 public class User : BaseAccountEntity
 {
-    [MaxLength(32)]
+    [MaxLength(64)]
     public required string FullName { get; set; }
     public virtual ICollection<Friend> Friends { get; set; } = new List<Friend>();
+    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public virtual ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();
 }

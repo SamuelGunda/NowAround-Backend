@@ -46,7 +46,7 @@ public class EstablishmentService : IEstablishmentService
         request.ValidateProperties();
         
         var establishmentInfo = request.EstablishmentInfo;
-        var personalInfo = request.PersonalInfo;
+        var personalInfo = request.OwnerInfo;
         
         if (await _establishmentRepository.CheckIfExistsByPropertyAsync("Name", establishmentInfo.Name))
         {
@@ -72,7 +72,8 @@ public class EstablishmentService : IEstablishmentService
             City = establishmentInfo.City,
             PriceCategory = (PriceCategory) establishmentInfo.PriceCategory,
             EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory { Category = c }).ToList(),
-            EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag { Tag = t }).ToList()
+            EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag { Tag = t }).ToList(),
+            
         };
             
         try
@@ -98,7 +99,7 @@ public class EstablishmentService : IEstablishmentService
         return establishment.ToDetailedResponse();
     }
     
-    public async Task<EstablishmentResponse> GetEstablishmentByAuth0IdAsync(string auth0Id)
+    public async Task<EstablishmentProfileResponse> GetEstablishmentByAuth0IdAsync(string auth0Id)
     {
         var establishment = await _establishmentRepository.GetByAuth0IdAsync(auth0Id);
         if (establishment == null)
@@ -106,7 +107,7 @@ public class EstablishmentService : IEstablishmentService
             throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
         }
 
-        return establishment.ToDetailedResponse();
+        return establishment;
     }
 
     public async Task<List<PendingEstablishmentResponse>> GetPendingEstablishmentsAsync()

@@ -11,7 +11,7 @@ public interface IEstablishmentService
 {
     Task RegisterEstablishmentAsync(EstablishmentRegisterRequest request);
     Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id);
-    Task<EstablishmentResponse> GetEstablishmentByAuth0IdAsync(string auth0Id);
+    Task<EstablishmentProfileResponse> GetEstablishmentByAuth0IdAsync(string auth0Id);
     Task<List<PendingEstablishmentResponse>> GetPendingEstablishmentsAsync();
     Task<List<EstablishmentDto>> GetEstablishmentsWithFilterAsync(SearchValues searchValues, int page);
     Task<int> GetEstablishmentsCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd);

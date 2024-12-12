@@ -113,16 +113,6 @@ public class EstablishmentController : ControllerBase
         return BadRequest(new { message = "Invalid action type. Please use 'accept' or 'reject'." });
     }
     
-    /// <summary>
-    /// Deletes the establishment with the given Auth0 ID
-    /// Only the establishment owner or an admin can delete the establishment
-    /// </summary>
-    /// <param name="auth0Id"> The Auth0 ID of the establishment </param>
-    /// <returns> A status code indicating the result of the operation </returns>
-    /// <response code="200"> Establishment deleted successfully </response>
-    /// <response code="403"> User does not have permission to delete this establishment </response>
-    /// <response code="404"> No establishment with the given Auth0 ID was found </response>
-    /// <response code="500"> An error occurred while deleting the establishment </response>
     [Authorize]
     [HttpDelete]
     public async Task<IActionResult> DeleteEstablishmentAsync(string auth0Id)
