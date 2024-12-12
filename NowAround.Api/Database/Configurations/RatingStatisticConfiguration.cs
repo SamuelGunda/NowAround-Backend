@@ -15,15 +15,9 @@ public class RatingStatisticConfiguration : IEntityTypeConfiguration<RatingStati
         builder.Property(rc => rc.FourStars).IsRequired();
         builder.Property(rc => rc.FiveStars).IsRequired();
         
-        builder.HasOne(rc => rc.Establishment)
-            .WithOne(e => e.RatingStatistic)
-            .HasForeignKey<RatingStatistic>(rc => rc.EstablishmentId)
-            .OnDelete(DeleteBehavior.NoAction);
-        
         builder.HasMany(rc => rc.Reviews)
             .WithOne(r => r.RatingStatistic)
             .HasForeignKey(r => r.RatingCollectionId)
             .OnDelete(DeleteBehavior.NoAction);
     }
-    
 }

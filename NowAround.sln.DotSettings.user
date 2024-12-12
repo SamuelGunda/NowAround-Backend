@@ -27,6 +27,10 @@
     &lt;Project Location="C:\Users\samue\Desktop\NowAround\NowAround.Api.UnitTests" Presentation="&amp;lt;NowAround.Api.UnitTests&amp;gt;" /&gt;&#xD;
   &lt;/Or&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3cd7a322_002D0f6f_002D403e_002Da0ec_002D34fe187e6b43/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=68be03c9_002Db1ac_002D49e4_002Dbad5_002De8f2662620f9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="RegisterEstablishmentAsync_InvalidCategoryThrowsException_ShouldThrowException" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::D5353132-2A8B-47EC-86CF-50DB54220608::net8.0::NowAround.Api.UnitTests.Services.EstablishmentServiceTests.RegisterEstablishmentAsync_InvalidCategoryThrowsException_ShouldThrowException&lt;/TestId&gt;&#xD;
@@ -38,6 +42,9 @@
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=8cb74fe8_002Df70f_002D4079_002Da7e8_002Dfeee5c4f9f79/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=bc34e42a_002D6251_002D464c_002D8106_002D9c42702d7af2/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	

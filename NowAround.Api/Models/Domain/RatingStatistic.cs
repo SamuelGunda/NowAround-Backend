@@ -13,6 +13,5 @@ public class RatingStatistic : BaseEntity
     public int EstablishmentId { get; set; }
     public Establishment Establishment { get; set; }
     
-    
     public  ICollection<Review> Reviews { get; set; } = new List<Review>();
 }

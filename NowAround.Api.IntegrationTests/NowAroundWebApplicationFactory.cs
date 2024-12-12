@@ -157,6 +157,40 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
             TagId = familyFriendlyTag.Id
         });
         
+        // Business Hours
+        
+        var businessHours = new BusinessHours
+        {
+            EstablishmentId = establishmentRestaurant.Id,
+            Monday = "08:00-17:00",
+            Tuesday = "08:00-17:00",
+            Wednesday = "08:00-17:00",
+            Thursday = "08:00-17:00",
+            Friday = "08:00-17:00",
+            Saturday = "08:00-17:00",
+            Sunday = "08:00-17:00"
+        };
+        
+        dbContext.BusinessHours.Add(businessHours);
+        
+        establishmentRestaurant.BusinessHours = businessHours;
+        
+        // Rating Statistic
+        
+        var ratingStatistic = new RatingStatistic
+        {
+            EstablishmentId = establishmentRestaurant.Id,
+            OneStar = 0,
+            TwoStars = 0,
+            ThreeStars = 0,
+            FourStars = 0,
+            FiveStars = 0
+        };
+        
+        dbContext.RatingStatistics.Add(ratingStatistic);
+        
+        establishmentRestaurant.RatingStatistic = ratingStatistic;
+        
         // Users
         
         var user = new User { Auth0Id = "auth0|valid", FullName = "Test User" };

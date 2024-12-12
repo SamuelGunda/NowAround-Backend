@@ -217,15 +217,15 @@ public class EstablishmentControllerTests
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishmentResponse = JsonConvert.DeserializeObject<EstablishmentResponse>(responseContent);
+        var establishmentResponse = JsonConvert.DeserializeObject<EstablishmentProfileResponse>(responseContent);
 
         Assert.Equal(establishment.Auth0Id, establishmentResponse.Auth0Id);
-        Assert.Equal(establishment.Name, establishmentResponse.Name);
-        Assert.Equal(establishment.Description, establishmentResponse.Description);
-        Assert.Equal(establishment.Address, establishmentResponse.Address);
-        Assert.Equal(establishment.City, establishmentResponse.City);
-        Assert.Equal(establishment.Latitude, establishmentResponse.Latitude);
-        Assert.Equal(establishment.Longitude, establishmentResponse.Longitude);
+        Assert.Equal(establishment.Name, establishmentResponse.GenericInfo.Name);
+        Assert.Equal(establishment.Description, establishmentResponse.GenericInfo.Description);
+        Assert.Equal(establishment.Address, establishmentResponse.LocationInfo.Address);
+        Assert.Equal(establishment.City, establishmentResponse.LocationInfo.City);
+        Assert.Equal(establishment.Latitude, establishmentResponse.LocationInfo.Lat);
+        Assert.Equal(establishment.Longitude, establishmentResponse.LocationInfo.Long);
     }
     
     [Fact]

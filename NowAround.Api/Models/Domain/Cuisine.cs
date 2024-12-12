@@ -8,5 +8,5 @@ public class Cuisine : BaseEntity
     [MaxLength(32)]
     public string Name { get; set; }
     
-    public virtual ICollection<EstablishmentCuisine> EstablishmentCuisines { get; set; } = new List<EstablishmentCuisine>();
+    public ICollection<EstablishmentCuisine> EstablishmentCuisines { get; set; } = new List<EstablishmentCuisine>();
 }

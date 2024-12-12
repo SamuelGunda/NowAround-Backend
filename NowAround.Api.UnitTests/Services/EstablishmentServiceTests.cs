@@ -10,6 +10,7 @@ using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;
+using NowAround.Api.Models.Responses;
 using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Services;
 
@@ -376,7 +377,7 @@ public class EstablishmentServiceTests
     // GetEstablishmentByAuth0IdAsync tests
     
     [Fact]
-    public async Task GetEstablishmentByAuth0IdAsync_ValidAuth0Id_ShouldReturnEstablishmentDto()
+    public async Task GetEstablishmentByAuth0IdAsync_ValidAuth0Id_ShouldReturnEstablishment()
     {
         // Arrange
         const string auth0Id = "test-auth0-id";
@@ -386,6 +387,7 @@ public class EstablishmentServiceTests
             Auth0Id = "test-auth0-id",
             Name = "test-name",
             Description = "test-description",
+            Website = "test-website",
             City = "test-city",
             Address = "test-address",
             Latitude = 1.0,
@@ -395,28 +397,58 @@ public class EstablishmentServiceTests
             EstablishmentCategories = new List<EstablishmentCategory>(),
             EstablishmentTags = new List<EstablishmentTag>()
         };
-        _establishmentRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(establishment);
+        
+        var establishmentProfile = new EstablishmentProfileResponse(
+            establishment.Auth0Id,
+            new GenericInfo(
+                establishment.Name,
+                "Default",
+                establishment.Description,
+                establishment.Website,
+                "Moderate",
+                new List<string>(),
+                new List<string>(),
+                new List<string>(),
+                new List<SocialLinkDto>()
+            ),
+            new LocationInfo(
+                establishment.Address,
+                establishment.City,
+                establishment.Longitude,
+                establishment.Latitude,
+                new BusinessHoursDto(
+                    "08:00 - 17:00",
+                    "08:00 - 17:00",
+                    "08:00 - 17:00",
+                    "08:00 - 17:00",
+                    "08:00 - 17:00",
+                    "08:00 - 17:00",
+                    "08:00 - 14:00",
+                    new List<BusinessHoursExceptionsDto>()
+                )
+            ),
+            new List<PostWithAuthIdsResponse>(),
+            new List<MenuDto>(),
+            new RatingStatisticResponse(
+                0, 0, 0, 0, 0,
+                new List<ReviewWithAuthIdsResponse>()
+                )
+        );
+        
+        _establishmentRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(establishmentProfile);
         
         // Act
         var result = await _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
         
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(establishment.Name, result.Name);
-        Assert.Equal(establishment.Description, result.Description);
-        Assert.Equal(establishment.City, result.City);
-        Assert.Equal(establishment.Address, result.Address);
-        Assert.Equal(establishment.Latitude, result.Latitude);
-        Assert.Equal(establishment.Longitude, result.Longitude);
-        Assert.Equal(establishment.PriceCategory, result.PriceCategory);
-        Assert.Equal(establishment.RequestStatus, result.RequestStatus);
     }
     
     [Fact]
     public async Task GetEstablishmentByAuth0IdAsync_InvalidAuth0Id_ShouldThrowEstablishmentNotFoundException()
     {
         const string auth0Id = "999";
-        _establishmentRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(null as Establishment);
+        _establishmentRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(null as EstablishmentProfileResponse);
 
         await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id));
     }

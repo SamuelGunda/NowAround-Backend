@@ -29,15 +29,19 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                 new GenericInfo(
                     e.Name,
                     null,
+                    e.Description,
+                    e.Website,
+                    e.PriceCategory.ToString(),
                     e.EstablishmentTags.Select(et => et.Tag.Name).ToList(),
                     e.EstablishmentCategories.Select(ec => ec.Category.Name).ToList(),
-                    e.PriceCategory.ToString(),
                     e.EstablishmentCuisines.Select(ec => ec.Cuisine.Name).ToList(),
                     e.SocialLinks.Select(sl => new SocialLinkDto(sl.Name, sl.Url)).ToList()
                 ),
                 new LocationInfo(
                     e.Address,
                     e.City,
+                    e.Longitude,
+                    e.Latitude,
                     new BusinessHoursDto(
                         e.BusinessHours.Monday,
                         e.BusinessHours.Tuesday,
@@ -49,9 +53,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                         e.BusinessHours.BusinessHoursExceptions
                             .Select(bhe => new BusinessHoursExceptionsDto(bhe.Date, bhe.Status))
                             .ToList()
-                    ),
-                    e.Longitude,
-                    e.Latitude
+                    )
                 ),
                 new List<PostWithAuthIdsResponse>(
                     e.Posts.Select(p => new PostWithAuthIdsResponse(
@@ -86,16 +88,20 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                         r.Rating,
                         r.CreatedAt
                     )).ToList()
-                    
                 )
             ))
             .FirstOrDefaultAsync();
+            
             if (establishment == null)
             {
                 Logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
                 throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
             }
             return establishment;
+        }
+        catch (EntityNotFoundException)
+        {
+            throw;
         }
         catch (Exception e)
         {
