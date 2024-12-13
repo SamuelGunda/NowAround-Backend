@@ -78,7 +78,7 @@ public class EstablishmentServiceTests
         _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(coordinates);
         _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>())).ReturnsAsync(auth0Id);
-        _categoryRepositoryMock.Setup(r => r.GetByNameWithTagsAsync(It.IsAny<string>())).ReturnsAsync(categories[0]);
+        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync(categories[0]);
         _tagRepositoryMock
             .Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>()))
             .ReturnsAsync((string property, string value) =>
@@ -193,7 +193,7 @@ public class EstablishmentServiceTests
         // Act & Assert
         _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync((1.0, 1.0));
-        _categoryRepositoryMock.Setup(r => r.GetByNameWithTagsAsync(It.IsAny<string>())).ReturnsAsync(categories[0]);
+        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync(categories[0]);
         _tagRepositoryMock
             .Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>()))
             .ReturnsAsync((string property, string value) =>
@@ -236,7 +236,7 @@ public class EstablishmentServiceTests
         _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(coordinates);
         _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>())).ReturnsAsync(auth0Id);
-        _categoryRepositoryMock.Setup(r => r.GetByNameWithTagsAsync(It.IsAny<string>())).ReturnsAsync(categories[0]);
+        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync(categories[0]);
         _tagRepositoryMock
             .Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>()))
             .ReturnsAsync((string property, string value) =>
@@ -281,7 +281,7 @@ public class EstablishmentServiceTests
         _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(coordinates);
         _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>())).ReturnsAsync(auth0Id);
-        _categoryRepositoryMock.Setup(r => r.GetByNameWithTagsAsync(It.IsAny<string>())).ReturnsAsync( null as Category);
+        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync( null as Category);
         
         await Assert.ThrowsAsync<ArgumentException>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
     }
@@ -318,7 +318,7 @@ public class EstablishmentServiceTests
         _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(coordinates);
         _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>())).ReturnsAsync(auth0Id);
-        _categoryRepositoryMock.Setup(r => r.GetByNameWithTagsAsync(It.IsAny<string>())).ReturnsAsync(categories[0]);
+        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync(categories[0]);
         _tagRepositoryMock
             .Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>()))
             .ReturnsAsync(null as Tag);
@@ -567,7 +567,7 @@ public class EstablishmentServiceTests
     {
         // Arrange
         var auth0Id = "auth0|12345";
-        var requestStatus = RequestStatus.Accepted; // Replace with appropriate enum value
+        var requestStatus = RequestStatus.Accepted;
 
         _establishmentRepositoryMock
             .Setup(r => r.UpdateAsync(It.IsAny<EstablishmentDto>()))
@@ -637,7 +637,7 @@ public class EstablishmentServiceTests
         var categories = new[] { new Category { Name = "Restaurant" } };
         var tags = new[] { new Tag { Name = "PET_FRIENDLY" } };
 
-        _categoryRepositoryMock.Setup(r => r.GetByNameWithTagsAsync(It.IsAny<string>())).ReturnsAsync(categories[0]);
+        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync(categories[0]);
         _tagRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync((string property, string value) =>
             tags.FirstOrDefault(t => t.Name == value));
 
@@ -697,14 +697,14 @@ public class EstablishmentServiceTests
             Tags = new List<string> { "NonExistentTag" }
         };
 
-        _categoryRepositoryMock.Setup(r => r.GetByNameWithTagsAsync(It.IsAny<string>())).ReturnsAsync((Category)null);
+        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync((Category)null);
         _tagRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync((Tag)null);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentException>(() => 
             _establishmentService.UpdateEstablishmentAsync(request));
 
-        Assert.Contains("Category", exception.Message); // Adjust based on the exception message
+        Assert.Contains("Category", exception.Message);
         _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<EstablishmentDto>()), Times.Never);
     }
     

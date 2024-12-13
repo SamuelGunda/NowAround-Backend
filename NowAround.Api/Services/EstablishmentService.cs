@@ -207,7 +207,7 @@ public class EstablishmentService : IEstablishmentService
             foreach (var categoryName in categoryNames)
             {
                 
-                var categoryEntity = await _categoryRepository.GetByNameWithTagsAsync(categoryName);
+                var categoryEntity = await _categoryRepository.GetByPropertyAsync("Name", categoryName);
 
                 if (categoryEntity == null)
                 {
@@ -224,10 +224,7 @@ public class EstablishmentService : IEstablishmentService
             foreach (var tag in tagNames)
             {
                 // Check if tag belongs to any of the categories, if not, get it from the database
-                var tagEntity = categories
-                                    .SelectMany(c => c.Tags)
-                                    .FirstOrDefault(t => t.Name == tag) 
-                                    ?? await _tagRepository.GetByPropertyAsync("Name",tag);
+                var tagEntity = await _tagRepository.GetByPropertyAsync("Name", tag);
 
                 if (tagEntity == null)
                 {

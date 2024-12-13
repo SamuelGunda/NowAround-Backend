@@ -51,15 +51,4 @@ public class Establishment : BaseAccountEntity
             TagNames = EstablishmentTags.Select(et => et.Tag.Name).ToList()
         };
     }
-
-    public EstablishmentResponse ToMarker()
-    {
-        return new EstablishmentResponse
-        {
-            Name = Name,
-            Auth0Id = Auth0Id,
-            Latitude = Latitude,
-            Longitude = Longitude
-        };
-    }
 }
