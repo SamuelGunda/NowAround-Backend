@@ -13,6 +13,7 @@ builder.Services.AddControllers()
         {
             NamingStrategy = new CamelCaseNamingStrategy()
         };
+        options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
     });
     
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();

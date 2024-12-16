@@ -40,21 +40,21 @@ public class Auth0Service : IAuth0Service
     /// Registers a new establishment account by creating a new user in Auth0 and assigning a role to the user.
     /// Establishment goes into a pending state until the establishment is verified.
     /// </summary>
-    /// <param name="personalInfo"> The personal information of the establishment owner </param>
+    /// <param name="ownerInfo"> The personal information of the establishment owner </param>
     /// <returns> The Auth0 user ID of the newly created establishment account </returns>
     /// <exception cref="EmailAlreadyInUseException"> Thrown when the email is already in use </exception>
     /// <exception cref="HttpRequestException"> Thrown when the request to Auth0 API fails </exception>
     /// <exception cref="JsonException"> Thrown when the response from Auth0 API cannot be deserialized </exception>
-    public async Task<string> RegisterEstablishmentAccountAsync(PersonalInfo personalInfo)
+    public async Task<string> RegisterEstablishmentAccountAsync(OwnerInfo ownerInfo)
     {
-        personalInfo.ValidateProperties();
+        ownerInfo.ValidateProperties();
         
         var requestBody = new
         {
-            email = personalInfo.Email,
+            email = ownerInfo.Email,
             password = PasswordUtils.Generate(),
-            given_name = personalInfo.FirstName,
-            family_name = personalInfo.LastName,
+            given_name = ownerInfo.FirstName,
+            family_name = ownerInfo.LastName,
             connection = "Username-Password-Authentication",
             app_metadata = new
             {
@@ -81,7 +81,7 @@ public class Auth0Service : IAuth0Service
             if (response is {StatusCode: HttpStatusCode.Conflict})
             {
                 _logger.LogWarning("Failed to create establishment. Email already in use. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
-                throw new EmailAlreadyInUseException(personalInfo.Email);
+                throw new EmailAlreadyInUseException(ownerInfo.Email);
             }
             
             // If request failed, throw an exception

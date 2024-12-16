@@ -112,7 +112,7 @@ public class EstablishmentController : ControllerBase
         _logger.LogWarning("Invalid action type provided: {Action}", action);
         return BadRequest(new { message = "Invalid action type. Please use 'accept' or 'reject'." });
     }
-
+    
     [Authorize]
     [HttpDelete]
     public async Task<IActionResult> DeleteEstablishmentAsync(string auth0Id)

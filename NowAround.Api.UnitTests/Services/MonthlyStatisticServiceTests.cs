@@ -63,7 +63,7 @@ public class MonthlyStatisticServiceTests
         var logEntry = _logger.LoggedMessages
             .FirstOrDefault(log => log.LogLevel == LogLevel.Error && log.Message == "Year cannot be in the future");
     
-        Assert.NotNull(logEntry); // Ensure the log entry exists
+        Assert.NotNull(logEntry);
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class MonthlyStatisticServiceTests
         // Assert
         Assert.Equal(2, result.Count);
         Assert.Equal(statistics.Date, result[0].Date);
-        Assert.Equal(0, result[1].UsersCreatedCount); // New statistic for February
+        Assert.Equal(0, result[1].UsersCreatedCount);
         Assert.Equal(0, result[1].EstablishmentsCreatedCount);
     }
 
@@ -99,7 +99,7 @@ public class MonthlyStatisticServiceTests
     {
         // Arrange
         var year = DateTime.Now.Year.ToString();
-        var months = new List<string> { $"{year}-12" }; // December, assuming it's in the future
+        var months = new List<string> { $"{year}-12" };
 
         _dateHelper
             .Setup(helper => helper.GetMonthsInYear(year))

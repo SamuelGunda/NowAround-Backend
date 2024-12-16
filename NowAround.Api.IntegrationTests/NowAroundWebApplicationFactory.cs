@@ -102,6 +102,8 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
             Latitude = 0,
             Longitude = 0,
             PriceCategory = PriceCategory.Affordable,
+            Categories = new List<Category> { restaurantCategory },
+            Tags = new List<Tag> { petFriendlyTag },
             RequestStatus = RequestStatus.Accepted,
             CreatedAt = new DateTime(2024, 1, 1)
         };
@@ -116,6 +118,8 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
             Latitude = 2,
             Longitude = 2,
             PriceCategory = PriceCategory.Affordable,
+            Categories = new List<Category> { cafeCategory },
+            Tags = new List<Tag> { petFriendlyTag, familyFriendlyTag },
             RequestStatus = RequestStatus.Accepted,
             CreatedAt = new DateTime(2024, 1, 1)
         };
@@ -123,39 +127,39 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
         dbContext.Establishments.AddRange(establishmentRestaurant, establishmentCafe);
         dbContext.SaveChanges();
         
-        // Establishment Categories
-
-        dbContext.EstablishmentCategories.Add(new EstablishmentCategory
+        // Business Hours
+        
+        var businessHours = new BusinessHours
         {
             EstablishmentId = establishmentRestaurant.Id,
-            CategoryId = restaurantCategory.Id
-        });
+            Monday = "08:00-17:00",
+            Tuesday = "08:00-17:00",
+            Wednesday = "08:00-17:00",
+            Thursday = "08:00-17:00",
+            Friday = "08:00-17:00",
+            Saturday = "08:00-17:00",
+            Sunday = "08:00-17:00"
+        };
         
-        dbContext.EstablishmentCategories.Add(new EstablishmentCategory
-        {
-            EstablishmentId = establishmentCafe.Id,
-            CategoryId = cafeCategory.Id
-        });
+        dbContext.BusinessHours.Add(businessHours);
         
-        // Establishment Tags
-
-        dbContext.EstablishmentTags.Add(new EstablishmentTag
+        establishmentRestaurant.BusinessHours = businessHours;
+        
+        // Rating Statistic
+        
+        var ratingStatistic = new RatingStatistic
         {
             EstablishmentId = establishmentRestaurant.Id,
-            TagId = petFriendlyTag.Id
-        });
+            OneStar = 0,
+            TwoStars = 0,
+            ThreeStars = 0,
+            FourStars = 0,
+            FiveStars = 0
+        };
         
-        dbContext.EstablishmentTags.Add(new EstablishmentTag
-        {
-            EstablishmentId = establishmentCafe.Id,
-            TagId = petFriendlyTag.Id
-        });
+        dbContext.RatingStatistics.Add(ratingStatistic);
         
-        dbContext.EstablishmentTags.Add(new EstablishmentTag
-        {
-            EstablishmentId = establishmentCafe.Id,
-            TagId = familyFriendlyTag.Id
-        });
+        establishmentRestaurant.RatingStatistic = ratingStatistic;
         
         // Users
         

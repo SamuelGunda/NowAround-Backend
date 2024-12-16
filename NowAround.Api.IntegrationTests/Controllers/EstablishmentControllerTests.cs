@@ -32,7 +32,7 @@ public class EstablishmentControllerTests
     public async Task RegisterEstablishmentAsync_WithValidRequest_ShouldReturnCreated()
     {
         _auth0ServiceMock
-            .Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<PersonalInfo>()))
+            .Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>()))
             .ReturnsAsync("auth0|valid_register");
 
         _mapboxServiceMock
@@ -56,7 +56,7 @@ public class EstablishmentControllerTests
                 Category = new List<string> { "BAR" },
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            PersonalInfo = new PersonalInfo
+            OwnerInfo = new OwnerInfo
             {
                 FirstName = "Test",
                 LastName = "Bar",
@@ -92,7 +92,7 @@ public class EstablishmentControllerTests
                 Category = new List<string> { "BAR" },
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            PersonalInfo = new PersonalInfo
+            OwnerInfo = new OwnerInfo
             {
                 FirstName = "Test",
                 LastName = "Bar"
@@ -127,7 +127,7 @@ public class EstablishmentControllerTests
                 Category = new List<string> { "BAR" },
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            PersonalInfo = new PersonalInfo
+            OwnerInfo = new OwnerInfo
             {
                 FirstName = "Test",
                 LastName = "Bar",
@@ -148,7 +148,7 @@ public class EstablishmentControllerTests
     public async Task RegisterEstablishmentAsync_WithEmailTaken_ShouldReturnConflict()
     {
         _auth0ServiceMock
-            .Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<PersonalInfo>()))
+            .Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>()))
             .ThrowsAsync(new EmailAlreadyInUseException("Email already in use"));
 
         var factory = new NowAroundWebApplicationFactory(_auth0ServiceMock);
@@ -167,7 +167,7 @@ public class EstablishmentControllerTests
                 Category = new List<string> { "BAR" },
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            PersonalInfo = new PersonalInfo
+            OwnerInfo = new OwnerInfo
             {
                 FirstName = "Test",
                 LastName = "Bar",
@@ -217,15 +217,15 @@ public class EstablishmentControllerTests
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishmentResponse = JsonConvert.DeserializeObject<EstablishmentResponse>(responseContent);
+        var establishmentResponse = JsonConvert.DeserializeObject<EstablishmentProfileResponse>(responseContent);
 
         Assert.Equal(establishment.Auth0Id, establishmentResponse.Auth0Id);
-        Assert.Equal(establishment.Name, establishmentResponse.Name);
-        Assert.Equal(establishment.Description, establishmentResponse.Description);
-        Assert.Equal(establishment.Address, establishmentResponse.Address);
-        Assert.Equal(establishment.City, establishmentResponse.City);
-        Assert.Equal(establishment.Latitude, establishmentResponse.Latitude);
-        Assert.Equal(establishment.Longitude, establishmentResponse.Longitude);
+        Assert.Equal(establishment.Name, establishmentResponse.GenericInfo.Name);
+        Assert.Equal(establishment.Description, establishmentResponse.GenericInfo.Description);
+        Assert.Equal(establishment.Address, establishmentResponse.LocationInfo.Address);
+        Assert.Equal(establishment.City, establishmentResponse.LocationInfo.City);
+        Assert.Equal(establishment.Latitude, establishmentResponse.LocationInfo.Lat);
+        Assert.Equal(establishment.Longitude, establishmentResponse.LocationInfo.Long);
     }
     
     [Fact]
@@ -533,7 +533,7 @@ public class EstablishmentControllerTests
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
-            Category = new List<string> { "RESTAURANT" },
+            Categories = new List<string> { "RESTAURANT" },
             Tags = new List<string> { "PET_FRIENDLY" }
         };
 
@@ -561,7 +561,7 @@ public class EstablishmentControllerTests
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
-            Category = new List<string> { "RESTAURANT" },
+            Categories = new List<string> { "RESTAURANT" },
             Tags = new List<string> { "PET_FRIENDLY" }
         };
 
@@ -588,7 +588,7 @@ public class EstablishmentControllerTests
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
-            Category = new List<string> { "RESTAURANT" },
+            Categories = new List<string> { "RESTAURANT" },
             Tags = new List<string> { "PET_FRIENDLY" }
         };
 
@@ -616,7 +616,7 @@ public class EstablishmentControllerTests
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
-            Category = new List<string> { "RESTAURANT" },
+            Categories = new List<string> { "RESTAURANT" },
             Tags = new List<string> { "PET_FRIENDLY" }
         };
 
@@ -644,7 +644,7 @@ public class EstablishmentControllerTests
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
-            Category = new List<string> { "RESTAURANT" },
+            Categories = new List<string> { "RESTAURANT" },
             Tags = new List<string> { "PET_FRIENDLY" }
         };
 

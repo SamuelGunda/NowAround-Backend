@@ -5,6 +5,7 @@ using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
+using NowAround.Api.Models.Responses;
 using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Utilities;
 
@@ -16,7 +17,99 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
         : base(context, logger)
     {
     }
-    
+
+    public new async Task<EstablishmentProfileResponse> GetByAuth0IdAsync(string auth0Id)
+    {
+        try
+        {
+            var establishment = await DbSet
+                .Where(e => e.Auth0Id == auth0Id)
+                .Select(e => new EstablishmentProfileResponse(
+                    e.Auth0Id,
+                new GenericInfo(
+                    e.Name,
+                    null,
+                    e.Description,
+                    e.Website,
+                    e.PriceCategory.ToString(),
+                    e.Tags.Select(et => et.Name).ToList(),
+                    e.Categories.Select(ec => ec.Name).ToList(),
+                    e.Cuisines.Select(ec => ec.Name).ToList(),
+                    e.SocialLinks.Select(sl => new SocialLinkDto(sl.Name, sl.Url)).ToList()
+                ),
+                new LocationInfo(
+                    e.Address,
+                    e.City,
+                    e.Longitude,
+                    e.Latitude,
+                    new BusinessHoursDto(
+                        e.BusinessHours.Monday,
+                        e.BusinessHours.Tuesday,
+                        e.BusinessHours.Wednesday,
+                        e.BusinessHours.Thursday,
+                        e.BusinessHours.Friday,
+                        e.BusinessHours.Saturday,
+                        e.BusinessHours.Sunday,
+                        e.BusinessHours.BusinessHoursExceptions
+                            .Select(bhe => new BusinessHoursExceptionsDto(bhe.Date, bhe.Status))
+                            .ToList()
+                    )
+                ),
+                new List<PostWithAuthIdsResponse>(
+                    e.Posts.Select(p => new PostWithAuthIdsResponse(
+                        null,
+                        p.Headline,
+                        p.Body,
+                        p.ImageUrl,
+                        p.PostLikes.Select(pl => pl.User.Auth0Id).ToList(),
+                        p.CreatedAt
+                    )).ToList()
+                    ),
+                e.Menus.Select(m => new MenuDto(
+                    m.Name,
+                    m.MenuItems.Select(mi => new MenuItemDto(
+                        mi.Name,
+                        mi.PhotoUrl,
+                        mi.Description,
+                        mi.Price.ToString()
+                    )).ToList()
+                )).ToList(),
+                new RatingStatisticResponse(
+                    e.RatingStatistic.OneStar,
+                    e.RatingStatistic.TwoStars,
+                    e.RatingStatistic.ThreeStars,
+                    e.RatingStatistic.FourStars,
+                    e.RatingStatistic.FiveStars,
+                    e.RatingStatistic.Reviews.Select(r => new ReviewWithAuthIdsResponse(
+                        r.User.Auth0Id,
+                        null,
+                        r.User.FullName,
+                        r.Body,
+                        r.Rating,
+                        r.CreatedAt
+                    )).ToList()
+                )
+            ))
+            .FirstOrDefaultAsync();
+            
+            if (establishment == null)
+            {
+                Logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
+                throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
+            }
+            return establishment;
+        }
+        catch (EntityNotFoundException)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Failed to get establishment by Auth0 ID: {Message}", e.Message);
+            throw new Exception("Failed to get establishment by Auth0 ID", e);
+        }
+    }
+
     public async Task<List<Establishment>> GetAllWhereRegisterStatusPendingAsync()
     {
         try
@@ -97,6 +190,8 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
         {
             var establishment = await DbSet
                 .IgnoreQueryFilters()
+                .Include(e => e.Categories)
+                .Include(e => e.Tags)
                 .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
             
             if (establishment == null)
@@ -111,31 +206,29 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                 if (newValue != null)
                 {
                     var establishmentProperty = typeof(Establishment).GetProperty(property.Name);
-                    if (property.Name != "EstablishmentCategories" && property.Name != "EstablishmentTags")
+                    if (property.Name != "Categories" && property.Name != "Tags")
                     {
                         establishmentProperty?.SetValue(establishment, newValue);
                     }
                 }
             }
             
-            if (establishmentDto.EstablishmentCategories?.Count > 0)
+            if (establishmentDto.Categories?.Count > 0)
             {
-                var categories = Context.EstablishmentCategories.Where(ec => ec.EstablishmentId == establishment.Id);
-                await DeleteRangeAsync(categories);
+                establishment.Categories.Clear();
 
-                establishment.EstablishmentCategories = establishmentDto.EstablishmentCategories;
-            }
+                establishment.Categories = establishmentDto.Categories;
+            } 
             
-            if (establishmentDto.EstablishmentTags?.Count > 0)
+            if (establishmentDto.Tags?.Count > 0)
             {
-                var tags = Context.EstablishmentTags.Where(et => et.EstablishmentId == establishment.Id);
-                await DeleteRangeAsync(tags);
-                
-                establishment.EstablishmentTags = establishmentDto.EstablishmentTags;
+                establishment.Tags.Clear();
+
+                establishment.Tags = establishmentDto.Tags;
             }
             
             establishment.UpdatedAt = DateTime.UtcNow;
-
+            
             await Context.SaveChangesAsync();
         }
         catch (EntityNotFoundException)

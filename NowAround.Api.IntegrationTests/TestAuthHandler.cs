@@ -31,7 +31,7 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
         var claims = new List<Claim>
         {
             new(ClaimTypes.Role, role),
-            new("roles", role)
+            new("https://now-around-auth-api/roles", role)
         };
 
         if (authHeaderParts.Length >= 3)

@@ -46,7 +46,7 @@ public class EstablishmentService : IEstablishmentService
         request.ValidateProperties();
         
         var establishmentInfo = request.EstablishmentInfo;
-        var personalInfo = request.PersonalInfo;
+        var personalInfo = request.OwnerInfo;
         
         if (await _establishmentRepository.CheckIfExistsByPropertyAsync("Name", establishmentInfo.Name))
         {
@@ -71,8 +71,8 @@ public class EstablishmentService : IEstablishmentService
             Address = $"{establishmentInfo.Address}, {establishmentInfo.PostalCode}",
             City = establishmentInfo.City,
             PriceCategory = (PriceCategory) establishmentInfo.PriceCategory,
-            EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory { Category = c }).ToList(),
-            EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag { Tag = t }).ToList()
+            Categories = catsAndTags.categories,
+            Tags = catsAndTags.tags
         };
             
         try
@@ -98,7 +98,7 @@ public class EstablishmentService : IEstablishmentService
         return establishment.ToDetailedResponse();
     }
     
-    public async Task<EstablishmentResponse> GetEstablishmentByAuth0IdAsync(string auth0Id)
+    public async Task<EstablishmentProfileResponse> GetEstablishmentByAuth0IdAsync(string auth0Id)
     {
         var establishment = await _establishmentRepository.GetByAuth0IdAsync(auth0Id);
         if (establishment == null)
@@ -106,7 +106,7 @@ public class EstablishmentService : IEstablishmentService
             throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
         }
 
-        return establishment.ToDetailedResponse();
+        return establishment;
     }
 
     public async Task<List<PendingEstablishmentResponse>> GetPendingEstablishmentsAsync()
@@ -147,7 +147,7 @@ public class EstablishmentService : IEstablishmentService
             throw new ArgumentNullException(nameof(request.Auth0Id));
         }
         
-        var catsAndTags = await SetCategoriesAndTagsAsync(request.Category, request.Tags);
+        var catsAndTags = await SetCategoriesAndTagsAsync(request.Categories, request.Tags);
         
         var establishmentDto = new EstablishmentDto
         {
@@ -155,8 +155,8 @@ public class EstablishmentService : IEstablishmentService
             Name = request.Name,
             Description = request.Description,
             PriceCategory = request.PriceCategory.HasValue ? (PriceCategory)request.PriceCategory.Value : null,
-            EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory { Category = c }).ToList(),
-            EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag { Tag = t }).ToList()
+            Categories = catsAndTags.categories,
+            Tags = catsAndTags.tags
         };
         
         await _establishmentRepository.UpdateAsync(establishmentDto);
@@ -205,8 +205,7 @@ public class EstablishmentService : IEstablishmentService
         {
             foreach (var categoryName in categoryNames)
             {
-                
-                var categoryEntity = await _categoryRepository.GetByNameWithTagsAsync(categoryName);
+                var categoryEntity = await _categoryRepository.GetByPropertyAsync("Name", categoryName);
 
                 if (categoryEntity == null)
                 {
@@ -222,11 +221,7 @@ public class EstablishmentService : IEstablishmentService
         {
             foreach (var tag in tagNames)
             {
-                // Check if tag belongs to any of the categories, if not, get it from the database
-                var tagEntity = categories
-                                    .SelectMany(c => c.Tags)
-                                    .FirstOrDefault(t => t.Name == tag) 
-                                    ?? await _tagRepository.GetByPropertyAsync("Name",tag);
+                var tagEntity = await _tagRepository.GetByPropertyAsync("Name", tag);
 
                 if (tagEntity == null)
                 {

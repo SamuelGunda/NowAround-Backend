@@ -1,6 +1,6 @@
 ﻿namespace NowAround.Api.Apis.Auth0.Models.Requests;
 
-public class PersonalInfo
+public class OwnerInfo
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }

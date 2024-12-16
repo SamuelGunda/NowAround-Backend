@@ -33,18 +33,18 @@ public static class EstablishmentSearchQueryBuilder
         
         if (!string.IsNullOrWhiteSpace(categoryName))
         {
-            query = query.Where(e => e.EstablishmentCategories.Any(ec => ec.Category.Name == categoryName));
+            query = query.Where(e => e.Categories.Any(c => c.Name == categoryName));
         }
 
         if (tagNames != null && tagNames.Count != 0)
         {
             if (tagNames.Count == 1)
             {
-                query = query.Where(e => e.EstablishmentTags.Any(et => tagNames.Contains(et.Tag.Name)));
+                query = query.Where(e => e.Tags.Any(t => tagNames.Contains(t.Name)));
             }
             else
             {
-                query = query.Where(e => tagNames.All(tag => e.EstablishmentTags.Any(et => et.Tag.Name == tag)));
+                query = query.Where(e => tagNames.All(tag => e.Tags.Any(t => t.Name == tag)));
             }
         }
         return query;

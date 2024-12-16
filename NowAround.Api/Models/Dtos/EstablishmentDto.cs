@@ -15,6 +15,9 @@ public class EstablishmentDto
     public PriceCategory? PriceCategory { get; set; }
     public RequestStatus? RequestStatus { get; set; }
     
-    public virtual ICollection<EstablishmentCategory>? EstablishmentCategories { get; set; }
-    public virtual ICollection<EstablishmentTag>? EstablishmentTags { get; set; }
+    public virtual BusinessHoursDto? BusinessHours { get; set; }
+    public virtual ICollection<MenuDto>? Menus { get; set; }
+    public virtual ICollection<SocialLinkDto>? SocialLinks { get; set; }
+    public virtual ICollection<Category>? Categories { get; set; }
+    public virtual ICollection<Tag>? Tags { get; set; }
 }
