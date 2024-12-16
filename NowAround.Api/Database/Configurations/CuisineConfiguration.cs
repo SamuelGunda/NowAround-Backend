@@ -10,10 +10,5 @@ public class CuisineConfiguration : IEntityTypeConfiguration<Cuisine>
     {
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Name).HasMaxLength(32).IsRequired();
-        
-        builder.HasMany(c => c.EstablishmentCuisines)
-            .WithOne(c => c.Cuisine)
-            .HasForeignKey(c => c.CuisineId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

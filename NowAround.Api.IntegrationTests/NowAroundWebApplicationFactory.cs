@@ -103,6 +103,7 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
             Longitude = 0,
             PriceCategory = PriceCategory.Affordable,
             Categories = new List<Category> { restaurantCategory },
+            Tags = new List<Tag> { petFriendlyTag },
             RequestStatus = RequestStatus.Accepted,
             CreatedAt = new DateTime(2024, 1, 1)
         };
@@ -118,32 +119,13 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
             Longitude = 2,
             PriceCategory = PriceCategory.Affordable,
             Categories = new List<Category> { cafeCategory },
+            Tags = new List<Tag> { petFriendlyTag, familyFriendlyTag },
             RequestStatus = RequestStatus.Accepted,
             CreatedAt = new DateTime(2024, 1, 1)
         };
         
         dbContext.Establishments.AddRange(establishmentRestaurant, establishmentCafe);
         dbContext.SaveChanges();
-        
-        // Establishment Tags
-
-        dbContext.EstablishmentTags.Add(new EstablishmentTag
-        {
-            EstablishmentId = establishmentRestaurant.Id,
-            TagId = petFriendlyTag.Id
-        });
-        
-        dbContext.EstablishmentTags.Add(new EstablishmentTag
-        {
-            EstablishmentId = establishmentCafe.Id,
-            TagId = petFriendlyTag.Id
-        });
-        
-        dbContext.EstablishmentTags.Add(new EstablishmentTag
-        {
-            EstablishmentId = establishmentCafe.Id,
-            TagId = familyFriendlyTag.Id
-        });
         
         // Business Hours
         

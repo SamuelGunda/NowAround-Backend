@@ -19,6 +19,5 @@ public class EstablishmentDto
     public virtual ICollection<MenuDto>? Menus { get; set; }
     public virtual ICollection<SocialLinkDto>? SocialLinks { get; set; }
     public virtual ICollection<Category>? Categories { get; set; }
-    public virtual ICollection<TagDto>? Tags { get; set; }
-    public  ICollection<EstablishmentTag>? EstablishmentTags { get; set; }
+    public virtual ICollection<Tag>? Tags { get; set; }
 }

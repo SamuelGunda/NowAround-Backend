@@ -533,7 +533,7 @@ public class EstablishmentControllerTests
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
-            Category = new List<string> { "RESTAURANT" },
+            Categories = new List<string> { "RESTAURANT" },
             Tags = new List<string> { "PET_FRIENDLY" }
         };
 
@@ -561,7 +561,7 @@ public class EstablishmentControllerTests
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
-            Category = new List<string> { "RESTAURANT" },
+            Categories = new List<string> { "RESTAURANT" },
             Tags = new List<string> { "PET_FRIENDLY" }
         };
 
@@ -588,7 +588,7 @@ public class EstablishmentControllerTests
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
-            Category = new List<string> { "RESTAURANT" },
+            Categories = new List<string> { "RESTAURANT" },
             Tags = new List<string> { "PET_FRIENDLY" }
         };
 
@@ -616,7 +616,7 @@ public class EstablishmentControllerTests
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
-            Category = new List<string> { "RESTAURANT" },
+            Categories = new List<string> { "RESTAURANT" },
             Tags = new List<string> { "PET_FRIENDLY" }
         };
 
@@ -644,7 +644,7 @@ public class EstablishmentControllerTests
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
-            Category = new List<string> { "RESTAURANT" },
+            Categories = new List<string> { "RESTAURANT" },
             Tags = new List<string> { "PET_FRIENDLY" }
         };
 

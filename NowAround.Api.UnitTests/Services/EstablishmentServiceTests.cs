@@ -346,7 +346,7 @@ public class EstablishmentServiceTests
             PriceCategory = PriceCategory.Moderate,
             RequestStatus = RequestStatus.Pending,
             Categories = new List<Category>(),
-            EstablishmentTags = new List<EstablishmentTag>()
+            Tags = new List<Tag>()
         };
         _establishmentRepositoryMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(establishment);
         
@@ -395,7 +395,7 @@ public class EstablishmentServiceTests
             PriceCategory = PriceCategory.Moderate,
             RequestStatus = RequestStatus.Pending,
             Categories = new List<Category>(),
-            EstablishmentTags = new List<EstablishmentTag>()
+            Tags = new List<Tag>()
         };
         
         var establishmentProfile = new EstablishmentProfileResponse(
@@ -483,7 +483,7 @@ public class EstablishmentServiceTests
                 PriceCategory = PriceCategory.Moderate,
                 RequestStatus = RequestStatus.Pending,
                 Categories= new List<Category>(),
-                EstablishmentTags = new List<EstablishmentTag>()
+                Tags = new List<Tag>()
             }
         };
         _establishmentRepositoryMock.Setup(r => r.GetAllWhereRegisterStatusPendingAsync()).ReturnsAsync(establishments);
@@ -516,7 +516,7 @@ public class EstablishmentServiceTests
                 PriceCategory = PriceCategory.Moderate,
                 RequestStatus = RequestStatus.Pending,
                 Categories = new List<Category>(),
-                EstablishmentTags = new List<EstablishmentTag>()
+                Tags = new List<Tag>()
             }
         };
         
@@ -630,7 +630,7 @@ public class EstablishmentServiceTests
             Name = "Test Establishment",
             Description = "Updated description",
             PriceCategory = 2,
-            Category = new List<string> { "Restaurant" },
+            Categories = new List<string> { "Restaurant" },
             Tags = new List<string> { "PET_FRIENDLY" }
         };
     
@@ -669,7 +669,7 @@ public class EstablishmentServiceTests
             Name = "Test Establishment",
             Description = "Updated description",
             PriceCategory = 2,
-            Category = new List<string> { "Restaurant" },
+            Categories = new List<string> { "Restaurant" },
             Tags = new List<string> { "PET_FRIENDLY" }
         };
 
@@ -691,7 +691,7 @@ public class EstablishmentServiceTests
             Name = "Test Establishment",
             Description = "Updated description",
             PriceCategory = 2,
-            Category = new List<string> { "NonExistentCategory" },
+            Categories = new List<string> { "NonExistentCategory" },
             Tags = new List<string> { "NonExistentTag" }
         };
 

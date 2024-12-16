@@ -7,5 +7,5 @@ public class Tag : BaseEntity
 {
     [MaxLength(32)]
     public required string Name { get; set; }
-    public virtual ICollection<EstablishmentTag> EstablishmentTags { get; } = new List<EstablishmentTag>();
+    public virtual ICollection<Establishment> Establishments { get; } = new List<Establishment>();
 }

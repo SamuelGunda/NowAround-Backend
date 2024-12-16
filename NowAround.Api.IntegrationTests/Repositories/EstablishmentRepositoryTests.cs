@@ -312,6 +312,7 @@ public class EstablishmentRepositoryTests
         var tag2 = new Tag { Name = "Test Tag2" };
         
         await _context.Set<Category>().AddRangeAsync(category, category2);
+        await _context.Set<Tag>().AddRangeAsync(tag, tag2);
         await _context.SaveChangesAsync();
                 
         var establishment = new Establishment
@@ -320,15 +321,14 @@ public class EstablishmentRepositoryTests
             City = "Test City", Address = "Test Address", Latitude = 1.0, Longitude = 1.0,
             PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|123",
             Categories = new List<Category> { category, category2 },
-            EstablishmentTags = new List<EstablishmentTag>( new [] { new EstablishmentTag { Tag = tag } })
+            Tags = new List<Tag> { tag, tag2 }
         };
         
         var updatedEstablishment = new EstablishmentDto
         {
             Auth0Id = "auth0|123",
             Categories = new List<Category> { category, category2 },
-            EstablishmentTags = new List<EstablishmentTag>([new EstablishmentTag { Tag = tag }, new EstablishmentTag { Tag = tag2 }
-            ])
+            Tags = new List<Tag> { tag, tag2 }
         };
         
         await _context.Set<Establishment>().AddAsync(establishment);
@@ -340,7 +340,7 @@ public class EstablishmentRepositoryTests
         // Assert
         var result = await _context.Set<Establishment>()
             .Include(e => e.Categories)
-            .Include(e => e.EstablishmentTags)
+            .Include(e => e.Tags)
             .FirstOrDefaultAsync(e => e.Auth0Id == "auth0|123");
         
         Assert.NotNull(result);
@@ -353,7 +353,7 @@ public class EstablishmentRepositoryTests
         Assert.Equal(PriceCategory.Affordable, result.PriceCategory);
         Assert.Equal("auth0|123", result.Auth0Id);
         Assert.Equal(2, result.Categories.Count);
-        Assert.Equal(2, result.EstablishmentTags.Count);
+        Assert.Equal(2, result.Tags.Count);
     }
     
     [Fact]

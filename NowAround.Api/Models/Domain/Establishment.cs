@@ -29,8 +29,8 @@ public class Establishment : BaseAccountEntity
     public ICollection<Menu> Menus { get; set; } = new List<Menu>();
     public ICollection<SocialLink> SocialLinks { get; set; } = new List<SocialLink>();
     public ICollection<Category> Categories { get; set; } = new List<Category>();
-    public ICollection<EstablishmentTag> EstablishmentTags { get; set; } = new List<EstablishmentTag>(); 
-    public ICollection<EstablishmentCuisine> EstablishmentCuisines { get; set; } = new List<EstablishmentCuisine>();
+    public ICollection<Tag> Tags { get; set; } = new List<Tag>(); 
+    public ICollection<Cuisine> Cuisines { get; set; } = new List<Cuisine>();
     public ICollection<Post> Posts { get; set; } = new List<Post>();
 
     public EstablishmentResponse ToDetailedResponse()
@@ -48,7 +48,7 @@ public class Establishment : BaseAccountEntity
             RequestStatus = RequestStatus,
 
             CategoryNames = Categories.Select(c => c.Name).ToList(),
-            TagNames = EstablishmentTags.Select(et => et.Tag.Name).ToList()
+            TagNames = Tags.Select(t => t.Name).ToList()
         };
     }
 }

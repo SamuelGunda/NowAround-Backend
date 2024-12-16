@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NowAround.Api.Database;
 
@@ -11,9 +12,11 @@ using NowAround.Api.Database;
 namespace NowAround.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241216112622_EstablishmentTagsCuisineRework")]
+    partial class EstablishmentTagsCuisineRework
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,32 +27,47 @@ namespace NowAround.Api.Migrations
 
             modelBuilder.Entity("CategoryEstablishment", b =>
                 {
-                    b.Property<int>("CategoryId")
+                    b.Property<int>("CategoriesId")
                         .HasColumnType("int");
 
-                    b.Property<int>("EstablishmentId")
+                    b.Property<int>("EstablishmentsId")
                         .HasColumnType("int");
 
-                    b.HasKey("CategoryId", "EstablishmentId");
+                    b.HasKey("CategoriesId", "EstablishmentsId");
 
-                    b.HasIndex("EstablishmentId");
+                    b.HasIndex("EstablishmentsId");
 
                     b.ToTable("CategoryEstablishment");
                 });
 
             modelBuilder.Entity("CuisineEstablishment", b =>
                 {
-                    b.Property<int>("CuisineId")
+                    b.Property<int>("CuisinesId")
                         .HasColumnType("int");
 
-                    b.Property<int>("EstablishmentId")
+                    b.Property<int>("EstablishmentsId")
                         .HasColumnType("int");
 
-                    b.HasKey("CuisineId", "EstablishmentId");
+                    b.HasKey("CuisinesId", "EstablishmentsId");
 
-                    b.HasIndex("EstablishmentId");
+                    b.HasIndex("EstablishmentsId");
 
                     b.ToTable("CuisineEstablishment");
+                });
+
+            modelBuilder.Entity("EstablishmentTag", b =>
+                {
+                    b.Property<int>("EstablishmentsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TagsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EstablishmentsId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("EstablishmentTag");
                 });
 
             modelBuilder.Entity("NowAround.Api.Models.Domain.BusinessHours", b =>
@@ -558,32 +576,17 @@ namespace NowAround.Api.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("TagEstablishment", b =>
-                {
-                    b.Property<int>("EstablishmentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TagId")
-                        .HasColumnType("int");
-
-                    b.HasKey("EstablishmentId", "TagId");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("TagEstablishment");
-                });
-
             modelBuilder.Entity("CategoryEstablishment", b =>
                 {
                     b.HasOne("NowAround.Api.Models.Domain.Category", null)
                         .WithMany()
-                        .HasForeignKey("CategoryId")
+                        .HasForeignKey("CategoriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("NowAround.Api.Models.Domain.Establishment", null)
                         .WithMany()
-                        .HasForeignKey("EstablishmentId")
+                        .HasForeignKey("EstablishmentsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -592,13 +595,28 @@ namespace NowAround.Api.Migrations
                 {
                     b.HasOne("NowAround.Api.Models.Domain.Cuisine", null)
                         .WithMany()
-                        .HasForeignKey("CuisineId")
+                        .HasForeignKey("CuisinesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("NowAround.Api.Models.Domain.Establishment", null)
                         .WithMany()
-                        .HasForeignKey("EstablishmentId")
+                        .HasForeignKey("EstablishmentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EstablishmentTag", b =>
+                {
+                    b.HasOne("NowAround.Api.Models.Domain.Establishment", null)
+                        .WithMany()
+                        .HasForeignKey("EstablishmentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NowAround.Api.Models.Domain.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -754,21 +772,6 @@ namespace NowAround.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Establishment");
-                });
-
-            modelBuilder.Entity("TagEstablishment", b =>
-                {
-                    b.HasOne("NowAround.Api.Models.Domain.Establishment", null)
-                        .WithMany()
-                        .HasForeignKey("EstablishmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NowAround.Api.Models.Domain.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("NowAround.Api.Models.Domain.BusinessHours", b =>

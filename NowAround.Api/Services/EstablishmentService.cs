@@ -72,8 +72,7 @@ public class EstablishmentService : IEstablishmentService
             City = establishmentInfo.City,
             PriceCategory = (PriceCategory) establishmentInfo.PriceCategory,
             Categories = catsAndTags.categories,
-            EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag { Tag = t }).ToList(),
-            
+            Tags = catsAndTags.tags
         };
             
         try
@@ -148,7 +147,7 @@ public class EstablishmentService : IEstablishmentService
             throw new ArgumentNullException(nameof(request.Auth0Id));
         }
         
-        var catsAndTags = await SetCategoriesAndTagsAsync(request.Category, request.Tags);
+        var catsAndTags = await SetCategoriesAndTagsAsync(request.Categories, request.Tags);
         
         var establishmentDto = new EstablishmentDto
         {
@@ -157,7 +156,7 @@ public class EstablishmentService : IEstablishmentService
             Description = request.Description,
             PriceCategory = request.PriceCategory.HasValue ? (PriceCategory)request.PriceCategory.Value : null,
             Categories = catsAndTags.categories,
-            EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag { Tag = t }).ToList()
+            Tags = catsAndTags.tags
         };
         
         await _establishmentRepository.UpdateAsync(establishmentDto);
@@ -206,7 +205,6 @@ public class EstablishmentService : IEstablishmentService
         {
             foreach (var categoryName in categoryNames)
             {
-                
                 var categoryEntity = await _categoryRepository.GetByPropertyAsync("Name", categoryName);
 
                 if (categoryEntity == null)
@@ -223,7 +221,6 @@ public class EstablishmentService : IEstablishmentService
         {
             foreach (var tag in tagNames)
             {
-                // Check if tag belongs to any of the categories, if not, get it from the database
                 var tagEntity = await _tagRepository.GetByPropertyAsync("Name", tag);
 
                 if (tagEntity == null)
