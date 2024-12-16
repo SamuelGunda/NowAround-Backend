@@ -71,7 +71,7 @@ public class EstablishmentService : IEstablishmentService
             Address = $"{establishmentInfo.Address}, {establishmentInfo.PostalCode}",
             City = establishmentInfo.City,
             PriceCategory = (PriceCategory) establishmentInfo.PriceCategory,
-            EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory { Category = c }).ToList(),
+            Categories = catsAndTags.categories,
             EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag { Tag = t }).ToList(),
             
         };
@@ -156,7 +156,7 @@ public class EstablishmentService : IEstablishmentService
             Name = request.Name,
             Description = request.Description,
             PriceCategory = request.PriceCategory.HasValue ? (PriceCategory)request.PriceCategory.Value : null,
-            EstablishmentCategories = catsAndTags.categories.Select(c => new EstablishmentCategory { Category = c }).ToList(),
+            Categories = catsAndTags.categories,
             EstablishmentTags = catsAndTags.tags.Select(t => new EstablishmentTag { Tag = t }).ToList()
         };
         

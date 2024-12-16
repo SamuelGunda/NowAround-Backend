@@ -102,6 +102,7 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
             Latitude = 0,
             Longitude = 0,
             PriceCategory = PriceCategory.Affordable,
+            Categories = new List<Category> { restaurantCategory },
             RequestStatus = RequestStatus.Accepted,
             CreatedAt = new DateTime(2024, 1, 1)
         };
@@ -116,26 +117,13 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
             Latitude = 2,
             Longitude = 2,
             PriceCategory = PriceCategory.Affordable,
+            Categories = new List<Category> { cafeCategory },
             RequestStatus = RequestStatus.Accepted,
             CreatedAt = new DateTime(2024, 1, 1)
         };
         
         dbContext.Establishments.AddRange(establishmentRestaurant, establishmentCafe);
         dbContext.SaveChanges();
-        
-        // Establishment Categories
-
-        dbContext.EstablishmentCategories.Add(new EstablishmentCategory
-        {
-            EstablishmentId = establishmentRestaurant.Id,
-            CategoryId = restaurantCategory.Id
-        });
-        
-        dbContext.EstablishmentCategories.Add(new EstablishmentCategory
-        {
-            EstablishmentId = establishmentCafe.Id,
-            CategoryId = cafeCategory.Id
-        });
         
         // Establishment Tags
 

@@ -33,7 +33,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                     e.Website,
                     e.PriceCategory.ToString(),
                     e.EstablishmentTags.Select(et => et.Tag.Name).ToList(),
-                    e.EstablishmentCategories.Select(ec => ec.Category.Name).ToList(),
+                    e.Categories.Select(ec => ec.Name).ToList(),
                     e.EstablishmentCuisines.Select(ec => ec.Cuisine.Name).ToList(),
                     e.SocialLinks.Select(sl => new SocialLinkDto(sl.Name, sl.Url)).ToList()
                 ),
@@ -190,12 +190,22 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
         {
             var establishment = await DbSet
                 .IgnoreQueryFilters()
+                .Include(e => e.Categories)
                 .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
             
             if (establishment == null)
             {
                 Logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
                 throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
+            }
+            
+            if (establishmentDto.Categories?.Count > 0)
+            {
+                establishment.Categories.Clear();
+
+                await Context.SaveChangesAsync();
+
+                establishment.Categories = establishmentDto.Categories;
             }
 
             foreach (var property in typeof(EstablishmentDto).GetProperties())
@@ -204,19 +214,11 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                 if (newValue != null)
                 {
                     var establishmentProperty = typeof(Establishment).GetProperty(property.Name);
-                    if (property.Name != "EstablishmentCategories" && property.Name != "EstablishmentTags")
+                    if (property.Name != "Categories" && property.Name != "EstablishmentTags")
                     {
                         establishmentProperty?.SetValue(establishment, newValue);
                     }
                 }
-            }
-            
-            if (establishmentDto.EstablishmentCategories?.Count > 0)
-            {
-                var categories = Context.EstablishmentCategories.Where(ec => ec.EstablishmentId == establishment.Id);
-                await DeleteRangeAsync(categories);
-
-                establishment.EstablishmentCategories = establishmentDto.EstablishmentCategories;
             }
             
             if (establishmentDto.EstablishmentTags?.Count > 0)
@@ -228,7 +230,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
             }
             
             establishment.UpdatedAt = DateTime.UtcNow;
-
+            
             await Context.SaveChangesAsync();
         }
         catch (EntityNotFoundException)

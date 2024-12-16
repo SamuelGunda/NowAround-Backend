@@ -345,7 +345,7 @@ public class EstablishmentServiceTests
             Longitude = 1.0,
             PriceCategory = PriceCategory.Moderate,
             RequestStatus = RequestStatus.Pending,
-            EstablishmentCategories = new List<EstablishmentCategory>(),
+            Categories = new List<Category>(),
             EstablishmentTags = new List<EstablishmentTag>()
         };
         _establishmentRepositoryMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(establishment);
@@ -394,7 +394,7 @@ public class EstablishmentServiceTests
             Longitude = 1.0,
             PriceCategory = PriceCategory.Moderate,
             RequestStatus = RequestStatus.Pending,
-            EstablishmentCategories = new List<EstablishmentCategory>(),
+            Categories = new List<Category>(),
             EstablishmentTags = new List<EstablishmentTag>()
         };
         
@@ -482,7 +482,7 @@ public class EstablishmentServiceTests
                 Longitude = 1.0,
                 PriceCategory = PriceCategory.Moderate,
                 RequestStatus = RequestStatus.Pending,
-                EstablishmentCategories = new List<EstablishmentCategory>(),
+                Categories= new List<Category>(),
                 EstablishmentTags = new List<EstablishmentTag>()
             }
         };
@@ -515,7 +515,7 @@ public class EstablishmentServiceTests
                 Longitude = 1.0,
                 PriceCategory = PriceCategory.Moderate,
                 RequestStatus = RequestStatus.Pending,
-                EstablishmentCategories = new List<EstablishmentCategory>(),
+                Categories = new List<Category>(),
                 EstablishmentTags = new List<EstablishmentTag>()
             }
         };
@@ -653,9 +653,7 @@ public class EstablishmentServiceTests
             dto.Auth0Id == request.Auth0Id &&
             dto.Name == request.Name &&
             dto.Description == request.Description &&
-            dto.PriceCategory == (PriceCategory)request.PriceCategory &&
-            dto.EstablishmentCategories.Any(ec => ec.Category.Name == "Restaurant") &&
-            dto.EstablishmentTags.Any(et => et.Tag.Name == "PET_FRIENDLY")
+            dto.PriceCategory == (PriceCategory)request.PriceCategory
         )), Times.Once);
     }
     

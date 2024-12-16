@@ -19,7 +19,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<MenuItem> MenuItems { get; set; }
     
     public DbSet<SocialLink> SocialLinks { get; set; }
+    /*
     public DbSet<EstablishmentCategory> EstablishmentCategories { get; set; }
+    */
     public DbSet<EstablishmentTag> EstablishmentTags { get; set; }
     public DbSet<EstablishmentCuisine> EstablishmentCuisines { get; set; }
     

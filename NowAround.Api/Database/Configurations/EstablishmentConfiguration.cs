@@ -42,11 +42,9 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
             .WithOne(sl => sl.Establishment)
             .HasForeignKey(sl => sl.EstablishmentId)
             .OnDelete(DeleteBehavior.Cascade);
-                
-        builder.HasMany(e => e.EstablishmentCategories)
-            .WithOne(ec => ec.Establishment)
-            .HasForeignKey(ec => ec.EstablishmentId)
-            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(e => e.Categories)
+            .WithMany(c => c.Establishments);
         
         builder.HasMany(e => e.EstablishmentTags)
             .WithOne(et => et.Establishment)

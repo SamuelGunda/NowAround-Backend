@@ -10,10 +10,5 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Name).IsRequired();
-        
-        builder.HasMany(c => c.EstablishmentCategories)
-            .WithOne(ec => ec.Category)
-            .HasForeignKey(ec => ec.CategoryId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -310,20 +310,23 @@ public class EstablishmentRepositoryTests
         var tag = new Tag { Name = "Test Tag" };
         var category2 = new Category { Name = "Test Category2" };
         var tag2 = new Tag { Name = "Test Tag2" };
+        
+        await _context.Set<Category>().AddRangeAsync(category, category2);
+        await _context.SaveChangesAsync();
                 
         var establishment = new Establishment
         {
             Name = "Test Name", RequestStatus = RequestStatus.Accepted,
             City = "Test City", Address = "Test Address", Latitude = 1.0, Longitude = 1.0,
             PriceCategory = PriceCategory.Affordable, Auth0Id = "auth0|123",
-            EstablishmentCategories = new List<EstablishmentCategory> { new EstablishmentCategory { Category = category } },
+            Categories = new List<Category> { category, category2 },
             EstablishmentTags = new List<EstablishmentTag>( new [] { new EstablishmentTag { Tag = tag } })
         };
         
         var updatedEstablishment = new EstablishmentDto
         {
             Auth0Id = "auth0|123",
-            EstablishmentCategories = new List<EstablishmentCategory> { new() { Category = category }, new() { Category = category2 } },
+            Categories = new List<Category> { category, category2 },
             EstablishmentTags = new List<EstablishmentTag>([new EstablishmentTag { Tag = tag }, new EstablishmentTag { Tag = tag2 }
             ])
         };
@@ -336,7 +339,7 @@ public class EstablishmentRepositoryTests
         
         // Assert
         var result = await _context.Set<Establishment>()
-            .Include(e => e.EstablishmentCategories)
+            .Include(e => e.Categories)
             .Include(e => e.EstablishmentTags)
             .FirstOrDefaultAsync(e => e.Auth0Id == "auth0|123");
         
@@ -349,7 +352,7 @@ public class EstablishmentRepositoryTests
         Assert.Equal(1.0, result.Longitude);
         Assert.Equal(PriceCategory.Affordable, result.PriceCategory);
         Assert.Equal("auth0|123", result.Auth0Id);
-        Assert.Equal(2, result.EstablishmentCategories.Count);
+        Assert.Equal(2, result.Categories.Count);
         Assert.Equal(2, result.EstablishmentTags.Count);
     }
     

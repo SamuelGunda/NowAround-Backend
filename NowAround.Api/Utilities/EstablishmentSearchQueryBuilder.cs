@@ -33,7 +33,7 @@ public static class EstablishmentSearchQueryBuilder
         
         if (!string.IsNullOrWhiteSpace(categoryName))
         {
-            query = query.Where(e => e.EstablishmentCategories.Any(ec => ec.Category.Name == categoryName));
+            query = query.Where(e => e.Categories.Any(c => c.Name == categoryName));
         }
 
         if (tagNames != null && tagNames.Count != 0)

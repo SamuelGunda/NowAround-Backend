@@ -7,5 +7,6 @@ public class Category : BaseEntity
 {
     [MaxLength(32)]
     public required string Name { get; set; }
-    public virtual ICollection<EstablishmentCategory> EstablishmentCategories { get; set; } = new List<EstablishmentCategory>();
+    
+    public ICollection<Establishment> Establishments { get; set; } = new List<Establishment>();
 }
