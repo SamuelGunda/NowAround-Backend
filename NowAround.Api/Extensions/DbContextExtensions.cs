@@ -10,8 +10,7 @@ public static class DbContextExtensions
         services.AddDbContext<AppDbContext>(options =>
         {
             options.UseSqlServer(configuration
-                    .GetSection("ConnectionStrings")
-                    .GetValue<string>("Default"),
+                    .GetConnectionString("Database"),
                 sqlOptions => sqlOptions.EnableRetryOnFailure(
                     maxRetryCount: 5, 
                     maxRetryDelay: TimeSpan.FromSeconds(30), 

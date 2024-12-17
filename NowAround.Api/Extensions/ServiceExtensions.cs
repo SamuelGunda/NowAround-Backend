@@ -1,4 +1,5 @@
-﻿using NowAround.Api.Apis.Auth0.Interfaces;
+﻿using Azure.Storage.Blobs;
+using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Auth0.Services;
 using NowAround.Api.Apis.Mapbox.Interfaces;
 using NowAround.Api.Apis.Mapbox.Services;
@@ -24,7 +25,8 @@ public static class ServiceExtensions
         services.AddScoped<IMonthlyStatisticService, MonthlyStatisticService>();
         
         services.AddSingleton<IMapboxService, MapboxService>();
-
+        services.AddScoped<IStorageService, StorageService>();
+        
         // Repositories
         services.AddScoped<IBaseAccountRepository<User>, UserRepository>();
         services.AddScoped<IEstablishmentRepository, EstablishmentRepository>();
