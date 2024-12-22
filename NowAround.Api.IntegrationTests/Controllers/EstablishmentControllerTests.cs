@@ -188,7 +188,7 @@ public class EstablishmentControllerTests
     // GetEstablishmentByAuth0IdAsync Tests
     
     [Fact]
-    public async Task GetEstablishmentByAuth0IdAsync_WithValidAuth0Id_ShouldReturnEstablishment()
+    public async Task GetEstablishmentProfileByAuth0IdAsync_WithValidAuth0Id_ShouldReturnEstablishment()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -212,7 +212,7 @@ public class EstablishmentControllerTests
         var client = factory.CreateClient();
 
         // Act
-        var response = await client.GetAsync($"/api/establishment/{auth0Id}");
+        var response = await client.GetAsync($"/api/establishment/profile/{auth0Id}");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -229,7 +229,7 @@ public class EstablishmentControllerTests
     }
     
     [Fact]
-    public async Task GetEstablishmentByAuth0IdAsync_WithInvalidAuth0Id_ShouldReturnNotFound()
+    public async Task GetEstablishmentProfileByAuth0IdAsync_WithInvalidAuth0Id_ShouldReturnNotFound()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -238,7 +238,7 @@ public class EstablishmentControllerTests
         var client = factory.CreateClient();
 
         // Act
-        var response = await client.GetAsync($"/api/establishment/{auth0Id}");
+        var response = await client.GetAsync($"/api/establishment/profile/{auth0Id}");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);

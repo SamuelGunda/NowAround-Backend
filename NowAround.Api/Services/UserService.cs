@@ -40,8 +40,24 @@ public class UserService : IUserService
         return user;
     }
     
-    public async Task<int> GetUsersCountCreatedInMonthAsync(DateTime startDate, DateTime endDate)
+    public async Task<int> GetUsersCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd)
     {
-        return await _userRepository.GetCountByCreatedAtBetweenDatesAsync(startDate, endDate);
+        return await _userRepository.GetCountByCreatedAtBetweenDatesAsync(monthStart, monthEnd);
+    }
+
+    public async Task UpdateUserPictureAsync(string auth0Id, string imageUrl)
+    {
+        var user = await _userRepository.GetByAuth0IdAsync(auth0Id);
+        
+        if (user == null)
+        {
+            _logger.LogWarning("User with Auth0 ID: {Auth0Id} not found", auth0Id);
+            throw new EntityNotFoundException("User", "Auth0 ID", auth0Id);
+        }
+        
+        user.ProfilePictureUrl = imageUrl.Contains("profile-picture") ? imageUrl : user.ProfilePictureUrl;
+        user.BackgroundPictureUrl = !imageUrl.Contains("profile-picture") ? imageUrl : user.BackgroundPictureUrl;
+        
+        await _userRepository.UpdateAsync(user);
     }
 }

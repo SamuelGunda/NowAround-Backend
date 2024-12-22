@@ -31,10 +31,10 @@ public class EstablishmentController : ControllerBase
         return Created("", new { message = "Establishment created successfully" });
     }
     
-    [HttpGet("{auth0Id}")]
-    public async Task<IActionResult> GetEstablishmentByAuth0IdAsync(string auth0Id)
+    [HttpGet("profile/{auth0Id}")]
+    public async Task<IActionResult> GetEstablishmentProfileInfoByAuth0IdAsync(string auth0Id)
     {
-        var establishment = await _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
+        var establishment = await _establishmentService.GetEstablishmentProfileByAuth0IdAsync(auth0Id);
         
         return Ok(establishment);
     }

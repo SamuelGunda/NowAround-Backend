@@ -435,10 +435,10 @@ public class EstablishmentServiceTests
                 )
         );
         
-        _establishmentRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(establishmentProfile);
+        _establishmentRepositoryMock.Setup(r => r.GetProfileByAuth0IdAsync(auth0Id)).ReturnsAsync(establishmentProfile);
         
         // Act
-        var result = await _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
+        var result = await _establishmentService.GetEstablishmentProfileByAuth0IdAsync(auth0Id);
         
         // Assert
         Assert.NotNull(result);
@@ -448,18 +448,18 @@ public class EstablishmentServiceTests
     public async Task GetEstablishmentByAuth0IdAsync_InvalidAuth0Id_ShouldThrowEstablishmentNotFoundException()
     {
         const string auth0Id = "999";
-        _establishmentRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(null as EstablishmentProfileResponse);
+        _establishmentRepositoryMock.Setup(r => r.GetProfileByAuth0IdAsync(auth0Id)).ReturnsAsync(null as EstablishmentProfileResponse);
 
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id));
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.GetEstablishmentProfileByAuth0IdAsync(auth0Id));
     }
     
     [Fact]
     public async Task GetEstablishmentByAuth0IdAsync_RepositoryThrowsException_ShouldThrowException()
     {
         const string auth0Id = "test-auth0-id";
-        _establishmentRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ThrowsAsync(new Exception());
+        _establishmentRepositoryMock.Setup(r => r.GetProfileByAuth0IdAsync(auth0Id)).ThrowsAsync(new Exception());
 
-        await Assert.ThrowsAsync<Exception>(() => _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id));
+        await Assert.ThrowsAsync<Exception>(() => _establishmentService.GetEstablishmentProfileByAuth0IdAsync(auth0Id));
     }
     
     // GetPendingEstablishmentsAsync tests
@@ -771,5 +771,86 @@ public class EstablishmentServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => _establishmentService.DeleteEstablishmentAsync(auth0Id));
+    }
+    
+    // UpdatePictureAsync tests
+    
+    [Fact]
+    public async Task UpdateEstablishmentPictureAsync_ValidProfilePictureUrl_ShouldUpdateProfilePicture()
+    {
+        // Arrange
+        const string auth0Id = "valid-auth0-id";
+        const string imageUrl = "https://example.com/profile-picture.jpg";
+        var establishment = new Establishment
+        {
+            Auth0Id = auth0Id,
+            Name = "Test Establishment",
+            Description = "Test Description",
+            City = "Test City",
+            Address = "Test Address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Affordable
+        };
+        _establishmentRepositoryMock.Setup(repo => repo.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(establishment);
+
+        // Act
+        await _establishmentService.UpdateEstablishmentPictureAsync(auth0Id, imageUrl);
+
+        // Assert
+        Assert.Equal(imageUrl, establishment.ProfilePictureUrl);
+        _establishmentRepositoryMock.Verify(repo => repo.UpdateAsync(establishment), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateEstablishmentPictureAsync_ValidBackgroundPictureUrl_ShouldUpdateBackgroundPicture()
+    {
+        // Arrange
+        const string auth0Id = "valid-auth0-id";
+        const string imageUrl = "https://example.com/background-picture.jpg";
+        var establishment = new Establishment
+        {
+            Auth0Id = auth0Id,
+            Name = "Test Establishment",
+            Description = "Test Description",
+            City = "Test City",
+            Address = "Test Address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Affordable
+        };
+        _establishmentRepositoryMock.Setup(repo => repo.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(establishment);
+
+        // Act
+        await _establishmentService.UpdateEstablishmentPictureAsync(auth0Id, imageUrl);
+
+        // Assert
+        Assert.Equal(imageUrl, establishment.BackgroundPictureUrl);
+        _establishmentRepositoryMock.Verify(repo => repo.UpdateAsync(establishment), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateEstablishmentPictureAsync_EstablishmentNotFound_ShouldThrowEntityNotFoundException()
+    {
+        // Arrange
+        const string auth0Id = "invalid-auth0-id";
+        const string imageUrl = "https://example.com/profile-picture.jpg";
+        _establishmentRepositoryMock.Setup(repo => repo.GetByAuth0IdAsync(auth0Id)).ReturnsAsync((Establishment)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.UpdateEstablishmentPictureAsync(auth0Id, imageUrl));
+        _establishmentRepositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<Establishment>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task UpdateEstablishmentPictureAsync_EmptyAuth0Id_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var auth0Id = string.Empty;
+        const string imageUrl = "https://example.com/profile-picture.jpg";
+
+        // Act & Assert
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.UpdateEstablishmentPictureAsync(auth0Id, imageUrl));
+        _establishmentRepositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<Establishment>()), Times.Never);
     }
 }

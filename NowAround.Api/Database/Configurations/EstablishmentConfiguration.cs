@@ -10,11 +10,12 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
     public void Configure(EntityTypeBuilder<Establishment> builder)
     {
         builder.HasKey(e => e.Id);
-        builder.Property(e => e.Auth0Id).IsRequired();
         builder.HasIndex(e => e.Auth0Id).IsUnique();
         
         builder.Property(e => e.Name).IsRequired();
         builder.Property(e => e.Description);
+        builder.Property(e => e.ProfilePictureUrl);
+        builder.Property(e => e.BackgroundPictureUrl);
         builder.Property(e => e.Address).IsRequired();
         builder.Property(e => e.City).IsRequired();
         builder.Property(e => e.Latitude).IsRequired();

@@ -18,7 +18,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
     {
     }
 
-    public new async Task<EstablishmentProfileResponse> GetByAuth0IdAsync(string auth0Id)
+    public async Task<EstablishmentProfileResponse> GetProfileByAuth0IdAsync(string auth0Id)
     {
         try
         {

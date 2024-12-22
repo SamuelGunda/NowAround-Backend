@@ -37,7 +37,7 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
         if (authHeaderParts.Length >= 3)
         {
             var sub = authHeaderParts[2];
-            claims.Add(new Claim("sub", sub));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, sub));
         }
         
         var identity = new ClaimsIdentity(claims, TestAuthScheme);

@@ -7,7 +7,7 @@ namespace NowAround.Api.Repositories.Interfaces;
 
 public interface IEstablishmentRepository : IBaseAccountRepository<Establishment>
 {
-    new Task<EstablishmentProfileResponse> GetByAuth0IdAsync(string auth0Id);
+    Task<EstablishmentProfileResponse> GetProfileByAuth0IdAsync(string auth0Id);
     Task<List<Establishment>> GetAllWhereRegisterStatusPendingAsync();
     Task<List<EstablishmentDto>> GetRangeWithFilterAsync(SearchValues searchValues, int page);
     Task UpdateAsync(EstablishmentDto establishmentDto);
