@@ -29,8 +29,6 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddCustomCors();
 builder.Services.AddApplicationInsightsTelemetry();
 
-/*builder.Logging.AddLogging();*/
-
 var app = builder.Build();
 
 app.UseExceptionHandler();

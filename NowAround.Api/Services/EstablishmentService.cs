@@ -86,7 +86,12 @@ public class EstablishmentService : IEstablishmentService
             throw new Exception("Failed to create establishment in the database");
         }
     }
-    
+
+    public Task<bool> CheckIfEstablishmentExistsAsync(string auth0Id)
+    {
+        return _establishmentRepository.CheckIfExistsByPropertyAsync("Auth0Id", auth0Id);
+    }
+
     public async Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id)
     {
         var establishment = await _establishmentRepository.GetByIdAsync(id);

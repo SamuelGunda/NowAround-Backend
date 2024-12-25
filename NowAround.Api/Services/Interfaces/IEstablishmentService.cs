@@ -10,6 +10,7 @@ namespace NowAround.Api.Services.Interfaces;
 public interface IEstablishmentService
 {
     Task RegisterEstablishmentAsync(EstablishmentRegisterRequest request);
+    Task<bool> CheckIfEstablishmentExistsAsync(string auth0Id);
     Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id);
     Task<EstablishmentProfileResponse> GetEstablishmentProfileByAuth0IdAsync(string auth0Id);
     Task<List<PendingEstablishmentResponse>> GetPendingEstablishmentsAsync();

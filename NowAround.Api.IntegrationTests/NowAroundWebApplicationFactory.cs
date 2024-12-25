@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Azure.Storage;
+using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
@@ -26,6 +29,7 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
     {
         _auth0ServiceMock = auth0ServiceMock;
         _mapboxServiceMock = mapboxServiceMock;
+        
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -33,7 +37,7 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
         builder.ConfigureTestServices(services =>
         {
             
-            //Database
+            // Database
             services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
             
             var connection = new SqliteConnection("DataSource=:memory:");

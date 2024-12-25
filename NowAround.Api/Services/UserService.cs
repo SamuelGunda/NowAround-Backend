@@ -26,7 +26,12 @@ public class UserService : IUserService
         await _auth0Service.AssignRoleAsync(auth0Id, "user");
         await _userRepository.CreateAsync(user);
     }
-    
+
+    public Task<bool> CheckIfUserExistsAsync(string auth0Id)
+    {
+        return _userRepository.CheckIfExistsByPropertyAsync("Auth0Id", auth0Id);
+    }
+
     public async Task<User?> GetUserAsync(string auth0Id)
     {
         var user = await _userRepository.GetByAuth0IdAsync(auth0Id);
