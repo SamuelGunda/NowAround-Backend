@@ -82,20 +82,17 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
     {
         
         // Categories
-        
         var restaurantCategory = new Category { Name = "RESTAURANT" };
         var barCategory = new Category { Name = "BAR" };
         var cafeCategory = new Category { Name = "CAFE" };
         dbContext.Categories.AddRange(restaurantCategory, barCategory, cafeCategory);
 
         // Tags
-        
         var petFriendlyTag = new Tag { Name = "PET_FRIENDLY" };
         var familyFriendlyTag = new Tag { Name = "FAMILY_FRIENDLY" };
         dbContext.Tags.AddRange(petFriendlyTag, familyFriendlyTag);
 
         // Establishments
-        
         var establishmentRestaurant = new Establishment
         {
             Auth0Id = "auth0|valid",
@@ -132,7 +129,6 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
         dbContext.SaveChanges();
         
         // Business Hours
-        
         var businessHours = new BusinessHours
         {
             EstablishmentId = establishmentRestaurant.Id,
@@ -150,7 +146,6 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
         establishmentRestaurant.BusinessHours = businessHours;
         
         // Rating Statistic
-        
         var ratingStatistic = new RatingStatistic
         {
             EstablishmentId = establishmentRestaurant.Id,
@@ -166,7 +161,6 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
         establishmentRestaurant.RatingStatistic = ratingStatistic;
         
         // Users
-        
         var user = new User { Auth0Id = "auth0|valid", FullName = "Test User" };
         dbContext.Users.Add(user);
         
