@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using NowAround.Api.Models.Domain;
+using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Responses;
 
@@ -9,7 +10,6 @@ namespace NowAround.Api.Database;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<MonthlyStatistic> MonthlyStatistics { get; set; }
-    
     public DbSet<Establishment> Establishments { get; set; }
     
     public DbSet<BusinessHours> BusinessHours { get; set; }

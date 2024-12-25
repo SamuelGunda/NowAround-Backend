@@ -25,7 +25,7 @@ public static class AuthenticationExtensions
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                RoleClaimType = $"{auth0Audience}/roles"
+                RoleClaimType = $"{auth0Audience}roles",
             };
             options.Events = new JwtBearerEvents
             {

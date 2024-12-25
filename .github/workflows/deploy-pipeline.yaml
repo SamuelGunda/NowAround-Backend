@@ -26,6 +26,8 @@ jobs:
       with:
         files: 'NowAround.Api/appsettings.json'
       env:
+        ConnectionStrings.StorageAccount: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+        ConnectionStrings.StorageKey: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
         Auth0.Audience: ${{ secrets.AUTH0_AUDIENCE }}
         Auth0.ClientId: ${{ secrets.AUTH0_CLIENT_ID }}
         Auth0.ClientSecret: ${{ secrets.AUTH0_CLIENT_SECRET }}

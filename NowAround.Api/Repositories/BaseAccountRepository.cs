@@ -67,5 +67,4 @@ public abstract class BaseAccountRepository<T> : BaseRepository<T>, IBaseAccount
             throw new Exception($"Failed to delete {typeof(T).Name} by Auth0 ID", e);
         }
     }
-    
 }

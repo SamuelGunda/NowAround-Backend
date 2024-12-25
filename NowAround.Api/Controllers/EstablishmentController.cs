@@ -31,10 +31,10 @@ public class EstablishmentController : ControllerBase
         return Created("", new { message = "Establishment created successfully" });
     }
     
-    [HttpGet("{auth0Id}")]
-    public async Task<IActionResult> GetEstablishmentByAuth0IdAsync(string auth0Id)
+    [HttpGet("profile/{auth0Id}")]
+    public async Task<IActionResult> GetEstablishmentProfileInfoByAuth0IdAsync(string auth0Id)
     {
-        var establishment = await _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
+        var establishment = await _establishmentService.GetEstablishmentProfileByAuth0IdAsync(auth0Id);
         
         return Ok(establishment);
     }
@@ -85,11 +85,11 @@ public class EstablishmentController : ControllerBase
         return Ok(establishmentDtos);
     }
     
-    [HttpPut]
     [Authorize]
+    [HttpPut]
     public async Task<IActionResult> UpdateEstablishmentAsync(EstablishmentUpdateRequest establishmentUpdateRequest)
     {
-        if (AuthorizationHelper.HasAdminOrMatchingEstablishmentId(User, establishmentUpdateRequest.Auth0Id))
+        if (AuthorizationHelper.HasAdminRightsOrMatchingAuth0Id(User, establishmentUpdateRequest.Auth0Id))
         {
             await _establishmentService.UpdateEstablishmentAsync(establishmentUpdateRequest);
             return NoContent();
@@ -117,7 +117,7 @@ public class EstablishmentController : ControllerBase
     [HttpDelete]
     public async Task<IActionResult> DeleteEstablishmentAsync(string auth0Id)
     {
-        if (AuthorizationHelper.HasAdminOrMatchingEstablishmentId(User, auth0Id))
+        if (AuthorizationHelper.HasAdminRightsOrMatchingAuth0Id(User, auth0Id))
         {
             await _establishmentService.DeleteEstablishmentAsync(auth0Id);
             return NoContent();

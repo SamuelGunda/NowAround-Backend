@@ -13,29 +13,29 @@ public class UserServiceTests
     private readonly Mock<IUserRepository> _userRepositoryMock;
     private readonly Mock<IAuth0Service> _auth0ServiceMock;
     private readonly Mock<ILogger<UserService>> _loggerMock;
-    
+
     private readonly UserService _userService;
-    
+
     public UserServiceTests()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
         _auth0ServiceMock = new Mock<IAuth0Service>();
         _loggerMock = new Mock<ILogger<UserService>>();
-        
+
         _userService = new UserService(
-            _loggerMock.Object, 
-            _userRepositoryMock.Object, 
+            _loggerMock.Object,
+            _userRepositoryMock.Object,
             _auth0ServiceMock.Object);
     }
-    
+
     // CreateUserAsync tests
-    
+
     [Fact]
     public async Task CreateUserAsync_CreatesUserAndAssignsRole_ForValidAuth0Id()
     {
         // Arrange
         const string auth0Id = "auth0|valid";
-        
+
         _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>())).ReturnsAsync(1);
         _auth0ServiceMock.Setup(s => s.AssignRoleAsync(auth0Id, "user")).Returns(Task.CompletedTask);
 
@@ -46,17 +46,19 @@ public class UserServiceTests
         _userRepositoryMock.Verify(r => r.CreateAsync(It.Is<User>(u => u.Auth0Id == auth0Id)), Times.Once);
         _auth0ServiceMock.Verify(s => s.AssignRoleAsync(auth0Id, "user"), Times.Once);
     }
-    
+
     [Fact]
     public async Task CreateUserAsync_LogsErrorAndThrowsException_WhenUserCreationFails()
     {
         // Arrange
         const string auth0Id = "auth0|valid";
 
-        _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>())).ThrowsAsync(new Exception("User creation failed"));
+        _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>()))
+            .ThrowsAsync(new Exception("User creation failed"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<Exception>(() => _userService.CreateUserAsync(auth0Id, "Samuel Pačút"));
+        var exception =
+            await Assert.ThrowsAsync<Exception>(() => _userService.CreateUserAsync(auth0Id, "Samuel Pačút"));
         Assert.Equal("User creation failed", exception.Message);
     }
 
@@ -71,12 +73,13 @@ public class UserServiceTests
             .ThrowsAsync(new Exception("Role assignment failed"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<Exception>(() => _userService.CreateUserAsync(auth0Id, "Samuel Pačút"));
+        var exception =
+            await Assert.ThrowsAsync<Exception>(() => _userService.CreateUserAsync(auth0Id, "Samuel Pačút"));
         Assert.Equal("Role assignment failed", exception.Message);
     }
-    
+
     // GetUsersCountCreatedInMonthAsync tests
-    
+
     [Fact]
     public async Task GetUsersCountCreatedInMonthAsync_ReturnsCorrectCount_ForValidDateRange()
     {
@@ -124,12 +127,14 @@ public class UserServiceTests
             .ThrowsAsync(new ArgumentException("Invalid date range"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentException>(() => _userService.GetUsersCountCreatedInMonthAsync(startDate, endDate));
+        var exception =
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                _userService.GetUsersCountCreatedInMonthAsync(startDate, endDate));
         Assert.Equal("Invalid date range", exception.Message);
     }
-    
+
     // GetUserAsync tests
-    
+
     [Fact]
     public async Task GetUserAsync_ReturnsUser_ForValidAuth0Id()
     {
@@ -152,10 +157,75 @@ public class UserServiceTests
         // Arrange
         const string auth0Id = "auth0|invalid";
         User? user = null;
-        
+
         _userRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(user);
-        
+
         // Act & Assert
         await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.GetUserAsync(auth0Id));
     }
+
+    // UpdateUserPictureAsync tests
+
+    [Fact]
+    public async Task UpdateUserPictureAsync_ValidProfilePictureUrl_ShouldUpdateProfilePicture()
+    {
+        // Arrange
+        const string auth0Id = "valid-auth0-id";
+        const string imageUrl = "https://example.com/profile-picture.jpg";
+        
+        var user = new User { Auth0Id = auth0Id, FullName = "Samuel Pačut" };
+        _userRepositoryMock.Setup(repo => repo.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(user);
+        
+        // Act
+        await _userService.UpdateUserPictureAsync(auth0Id, imageUrl);
+        
+        // Assert
+        Assert.Equal(imageUrl, user.ProfilePictureUrl);
+        _userRepositoryMock.Verify(repo => repo.UpdateAsync(It.Is<User>(u => u.ProfilePictureUrl == imageUrl)), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateUserPictureAsync_ValidProfilePictureUrl_ShouldUpdateBackgroundPicture()
+    {
+        // Arrange
+        const string auth0Id = "valid-auth0-id";
+        const string imageUrl = "https://example.com/background-picture.jpg";
+        
+        var user = new User { Auth0Id = auth0Id, FullName = "Samuel Pačut" };
+        _userRepositoryMock.Setup(repo => repo.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(user);
+        
+        // Act
+        await _userService.UpdateUserPictureAsync(auth0Id, imageUrl);
+        
+        // Assert
+        Assert.Equal(imageUrl, user.BackgroundPictureUrl);
+        _userRepositoryMock.Verify(repo => repo.UpdateAsync(It.Is<User>(u => u.BackgroundPictureUrl == imageUrl)), Times.Once);
+    }
+    
+    [Fact]
+    public async Task UpdateUserPictureAsync_UserNotFound_ShouldThrowEntityNotFoundException()
+    {
+        // Arrange
+        const string auth0Id = "invalid-auth0-id";
+        const string imageUrl = "https://example.com/profile-picture.jpg";
+        
+        _userRepositoryMock.Setup(repo => repo.GetByAuth0IdAsync(auth0Id)).ReturnsAsync((User) null);
+        
+        // Act & Assert
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.UpdateUserPictureAsync(auth0Id, imageUrl));
+        _userRepositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<User>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task UpdateUserPictureAsync__EmptyAuth0Id_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var auth0Id = string.Empty;
+        const string imageUrl = "https://example.com/profile-picture.jpg";
+        
+        // Act & Assert
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.UpdateUserPictureAsync(auth0Id, imageUrl));
+        _userRepositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<User>()), Times.Never);
+    }
+    
 }

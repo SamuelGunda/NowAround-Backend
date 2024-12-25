@@ -58,7 +58,7 @@ public class EstablishmentService : IEstablishmentService
         var coordinates = await _mapboxService.GetCoordinatesFromAddressAsync(establishmentInfo.Address, establishmentInfo.PostalCode, establishmentInfo.City);
         
         // Check if categories and tags exist by their name and get them from the database
-        var catsAndTags = await SetCategoriesAndTagsAsync(establishmentInfo.Category, establishmentInfo.Tags);
+        var catsAndTags = await GetCategoriesAndTagsAsync(establishmentInfo.Category, establishmentInfo.Tags);
         
         var auth0Id = await _auth0Service.RegisterEstablishmentAccountAsync(personalInfo);
 
@@ -86,7 +86,12 @@ public class EstablishmentService : IEstablishmentService
             throw new Exception("Failed to create establishment in the database");
         }
     }
-    
+
+    public Task<bool> CheckIfEstablishmentExistsAsync(string auth0Id)
+    {
+        return _establishmentRepository.CheckIfExistsByPropertyAsync("Auth0Id", auth0Id);
+    }
+
     public async Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id)
     {
         var establishment = await _establishmentRepository.GetByIdAsync(id);
@@ -98,9 +103,9 @@ public class EstablishmentService : IEstablishmentService
         return establishment.ToDetailedResponse();
     }
     
-    public async Task<EstablishmentProfileResponse> GetEstablishmentByAuth0IdAsync(string auth0Id)
+    public async Task<EstablishmentProfileResponse> GetEstablishmentProfileByAuth0IdAsync(string auth0Id)
     {
-        var establishment = await _establishmentRepository.GetByAuth0IdAsync(auth0Id);
+        var establishment = await _establishmentRepository.GetProfileByAuth0IdAsync(auth0Id);
         if (establishment == null)
         {
             throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
@@ -147,7 +152,7 @@ public class EstablishmentService : IEstablishmentService
             throw new ArgumentNullException(nameof(request.Auth0Id));
         }
         
-        var catsAndTags = await SetCategoriesAndTagsAsync(request.Categories, request.Tags);
+        var catsAndTags = await GetCategoriesAndTagsAsync(request.Categories, request.Tags);
         
         var establishmentDto = new EstablishmentDto
         {
@@ -160,6 +165,23 @@ public class EstablishmentService : IEstablishmentService
         };
         
         await _establishmentRepository.UpdateAsync(establishmentDto);
+    }
+
+    public async Task UpdateEstablishmentPictureAsync(string auth0Id, string imageUrl)
+    {
+        var establishment = await _establishmentRepository.GetByAuth0IdAsync(auth0Id);
+        
+        if (establishment == null)
+        {
+            _logger.LogWarning("User with Auth0 ID: {Auth0Id} not found", auth0Id);
+            throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
+        }
+        
+        establishment.ProfilePictureUrl = imageUrl.Contains("profile-picture") ? imageUrl : establishment.ProfilePictureUrl;
+        establishment.BackgroundPictureUrl = !imageUrl.Contains("profile-picture") ? imageUrl : establishment.BackgroundPictureUrl;
+        
+        
+        await _establishmentRepository.UpdateAsync(establishment);
     }
 
     public async Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus)
@@ -196,7 +218,7 @@ public class EstablishmentService : IEstablishmentService
         }
     }
 
-    private async Task<(Category[] categories, Tag[] tags)> SetCategoriesAndTagsAsync(ICollection<string>? categoryNames, ICollection<string>? tagNames)
+    private async Task<(Category[] categories, Tag[] tags)> GetCategoriesAndTagsAsync(ICollection<string>? categoryNames, ICollection<string>? tagNames)
     {
         List<Category> categories = [];
         List<Tag> tags = [];

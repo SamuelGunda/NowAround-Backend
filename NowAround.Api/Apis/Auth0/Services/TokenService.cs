@@ -28,7 +28,6 @@ public class TokenService : ITokenService
         _domain = configuration["Auth0:Domain"] ?? throw new ArgumentNullException(configuration["Auth0:Domain"]);
         _clientId = configuration["Auth0:ClientId"] ?? throw new ArgumentNullException(configuration["Auth0:ClientId"]);
         _clientSecret = configuration["Auth0:ClientSecret"] ?? throw new ArgumentNullException(configuration["Auth0:ClientSecret"]);
-        //TODO: Remove ManagementScopes from configuration and hardcode it here
         _managementScopes = configuration["Auth0:ManagementScopes"] ?? throw new ArgumentNullException(configuration["Auth0:ManagementScopes"]);
     }
     
