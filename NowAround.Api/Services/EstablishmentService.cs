@@ -102,7 +102,19 @@ public class EstablishmentService : IEstablishmentService
 
         return establishment.ToDetailedResponse();
     }
-    
+
+    public async Task<Establishment> GetEstablishmentByAuth0Id(string auth0Id)
+    {
+        var establishment = await _establishmentRepository.GetByAuth0IdAsync(auth0Id);
+        if (establishment == null)
+        {
+            throw new EntityNotFoundException("Establishment","Auth0ID", auth0Id);
+        }
+
+        return establishment;
+    }
+
+
     public async Task<EstablishmentProfileResponse> GetEstablishmentProfileByAuth0IdAsync(string auth0Id)
     {
         var establishment = await _establishmentRepository.GetProfileByAuth0IdAsync(auth0Id);

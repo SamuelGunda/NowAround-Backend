@@ -11,22 +11,15 @@ namespace NowAround.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class EstablishmentController : ControllerBase
+public class EstablishmentController(
+    IEstablishmentService establishmentService,
+    ILogger<EstablishmentController> logger)
+    : ControllerBase
 {
-    
-    private readonly ILogger<EstablishmentController> _logger;
-    private readonly IEstablishmentService _establishmentService;
-    
-    public EstablishmentController(IEstablishmentService establishmentService, ILogger<EstablishmentController> logger)
-    {
-        _logger = logger;
-        _establishmentService = establishmentService;
-    }
-    
     [HttpPost]
     public async Task<IActionResult> RegisterEstablishmentAsync(EstablishmentRegisterRequest establishment)
     {
-        await _establishmentService.RegisterEstablishmentAsync(establishment);
+        await establishmentService.RegisterEstablishmentAsync(establishment);
         
         return Created("", new { message = "Establishment created successfully" });
     }
@@ -34,7 +27,7 @@ public class EstablishmentController : ControllerBase
     [HttpGet("profile/{auth0Id}")]
     public async Task<IActionResult> GetEstablishmentProfileInfoByAuth0IdAsync(string auth0Id)
     {
-        var establishment = await _establishmentService.GetEstablishmentProfileByAuth0IdAsync(auth0Id);
+        var establishment = await establishmentService.GetEstablishmentProfileByAuth0IdAsync(auth0Id);
         
         return Ok(establishment);
     }
@@ -43,7 +36,7 @@ public class EstablishmentController : ControllerBase
     [HttpGet("pending")]
     public async Task<IActionResult> GetPendingEstablishmentsAsync()
     {
-        var establishments = await _establishmentService.GetPendingEstablishmentsAsync();
+        var establishments = await establishmentService.GetPendingEstablishmentsAsync();
         if (establishments.Count == 0)
         {
             return NoContent();
@@ -76,7 +69,7 @@ public class EstablishmentController : ControllerBase
             }
         };
         
-        var establishmentDtos = await _establishmentService.GetEstablishmentsWithFilterAsync(searchValues, page ?? 0);
+        var establishmentDtos = await establishmentService.GetEstablishmentsWithFilterAsync(searchValues, page ?? 0);
         if (establishmentDtos.Count == 0)
         {
             return NoContent();
@@ -91,7 +84,7 @@ public class EstablishmentController : ControllerBase
     {
         if (AuthorizationHelper.HasAdminRightsOrMatchingAuth0Id(User, establishmentUpdateRequest.Auth0Id))
         {
-            await _establishmentService.UpdateEstablishmentAsync(establishmentUpdateRequest);
+            await establishmentService.UpdateEstablishmentAsync(establishmentUpdateRequest);
             return NoContent();
         }
 
@@ -105,11 +98,11 @@ public class EstablishmentController : ControllerBase
         if (Enum.TryParse<RequestStatus>(action + "ed", true, out var status) && 
             status is RequestStatus.Accepted or RequestStatus.Rejected)
         {
-            await _establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, status);
+            await establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, status);
             return NoContent();
         }
 
-        _logger.LogWarning("Invalid action type provided: {Action}", action);
+        logger.LogWarning("Invalid action type provided: {Action}", action);
         return BadRequest(new { message = "Invalid action type. Please use 'accept' or 'reject'." });
     }
     
@@ -119,7 +112,7 @@ public class EstablishmentController : ControllerBase
     {
         if (AuthorizationHelper.HasAdminRightsOrMatchingAuth0Id(User, auth0Id))
         {
-            await _establishmentService.DeleteEstablishmentAsync(auth0Id);
+            await establishmentService.DeleteEstablishmentAsync(auth0Id);
             return NoContent();
         }
 

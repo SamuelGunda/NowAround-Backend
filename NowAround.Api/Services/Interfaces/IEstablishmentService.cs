@@ -1,4 +1,5 @@
 ﻿using NowAround.Api.Apis.Auth0.Models.Requests;
+using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
@@ -12,6 +13,7 @@ public interface IEstablishmentService
     Task RegisterEstablishmentAsync(EstablishmentRegisterRequest request);
     Task<bool> CheckIfEstablishmentExistsAsync(string auth0Id);
     Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id);
+    Task<Establishment> GetEstablishmentByAuth0Id(string auth0Id);
     Task<EstablishmentProfileResponse> GetEstablishmentProfileByAuth0IdAsync(string auth0Id);
     Task<List<PendingEstablishmentResponse>> GetPendingEstablishmentsAsync();
     Task<List<EstablishmentDto>> GetEstablishmentsWithFilterAsync(SearchValues searchValues, int page);
