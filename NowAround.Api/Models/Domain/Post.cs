@@ -11,7 +11,7 @@ public class Post : BaseEntity
     public required string Body { get; set; }
     [MaxLength(256)]
     public string? ImageUrl { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime CreatedAt { get; init; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
     
     public ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();

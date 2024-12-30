@@ -44,7 +44,7 @@ public class StorageControllerTests : IClassFixture<StorageContextFixture>
         var testFile = new MultipartFormDataContent();
         testFile.Add(imageContent, "image", "test.jpg");
 
-        const string requestUrl = "/api/Storage/upload/auth0|valid/profile-picture";
+        const string requestUrl = "/api/Storage/upload/profile-picture";
 
         // Act
         var response = await client.PostAsync(requestUrl, testFile);
@@ -52,10 +52,10 @@ public class StorageControllerTests : IClassFixture<StorageContextFixture>
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.Equal("Image successfully uploaded", await response.Content.ReadAsStringAsync());
-        Assert.Equal("https://nowaroundimagestorage.blob.core.windows.net/auth0-valid/profile-picture/test.jpg", response.Headers.Location?.ToString());
+        Assert.Equal("https://nowaroundimagestorage.blob.core.windows.net/auth0-valid/profile-picture", response.Headers.Location?.ToString());
         
         _containerName = "user";
-        _blobPath = "auth0-valid/profile-picture/test.jpg";
+        _blobPath = "auth0-valid/profile-picture";
         await CleanStorage();
     }
 
@@ -78,7 +78,7 @@ public class StorageControllerTests : IClassFixture<StorageContextFixture>
         var testFile = new MultipartFormDataContent();
         testFile.Add(imageContent, "image", "test.jpg");
 
-        const string requestUrl = "/api/Storage/upload/auth0|valid/profile-picture";
+        const string requestUrl = "/api/Storage/upload/profile-picture";
 
         // Act
         var response = await client.PostAsync(requestUrl, testFile);
@@ -86,10 +86,10 @@ public class StorageControllerTests : IClassFixture<StorageContextFixture>
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.Equal("Image successfully uploaded", await response.Content.ReadAsStringAsync());
-        Assert.Equal("https://nowaroundimagestorage.blob.core.windows.net/auth0-valid/profile-picture/test.jpg", response.Headers.Location?.ToString());
+        Assert.Equal("https://nowaroundimagestorage.blob.core.windows.net/auth0-valid/profile-picture", response.Headers.Location?.ToString());
         
         _containerName = "establishment";
-        _blobPath = "auth0-valid/profile-picture/test.jpg";
+        _blobPath = "auth0-valid/profile-picture";
         await CleanStorage();
     }
     
@@ -111,7 +111,7 @@ public class StorageControllerTests : IClassFixture<StorageContextFixture>
         var testFile = new MultipartFormDataContent();
         testFile.Add(imageContent, "image", "test.jpg");
 
-        const string requestUrl = "/api/Storage/upload/auth0|invalid/profile-picture";
+        const string requestUrl = "/api/Storage/upload/profile-picture";
 
         // Act
         var response = await client.PostAsync(requestUrl, testFile);
@@ -138,7 +138,7 @@ public class StorageControllerTests : IClassFixture<StorageContextFixture>
         var testFile = new MultipartFormDataContent();
         testFile.Add(imageContent, "image", "test.jpg");
 
-        const string requestUrl = "/api/Storage/upload/auth0|valid/profile-picture";
+        const string requestUrl = "/api/Storage/upload/profile-picture";
 
         // Act
         var response = await client.PostAsync(requestUrl, testFile);
@@ -163,7 +163,7 @@ public class StorageControllerTests : IClassFixture<StorageContextFixture>
         var testFile = new MultipartFormDataContent();
         testFile.Add(imageContent, "image", "test.jpg");
 
-        const string requestUrl = "/api/Storage/upload/auth0|valid/profile-picture";
+        const string requestUrl = "/api/Storage/upload/profile-picture";
 
         // Act
         var response = await client.PostAsync(requestUrl, testFile);

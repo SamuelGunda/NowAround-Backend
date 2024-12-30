@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NowAround.Api.Services.Interfaces;
-using NowAround.Api.Utilities;
 
 namespace NowAround.Api.Controllers;
 
@@ -10,17 +10,14 @@ namespace NowAround.Api.Controllers;
 public class StorageController(IStorageService storageService) : ControllerBase
 {
     
-    [HttpPost("upload/{auth0Id}/{type}/{id?}")]
+    [HttpPost("upload/{type}")]
     [Authorize]
-    public async Task<IActionResult> UploadImageAsync(IFormFile image, [FromRoute] string auth0Id, [FromRoute] string type, [FromRoute] string? id = null)
+    public async Task<IActionResult> UploadImageAsync(IFormFile image, [FromRoute] string type, [FromQuery] int? id)
     {
-        if (AuthorizationHelper.HasAdminRightsOrMatchingAuth0Id(User, auth0Id))
-        {
-            var role = User.Claims.FirstOrDefault(c => c.Type == "https://now-around-auth-api/roles")?.Value;
-            var url = await storageService.UploadImageAsync(image, role, auth0Id, type, id);
-            
-            return Created(url, "Image successfully uploaded");
-        }
-        return Unauthorized();
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        var role = User.Claims.FirstOrDefault(c => c.Type == "https://now-around-auth-api/roles")?.Value ?? throw new ArgumentException("Role not found");
+        var url = await storageService.UploadImageAsync(image, role, auth0Id, type, id);
+        
+        return Created(url, "Image successfully uploaded");
     }
 }
