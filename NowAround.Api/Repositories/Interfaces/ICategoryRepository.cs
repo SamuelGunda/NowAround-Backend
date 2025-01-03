@@ -2,6 +2,4 @@
 
 namespace NowAround.Api.Repositories.Interfaces;
 
-public interface ICategoryRepository : IBaseRepository<Category>
-{
-}
+public interface ICategoryRepository : IBaseRepository<Category>;

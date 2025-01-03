@@ -1,12 +1,9 @@
-﻿using Azure.Storage;
-using Azure.Storage.Blobs;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
@@ -164,6 +161,15 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
         var user = new User { Auth0Id = "auth0|valid", FullName = "Test User" };
         dbContext.Users.Add(user);
         
+        //Posts
+        var post = new Post
+        {
+            EstablishmentId = establishmentRestaurant.Id,
+            Headline = "Test Headline",
+            Body = "Test Body",
+        };
+        
+        dbContext.Posts.Add(post);
         dbContext.SaveChanges();
     }
 }

@@ -18,6 +18,6 @@ public class RatingStatisticConfiguration : IEntityTypeConfiguration<RatingStati
         builder.HasMany(rc => rc.Reviews)
             .WithOne(r => r.RatingStatistic)
             .HasForeignKey(r => r.RatingCollectionId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

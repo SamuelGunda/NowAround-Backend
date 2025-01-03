@@ -48,22 +48,22 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
             .WithMany(c => c.Establishments)
             .UsingEntity<Dictionary<string, object>>(
                 "CategoryEstablishment",
-                j => j.HasOne<Category>().WithMany().HasForeignKey("CategoryId"),
-                j => j.HasOne<Establishment>().WithMany().HasForeignKey("EstablishmentId"));
+                j => j.HasOne<Category>().WithMany().HasForeignKey("CategoryId").OnDelete(DeleteBehavior.Cascade),
+                j => j.HasOne<Establishment>().WithMany().HasForeignKey("EstablishmentId").OnDelete(DeleteBehavior.Cascade));
 
         builder.HasMany(e => e.Tags)
             .WithMany(t => t.Establishments)
             .UsingEntity<Dictionary<string, object>>(
                 "TagEstablishment",
-                j => j.HasOne<Tag>().WithMany().HasForeignKey("TagId"),
-                j => j.HasOne<Establishment>().WithMany().HasForeignKey("EstablishmentId"));
+                j => j.HasOne<Tag>().WithMany().HasForeignKey("TagId").OnDelete(DeleteBehavior.Cascade),
+                j => j.HasOne<Establishment>().WithMany().HasForeignKey("EstablishmentId").OnDelete(DeleteBehavior.Cascade));
 
         builder.HasMany(e => e.Cuisines)
             .WithMany(c => c.Establishments)
             .UsingEntity<Dictionary<string, object>>(
                 "CuisineEstablishment",
-                j => j.HasOne<Cuisine>().WithMany().HasForeignKey("CuisineId"),
-                j => j.HasOne<Establishment>().WithMany().HasForeignKey("EstablishmentId"));
+                j => j.HasOne<Cuisine>().WithMany().HasForeignKey("CuisineId").OnDelete(DeleteBehavior.Cascade),
+                j => j.HasOne<Establishment>().WithMany().HasForeignKey("EstablishmentId").OnDelete(DeleteBehavior.Cascade));
         
         builder.HasMany(e => e.Posts)
             .WithOne(p => p.Establishment)

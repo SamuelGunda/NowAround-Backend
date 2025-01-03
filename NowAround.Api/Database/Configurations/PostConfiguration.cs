@@ -19,7 +19,7 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
         builder.HasOne(p => p.Establishment)
             .WithMany(e => e.Posts)
             .HasForeignKey(p => p.EstablishmentId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);
         
         builder.HasMany(p => p.PostLikes)
             .WithOne(pl => pl.Post)
