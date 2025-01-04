@@ -12,7 +12,7 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Headline).IsRequired();
         builder.Property(p => p.Body).IsRequired();
-        builder.Property(p => p.ImageUrl);
+        builder.Property(p => p.PictureUrl);
         builder.Property(p => p.CreatedAt).IsRequired();
         builder.Property(p => p.UpdatedAt).IsRequired();
         

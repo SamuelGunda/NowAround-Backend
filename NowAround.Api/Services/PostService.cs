@@ -8,11 +8,13 @@ namespace NowAround.Api.Services;
 
 public class PostService : IPostService
 {
+    private readonly ILogger<PostService> _logger;
     private readonly IEstablishmentService _establishmentService;
     private readonly IPostRepository _postRepository;
     
-    public PostService(IEstablishmentService establishmentService, IPostRepository postRepository)
+    public PostService(ILogger<PostService> logger ,IEstablishmentService establishmentService, IPostRepository postRepository)
     {
+        _logger = logger;
         _establishmentService = establishmentService;
         _postRepository = postRepository;
     }
@@ -36,35 +38,41 @@ public class PostService : IPostService
     public async Task<bool> CheckPostOwnershipByAuth0IdAsync(string auth0Id, int postId)
     {
         var establishment = await _establishmentService.GetEstablishmentByAuth0Id(auth0Id);
-        Console.WriteLine(establishment.Id);
-        Console.WriteLine(auth0Id);
         
-        var post = await _postRepository.GetByIdAsync(postId);
-        
-        if (post == null)
-        {
-            throw new EntityNotFoundException("Post", "ID", postId.ToString());
-        }
+        var post = await GetPostAsync(postId);
         
         return establishment.Id == post.EstablishmentId;
     }
 
-    public Task<Post> GetPostAsync(int postId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task UpdatePictureAsync(int postId, string imageUrl)
+    public async Task<Post> GetPostAsync(int postId)
     {
         var post = await _postRepository.GetByIdAsync(postId);
         
         if (post == null)
         {
+            _logger.LogWarning("Post with ID: {PostId} not found", postId);
             throw new EntityNotFoundException("Post", "ID", postId.ToString());
         }
         
-        post.ImageUrl = imageUrl;
+        return post;
+    }
+
+    public async Task UpdatePictureAsync(int postId, string pictureUrl)
+    {
+        var post = await GetPostAsync(postId);
+        
+        post.PictureUrl = pictureUrl;
         
         await _postRepository.UpdateAsync(post);
+    }
+
+    public async Task DeletePostAsync(int postId)
+    {
+        var result = await _postRepository.DeleteAsync(postId);
+        
+        if (!result)
+        {
+            throw new EntityNotFoundException("Post", "ID", postId.ToString());
+        }
     }
 }

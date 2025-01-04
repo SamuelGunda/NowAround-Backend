@@ -403,13 +403,14 @@ public class EstablishmentServiceTests
             new GenericInfo(
                 establishment.Name,
                 "Default",
+                "Default",
                 establishment.Description,
                 establishment.Website,
                 "Moderate",
-                new List<string>(),
-                new List<string>(),
-                new List<string>(),
-                new List<SocialLinkDto>()
+                [],
+                [],
+                [],
+                []
             ),
             new LocationInfo(
                 establishment.Address,
@@ -427,8 +428,8 @@ public class EstablishmentServiceTests
                     new List<BusinessHoursExceptionsDto>()
                 )
             ),
-            new List<PostWithAuthIdsResponse>(),
-            new List<MenuDto>(),
+            [],
+            [],
             new RatingStatisticResponse(
                 0, 0, 0, 0, 0,
                 new List<ReviewWithAuthIdsResponse>()

@@ -14,7 +14,7 @@ public class MenuItemConfiguration : IEntityTypeConfiguration<MenuItem>
             .IsRequired()
             .HasMaxLength(32);
         
-        builder.Property(mi => mi.PhotoUrl)
+        builder.Property(mi => mi.PictureUrl)
             .IsRequired()
             .HasMaxLength(256);
         

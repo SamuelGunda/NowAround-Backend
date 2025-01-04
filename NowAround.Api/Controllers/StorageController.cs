@@ -10,8 +10,8 @@ namespace NowAround.Api.Controllers;
 public class StorageController(IStorageService storageService) : ControllerBase
 {
     
-    [HttpPost("upload/{type}")]
     [Authorize]
+    [HttpPost("upload/{type}")]
     public async Task<IActionResult> UploadImageAsync(IFormFile image, [FromRoute] string type, [FromQuery] int? id)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
