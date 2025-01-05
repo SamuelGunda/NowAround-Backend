@@ -5,6 +5,7 @@ using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Repositories;
 using NowAround.Api.Services;
+using NowAround.Api.Services.Interfaces;
 
 namespace NowAround.Api.UnitTests.Services;
 
@@ -13,6 +14,7 @@ public class UserServiceTests
     private readonly Mock<IUserRepository> _userRepositoryMock;
     private readonly Mock<IAuth0Service> _auth0ServiceMock;
     private readonly Mock<ILogger<UserService>> _loggerMock;
+    private readonly Mock<IStorageService> _storageServiceMock;
 
     private readonly UserService _userService;
 
@@ -21,11 +23,13 @@ public class UserServiceTests
         _userRepositoryMock = new Mock<IUserRepository>();
         _auth0ServiceMock = new Mock<IAuth0Service>();
         _loggerMock = new Mock<ILogger<UserService>>();
+        _storageServiceMock = new Mock<IStorageService>();
 
         _userService = new UserService(
             _loggerMock.Object,
             _userRepositoryMock.Object,
-            _auth0ServiceMock.Object);
+            _auth0ServiceMock.Object,
+            _storageServiceMock.Object);
     }
 
     // CreateUserAsync tests
@@ -163,69 +167,4 @@ public class UserServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.GetUserAsync(auth0Id));
     }
-
-    // UpdateUserPictureAsync tests
-
-    [Fact]
-    public async Task UpdateUserPictureAsync_ValidProfilePictureUrl_ShouldUpdateProfilePicture()
-    {
-        // Arrange
-        const string auth0Id = "valid-auth0-id";
-        const string imageUrl = "https://example.com/profile-picture.jpg";
-        
-        var user = new User { Auth0Id = auth0Id, FullName = "Samuel Pačut" };
-        _userRepositoryMock.Setup(repo => repo.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(user);
-        
-        // Act
-        await _userService.UpdateUserPictureAsync(auth0Id, imageUrl);
-        
-        // Assert
-        Assert.Equal(imageUrl, user.ProfilePictureUrl);
-        _userRepositoryMock.Verify(repo => repo.UpdateAsync(It.Is<User>(u => u.ProfilePictureUrl == imageUrl)), Times.Once);
-    }
-
-    [Fact]
-    public async Task UpdateUserPictureAsync_ValidProfilePictureUrl_ShouldUpdateBackgroundPicture()
-    {
-        // Arrange
-        const string auth0Id = "valid-auth0-id";
-        const string imageUrl = "https://example.com/background-picture.jpg";
-        
-        var user = new User { Auth0Id = auth0Id, FullName = "Samuel Pačut" };
-        _userRepositoryMock.Setup(repo => repo.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(user);
-        
-        // Act
-        await _userService.UpdateUserPictureAsync(auth0Id, imageUrl);
-        
-        // Assert
-        Assert.Equal(imageUrl, user.BackgroundPictureUrl);
-        _userRepositoryMock.Verify(repo => repo.UpdateAsync(It.Is<User>(u => u.BackgroundPictureUrl == imageUrl)), Times.Once);
-    }
-    
-    [Fact]
-    public async Task UpdateUserPictureAsync_UserNotFound_ShouldThrowEntityNotFoundException()
-    {
-        // Arrange
-        const string auth0Id = "invalid-auth0-id";
-        const string imageUrl = "https://example.com/profile-picture.jpg";
-        
-        _userRepositoryMock.Setup(repo => repo.GetByAuth0IdAsync(auth0Id)).ReturnsAsync((User) null);
-        
-        // Act & Assert
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.UpdateUserPictureAsync(auth0Id, imageUrl));
-        _userRepositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<User>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task UpdateUserPictureAsync__EmptyAuth0Id_ThrowsArgumentNullException()
-    {
-        // Arrange
-        var auth0Id = string.Empty;
-        const string imageUrl = "https://example.com/profile-picture.jpg";
-        
-        // Act & Assert
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.UpdateUserPictureAsync(auth0Id, imageUrl));
-        _userRepositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<User>()), Times.Never);
-    }
-    
 }

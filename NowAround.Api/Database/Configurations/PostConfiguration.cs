@@ -12,13 +12,14 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Headline).IsRequired();
         builder.Property(p => p.Body).IsRequired();
+        builder.Property(p => p.PictureUrl);
         builder.Property(p => p.CreatedAt).IsRequired();
         builder.Property(p => p.UpdatedAt).IsRequired();
         
         builder.HasOne(p => p.Establishment)
             .WithMany(e => e.Posts)
             .HasForeignKey(p => p.EstablishmentId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);
         
         builder.HasMany(p => p.PostLikes)
             .WithOne(pl => pl.Post)

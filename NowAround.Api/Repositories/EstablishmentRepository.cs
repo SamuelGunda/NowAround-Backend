@@ -28,7 +28,8 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                     e.Auth0Id,
                 new GenericInfo(
                     e.Name,
-                    null,
+                    e.ProfilePictureUrl,
+                    e.BackgroundPictureUrl,
                     e.Description,
                     e.Website,
                     e.PriceCategory.ToString(),
@@ -55,21 +56,23 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                             .ToList()
                     )
                 ),
-                new List<PostWithAuthIdsResponse>(
-                    e.Posts.Select(p => new PostWithAuthIdsResponse(
+                new List<PostDto>(
+                    e.Posts.Select(p => new PostDto(
+                        p.Id,
                         null,
                         p.Headline,
                         p.Body,
-                        p.ImageUrl,
-                        p.PostLikes.Select(pl => pl.User.Auth0Id).ToList(),
-                        p.CreatedAt
+                        p.PictureUrl,
+                        p.CreatedAt,
+                        p.PostLikes.Select(pl => pl.User.Auth0Id).ToList()
                     )).ToList()
                     ),
                 e.Menus.Select(m => new MenuDto(
                     m.Name,
                     m.MenuItems.Select(mi => new MenuItemDto(
+                        mi.Id,
                         mi.Name,
-                        mi.PhotoUrl,
+                        mi.PictureUrl,
                         mi.Description,
                         mi.Price.ToString()
                     )).ToList()
@@ -141,7 +144,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
             
             query = EstablishmentSearchQueryBuilder.ApplyFilters(query, searchValues);
 
-            var establishments = new List<EstablishmentDto>();
+            List<EstablishmentDto> establishments;
             
             if (page > 0)
             {

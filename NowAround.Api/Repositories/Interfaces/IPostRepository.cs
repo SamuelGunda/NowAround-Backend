@@ -2,4 +2,4 @@
 
 namespace NowAround.Api.Repositories.Interfaces;
 
-public interface ITagRepository : IBaseRepository<Tag>;
+public interface IPostRepository : IBaseRepository<Post>;

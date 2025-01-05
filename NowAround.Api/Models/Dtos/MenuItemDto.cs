@@ -1,3 +1,3 @@
 ﻿namespace NowAround.Api.Models.Dtos;
 
-public sealed record MenuItemDto(string Name, string Url, string Description, string Price);
+public sealed record MenuItemDto(int Id, string Name, string PictureUrl, string Description, string Price);

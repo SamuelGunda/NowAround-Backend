@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
@@ -13,6 +14,7 @@ using NowAround.Api.Models.Requests;
 using NowAround.Api.Models.Responses;
 using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Services;
+using NowAround.Api.Services.Interfaces;
 
 namespace NowAround.Api.UnitTests.Services;
 
@@ -24,6 +26,7 @@ public class EstablishmentServiceTests
     private readonly Mock<IMapboxService> _mapboxServiceMock;
     private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
     private readonly Mock<ITagRepository> _tagRepositoryMock;
+    private readonly Mock<IStorageService> _storageServiceMock;
 
     private readonly EstablishmentService _establishmentService;
     
@@ -34,6 +37,7 @@ public class EstablishmentServiceTests
         _mapboxServiceMock = new Mock<IMapboxService>();
         _categoryRepositoryMock = new Mock<ICategoryRepository>();
         _tagRepositoryMock = new Mock<ITagRepository>();
+        _storageServiceMock = new Mock<IStorageService>();
         Mock<ILogger<EstablishmentService>> loggerMock = new();
         
         _establishmentService = new EstablishmentService(
@@ -42,6 +46,7 @@ public class EstablishmentServiceTests
             _establishmentRepositoryMock.Object,
             _categoryRepositoryMock.Object,
             _tagRepositoryMock.Object,
+            _storageServiceMock.Object,
             loggerMock.Object);
     }
     
@@ -403,13 +408,14 @@ public class EstablishmentServiceTests
             new GenericInfo(
                 establishment.Name,
                 "Default",
+                "Default",
                 establishment.Description,
                 establishment.Website,
                 "Moderate",
-                new List<string>(),
-                new List<string>(),
-                new List<string>(),
-                new List<SocialLinkDto>()
+                [],
+                [],
+                [],
+                []
             ),
             new LocationInfo(
                 establishment.Address,
@@ -427,8 +433,8 @@ public class EstablishmentServiceTests
                     new List<BusinessHoursExceptionsDto>()
                 )
             ),
-            new List<PostWithAuthIdsResponse>(),
-            new List<MenuDto>(),
+            [],
+            [],
             new RatingStatisticResponse(
                 0, 0, 0, 0, 0,
                 new List<ReviewWithAuthIdsResponse>()
@@ -771,86 +777,5 @@ public class EstablishmentServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => _establishmentService.DeleteEstablishmentAsync(auth0Id));
-    }
-    
-    // UpdatePictureAsync tests
-    
-    [Fact]
-    public async Task UpdateEstablishmentPictureAsync_ValidProfilePictureUrl_ShouldUpdateProfilePicture()
-    {
-        // Arrange
-        const string auth0Id = "valid-auth0-id";
-        const string imageUrl = "https://example.com/profile-picture.jpg";
-        var establishment = new Establishment
-        {
-            Auth0Id = auth0Id,
-            Name = "Test Establishment",
-            Description = "Test Description",
-            City = "Test City",
-            Address = "Test Address",
-            Latitude = 1.0,
-            Longitude = 1.0,
-            PriceCategory = PriceCategory.Affordable
-        };
-        _establishmentRepositoryMock.Setup(repo => repo.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(establishment);
-
-        // Act
-        await _establishmentService.UpdateEstablishmentPictureAsync(auth0Id, imageUrl);
-
-        // Assert
-        Assert.Equal(imageUrl, establishment.ProfilePictureUrl);
-        _establishmentRepositoryMock.Verify(repo => repo.UpdateAsync(establishment), Times.Once);
-    }
-
-    [Fact]
-    public async Task UpdateEstablishmentPictureAsync_ValidBackgroundPictureUrl_ShouldUpdateBackgroundPicture()
-    {
-        // Arrange
-        const string auth0Id = "valid-auth0-id";
-        const string imageUrl = "https://example.com/background-picture.jpg";
-        var establishment = new Establishment
-        {
-            Auth0Id = auth0Id,
-            Name = "Test Establishment",
-            Description = "Test Description",
-            City = "Test City",
-            Address = "Test Address",
-            Latitude = 1.0,
-            Longitude = 1.0,
-            PriceCategory = PriceCategory.Affordable
-        };
-        _establishmentRepositoryMock.Setup(repo => repo.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(establishment);
-
-        // Act
-        await _establishmentService.UpdateEstablishmentPictureAsync(auth0Id, imageUrl);
-
-        // Assert
-        Assert.Equal(imageUrl, establishment.BackgroundPictureUrl);
-        _establishmentRepositoryMock.Verify(repo => repo.UpdateAsync(establishment), Times.Once);
-    }
-
-    [Fact]
-    public async Task UpdateEstablishmentPictureAsync_EstablishmentNotFound_ShouldThrowEntityNotFoundException()
-    {
-        // Arrange
-        const string auth0Id = "invalid-auth0-id";
-        const string imageUrl = "https://example.com/profile-picture.jpg";
-        _establishmentRepositoryMock.Setup(repo => repo.GetByAuth0IdAsync(auth0Id)).ReturnsAsync((Establishment)null);
-
-        // Act & Assert
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.UpdateEstablishmentPictureAsync(auth0Id, imageUrl));
-        _establishmentRepositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<Establishment>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task UpdateEstablishmentPictureAsync_EmptyAuth0Id_ThrowsArgumentNullException()
-    {
-        // Arrange
-        var auth0Id = string.Empty;
-        const string imageUrl = "https://example.com/profile-picture.jpg";
-
-        // Act & Assert
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.UpdateEstablishmentPictureAsync(auth0Id, imageUrl));
-        _establishmentRepositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<Establishment>()), Times.Never);
     }
 }

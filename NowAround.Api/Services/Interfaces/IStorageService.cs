@@ -2,5 +2,7 @@
 
 public interface IStorageService
 {
-    Task<string> UploadImageAsync(IFormFile file, string role, string auth0Id, string imageContext, string contextId);
+    Task<string> UploadPictureAsync(IFormFile file, string role, string auth0Id, string imageContext, int? contextId);
+
+    void CheckPictureType(string contentType);
 }

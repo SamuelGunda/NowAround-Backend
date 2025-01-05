@@ -42,6 +42,12 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
                 Title = "Invalid search action",
                 Detail = invalidSearchActionException.Message
             },
+            UnauthorizedAccessException unauthorizedAccessException => new ProblemDetails
+            {
+                Status = StatusCodes.Status401Unauthorized,
+                Title = "Unauthorized",
+                Detail = unauthorizedAccessException.Message
+            },
             _ => new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,

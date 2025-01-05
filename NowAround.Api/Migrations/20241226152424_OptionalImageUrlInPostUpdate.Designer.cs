@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NowAround.Api.Database;
 
@@ -11,9 +12,11 @@ using NowAround.Api.Database;
 namespace NowAround.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241226152424_OptionalImageUrlInPostUpdate")]
+    partial class OptionalImageUrlInPostUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -333,7 +336,7 @@ namespace NowAround.Api.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
-                    b.Property<string>("PictureUrl")
+                    b.Property<string>("PhotoUrl")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -390,7 +393,7 @@ namespace NowAround.Api.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
-                    b.Property<string>("PictureUrl")
+                    b.Property<string>("ImageUrl")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -706,7 +709,7 @@ namespace NowAround.Api.Migrations
                     b.HasOne("NowAround.Api.Models.Domain.Establishment", "Establishment")
                         .WithMany("Posts")
                         .HasForeignKey("EstablishmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Establishment");
@@ -747,7 +750,7 @@ namespace NowAround.Api.Migrations
                     b.HasOne("NowAround.Api.Models.Domain.RatingStatistic", "RatingStatistic")
                         .WithMany("Reviews")
                         .HasForeignKey("RatingCollectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("NowAround.Api.Models.Domain.User", "User")

@@ -23,6 +23,7 @@ public static class ServiceExtensions
         services.AddScoped<IEstablishmentService, EstablishmentService>();
         services.AddScoped<IAuth0Service, Auth0Service>();
         services.AddScoped<IMonthlyStatisticService, MonthlyStatisticService>();
+        services.AddScoped<IPostService, PostService>();
         
         services.AddSingleton<IMapboxService, MapboxService>();
         services.AddScoped<IStorageService, StorageService>();
@@ -33,6 +34,7 @@ public static class ServiceExtensions
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<IMonthlyStatisticRepository, MonthlyStatisticRepository>();
+        services.AddScoped<IPostRepository, PostRepository>();
         
         // Helpers
         services.AddTransient<IDateHelper, DateHelper>();

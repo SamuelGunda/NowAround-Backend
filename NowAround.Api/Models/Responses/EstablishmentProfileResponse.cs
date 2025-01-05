@@ -6,14 +6,15 @@ public sealed record EstablishmentProfileResponse(
     string Auth0Id,
     GenericInfo GenericInfo,
     LocationInfo LocationInfo,
-    List<PostWithAuthIdsResponse> Posts,
+    List<PostDto> Posts,
     List<MenuDto> Menus,
     RatingStatisticResponse RatingStatistic
 );
 
 public sealed record GenericInfo(
     string Name,
-    string Photo,
+    string ProfilePictureUrl,
+    string BackgroundPictureUrl,
     string Description,
     string Website,
     string PriceRange,
