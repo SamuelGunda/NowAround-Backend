@@ -37,16 +37,17 @@ public class PostService : IPostService
 
     public async Task<bool> CheckPostOwnershipByAuth0IdAsync(string auth0Id, int postId)
     {
-        var establishment = await _establishmentService.GetEstablishmentByAuth0Id(auth0Id);
-        
         var post = await GetPostAsync(postId);
         
-        return establishment.Id == post.EstablishmentId;
+        return auth0Id == post.Establishment.Auth0Id;
     }
 
-    public async Task<Post> GetPostAsync(int postId)
+    public async Task<Post> GetPostAsync(int postId, bool tracked = false)
     {
-        var post = await _postRepository.GetByIdAsync(postId);
+
+        var post = await _postRepository.GetAsync(p => p.Id == postId, 
+            tracked, 
+            p => p.Establishment);
         
         if (post == null)
         {
@@ -59,7 +60,7 @@ public class PostService : IPostService
 
     public async Task UpdatePictureAsync(int postId, string pictureUrl)
     {
-        var post = await GetPostAsync(postId);
+        var post = await GetPostAsync(postId, true);
         
         post.PictureUrl = pictureUrl;
         

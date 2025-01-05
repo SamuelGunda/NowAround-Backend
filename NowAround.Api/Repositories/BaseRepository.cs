@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using NowAround.Api.Database;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Repositories.Interfaces;
@@ -95,6 +96,40 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntit
             throw new Exception($"Failed to get {typeof(T).Name} by {propertyName}", ex);
         }
     }
+    
+    public async Task<T?> GetAsync(
+        Expression<Func<T, bool>>? filter = null,
+        bool tracked = true,
+        params Expression<Func<T, object>>[] includes)
+    {
+        try
+        {
+            IQueryable<T> query = DbSet;
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (!tracked)
+            {
+                query = query.AsNoTracking();
+            }
+
+            return await query.FirstOrDefaultAsync();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to get {EntityType}: {message}", typeof(T).Name, e.Message);
+            throw new Exception($"Failed to get {typeof(T).Name}", e);
+        }
+    }
+
 
     public async Task<IEnumerable<T>> GetAllAsync()
     {
