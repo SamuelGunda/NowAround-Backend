@@ -23,10 +23,10 @@ public class PostService : IPostService
     
     public async Task<int> CreatePostAsync(PostCreateRequest postCreateRequest, string auth0Id)
     {
-        if (postCreateRequest.Image != null)
+        if (postCreateRequest.Picture != null)
         {
-            var pictureType = postCreateRequest.Image.ContentType;
-            _storageService.CheckValidImageType(pictureType);
+            var pictureType = postCreateRequest.Picture.ContentType;
+            _storageService.CheckPictureType(pictureType);
         }
         
         var establishment = await _establishmentService.GetEstablishmentByAuth0Id(auth0Id);
@@ -40,9 +40,9 @@ public class PostService : IPostService
         
         var id = await _postRepository.CreateAsync(post);
         
-        if (postCreateRequest.Image != null)
+        if (postCreateRequest.Picture != null)
         {
-            var pictureUrl = await _storageService.UploadImageAsync(postCreateRequest.Image, "Establishment", auth0Id, "post", id);
+            var pictureUrl = await _storageService.UploadPictureAsync(postCreateRequest.Picture, "Establishment", auth0Id, "post", id);
             await UpdatePictureAsync(id, pictureUrl);
         }
         

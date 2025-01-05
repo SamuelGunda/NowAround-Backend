@@ -23,6 +23,7 @@ public class EstablishmentService : IEstablishmentService
     private readonly IEstablishmentRepository _establishmentRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly ITagRepository _tagRepository;
+    private readonly IStorageService _storageService;
     private readonly ILogger<EstablishmentService> _logger;
 
     public EstablishmentService(
@@ -31,6 +32,7 @@ public class EstablishmentService : IEstablishmentService
         IEstablishmentRepository establishmentRepository,
         ICategoryRepository categoryRepository,
         ITagRepository tagRepository,
+        IStorageService storageService,
         ILogger<EstablishmentService> logger)
     {
         _auth0Service = auth0Service;
@@ -38,6 +40,7 @@ public class EstablishmentService : IEstablishmentService
         _establishmentRepository = establishmentRepository;
         _categoryRepository = categoryRepository;
         _tagRepository = tagRepository;
+        _storageService = storageService;
         _logger = logger;
     }
     
@@ -179,8 +182,19 @@ public class EstablishmentService : IEstablishmentService
         await _establishmentRepository.UpdateAsync(establishmentDto);
     }
 
-    public async Task UpdateEstablishmentPictureAsync(string auth0Id, string imageUrl)
+    public async Task UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile picture)
     {
+        if (pictureContext != "profile-picture" && pictureContext != "background-picture")
+        {
+            _logger.LogWarning("Invalid image context: {ImageContext}", pictureContext);
+            throw new ArgumentException("Invalid image context", nameof(pictureContext));
+        }
+        
+        var pictureType = picture.ContentType;
+        _storageService.CheckPictureType(pictureType);
+        
+        var pictureUrl = await _storageService.UploadPictureAsync(picture, "Establishment", auth0Id, pictureContext, null);
+        
         var establishment = await _establishmentRepository.GetByAuth0IdAsync(auth0Id);
         
         if (establishment == null)
@@ -189,9 +203,8 @@ public class EstablishmentService : IEstablishmentService
             throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
         }
         
-        establishment.ProfilePictureUrl = imageUrl.Contains("profile-picture") ? imageUrl : establishment.ProfilePictureUrl;
-        establishment.BackgroundPictureUrl = !imageUrl.Contains("profile-picture") ? imageUrl : establishment.BackgroundPictureUrl;
-        
+        establishment.ProfilePictureUrl = pictureUrl.Contains("profile-picture") ? pictureUrl : establishment.ProfilePictureUrl;
+        establishment.BackgroundPictureUrl = pictureUrl.Contains("background-picture") ? pictureUrl : establishment.BackgroundPictureUrl;
         
         await _establishmentRepository.UpdateAsync(establishment);
     }

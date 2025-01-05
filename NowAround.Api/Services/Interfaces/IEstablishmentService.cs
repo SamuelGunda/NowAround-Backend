@@ -20,6 +20,6 @@ public interface IEstablishmentService
     Task<int> GetEstablishmentsCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd);
     Task UpdateEstablishmentAsync(EstablishmentUpdateRequest request);
     Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus);
-    Task UpdateEstablishmentPictureAsync(string auth0Id, string imageUrl);
+    Task UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile image);
     Task DeleteEstablishmentAsync(string auth0Id);
 }

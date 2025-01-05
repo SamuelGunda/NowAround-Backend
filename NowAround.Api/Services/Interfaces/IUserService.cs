@@ -8,5 +8,5 @@ public interface IUserService
     Task<bool> CheckIfUserExistsAsync(string auth0Id);
     Task<User?> GetUserAsync(string auth0Id);
     Task<int> GetUsersCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd);
-    Task UpdateUserPictureAsync(string auth0Id, string imageUrl);
+    Task UpdateUserPictureAsync(string auth0Id, string pictureContext, IFormFile picture);
 }

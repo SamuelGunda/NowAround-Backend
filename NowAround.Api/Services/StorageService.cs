@@ -22,7 +22,7 @@ public class StorageService : IStorageService
         _blobServiceClient = new BlobServiceClient(new Uri($"https://{storageAccount}.blob.core.windows.net"), credential);
     }
     
-    public async Task<string> UploadImageAsync(IFormFile file, string role, string auth0Id, string imageContext, int? contextId)
+    public async Task<string> UploadPictureAsync(IFormFile file, string role, string auth0Id, string imageContext, int? contextId)
     {
         var sanitizedAuth0Id = auth0Id.Replace("|", "-").ToLower();
         
@@ -40,7 +40,7 @@ public class StorageService : IStorageService
 
         string blobPath;
         
-        if (imageContext is "profile-picture" or "cover-picture")
+        if (imageContext is "profile-picture" or "background-picture")
         {
             blobPath = $"{sanitizedAuth0Id}/{imageContext}";
         }
@@ -78,7 +78,7 @@ public class StorageService : IStorageService
         }
     }*/
     
-    public void CheckValidImageType(string contentType)
+    public void CheckPictureType(string contentType)
     {
         var permittedImageTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
         

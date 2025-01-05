@@ -16,7 +16,7 @@ public class StorageController(IStorageService storageService) : ControllerBase
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
         var role = User.Claims.FirstOrDefault(c => c.Type == "https://now-around-auth-api/roles")?.Value ?? throw new ArgumentException("Role not found");
-        var url = await storageService.UploadImageAsync(image, role, auth0Id, type, id);
+        var url = await storageService.UploadPictureAsync(image, role, auth0Id, type, id);
         
         return Created(url, "Image successfully uploaded");
     }

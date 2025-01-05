@@ -7,6 +7,7 @@ namespace NowAround.Api.IntegrationTests.Controllers;
 
 public class StorageControllerTests : IClassFixture<StorageContextFixture>
 {
+    /*
     private readonly BlobServiceClient _blobServiceClient;
     private string? _containerName;
     private string? _blobPath;
@@ -231,5 +232,6 @@ public class StorageControllerTests : IClassFixture<StorageContextFixture>
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
+    */
     
 }

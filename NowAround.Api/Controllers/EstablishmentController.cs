@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NowAround.Api.Apis.Auth0.Models.Requests;
 using NowAround.Api.Models.Entities;
@@ -89,6 +90,16 @@ public class EstablishmentController(
         }
 
         return Forbid();
+    }
+    
+    [Authorize(Roles = "Establishment")]
+    [HttpPut ("{pictureContext}")]
+    public async Task<IActionResult> UpdateEstablishmentPictureAsync([FromRoute] string pictureContext, IFormFile picture)
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        
+        await establishmentService.UpdateEstablishmentPictureAsync(auth0Id, pictureContext, picture);
+        return Created("", new { message = "Picture updated successfully" });
     }
     
     [Authorize(Roles = "Admin")]
