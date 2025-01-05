@@ -13,7 +13,7 @@ public class PostController(IPostService postService) : ControllerBase
 
     [Authorize(Roles = "Establishment")]
     [HttpPost]
-    public async Task<IActionResult> CreatePostAsync([FromBody] PostCreateRequest postCreateRequest)
+    public async Task<IActionResult> CreatePostAsync([FromForm] PostCreateRequest postCreateRequest)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
 

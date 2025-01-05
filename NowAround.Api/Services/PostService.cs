@@ -11,16 +11,24 @@ public class PostService : IPostService
     private readonly ILogger<PostService> _logger;
     private readonly IEstablishmentService _establishmentService;
     private readonly IPostRepository _postRepository;
+    private readonly IStorageService _storageService;
     
-    public PostService(ILogger<PostService> logger ,IEstablishmentService establishmentService, IPostRepository postRepository)
+    public PostService(ILogger<PostService> logger ,IEstablishmentService establishmentService, IPostRepository postRepository, IStorageService storageService)
     {
         _logger = logger;
         _establishmentService = establishmentService;
         _postRepository = postRepository;
+        _storageService = storageService;
     }
     
     public async Task<int> CreatePostAsync(PostCreateRequest postCreateRequest, string auth0Id)
     {
+        if (postCreateRequest.Image != null)
+        {
+            var pictureType = postCreateRequest.Image.ContentType;
+            _storageService.CheckValidImageType(pictureType);
+        }
+        
         var establishment = await _establishmentService.GetEstablishmentByAuth0Id(auth0Id);
         
         var post = new Post
@@ -30,9 +38,15 @@ public class PostService : IPostService
             EstablishmentId = establishment.Id
         };
         
-        await _postRepository.CreateAsync(post);
+        var id = await _postRepository.CreateAsync(post);
         
-        return post.Id;
+        if (postCreateRequest.Image != null)
+        {
+            var pictureUrl = await _storageService.UploadImageAsync(postCreateRequest.Image, "Establishment", auth0Id, "post", id);
+            await UpdatePictureAsync(id, pictureUrl);
+        }
+        
+        return id;
     }
 
     public async Task<bool> CheckPostOwnershipByAuth0IdAsync(string auth0Id, int postId)
