@@ -331,17 +331,17 @@ public class EstablishmentServiceTests
         await Assert.ThrowsAsync<ArgumentException>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
     }
 
-    // GetEstablishmentByIdAsync tests
+    // GetEstablishmentByAuth0IdAsync tests
 
     [Fact]
     public async Task GetEstablishmentByAuth0IdAsync_ValidId_ShouldReturnEstablishmentDto()
     {
         // Arrange
-        const int id = 1;
+        const string auth0Id = "test-auth0-id";
         var establishment = new Establishment
         {
             Id = 1,
-            Auth0Id = "test-auth0-id",
+            Auth0Id = auth0Id,
             Name = "test-name",
             Description = "test-description",
             City = "test-city",
@@ -353,10 +353,10 @@ public class EstablishmentServiceTests
             Categories = new List<Category>(),
             Tags = new List<Tag>()
         };
-        _establishmentRepositoryMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(establishment);
+        _establishmentRepositoryMock.Setup(r => r.GetAsync(e => e.Auth0Id == auth0Id, false)).ReturnsAsync(establishment);
         
         // Act
-        var result = await _establishmentService.GetEstablishmentByIdAsync(id);
+        var result = await _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
         
         // Assert
         Assert.NotNull(result);
@@ -373,10 +373,10 @@ public class EstablishmentServiceTests
     [Fact]
     public async Task GetEstablishmentByAuth0IdAsync_InvalidId_ShouldThrowEstablishmentNotFoundException()
     {
-        const int id = 999;
-        _establishmentRepositoryMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(null as Establishment);
+        const string auth0Id = "test-auth0-id";
+        _establishmentRepositoryMock.Setup(r => r.GetAsync(e => e.Auth0Id == auth0Id, false)).ReturnsAsync(null as Establishment);
 
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.GetEstablishmentByIdAsync(id));
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id));
     }
     
     // GetEstablishmentByAuth0IdAsync tests
@@ -630,9 +630,9 @@ public class EstablishmentServiceTests
     public async Task UpdateEstablishmentAsync_ValidInput_ShouldCallUpdateAsync()
     {
         // Arrange
+        const string auth0Id = "auth0|123";
         var request = new EstablishmentUpdateRequest
         {
-            Auth0Id = "auth0|123",
             Name = "Test Establishment",
             Description = "Updated description",
             PriceCategory = 2,
@@ -652,48 +652,23 @@ public class EstablishmentServiceTests
             .Returns(Task.CompletedTask);
 
         // Act
-        await _establishmentService.UpdateEstablishmentAsync(request);
+        await _establishmentService.UpdateEstablishmentAsync(auth0Id, request);
 
         // Assert
         _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.Is<EstablishmentDto>(dto =>
-            dto.Auth0Id == request.Auth0Id &&
             dto.Name == request.Name &&
             dto.Description == request.Description &&
             dto.PriceCategory == (PriceCategory)request.PriceCategory
         )), Times.Once);
     }
     
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    public async Task UpdateEstablishmentAsync_InvalidAuth0Id_ShouldThrowArgumentNullException(string auth0Id)
-    {
-        // Arrange
-        var request = new EstablishmentUpdateRequest
-        {
-            Auth0Id = auth0Id,
-            Name = "Test Establishment",
-            Description = "Updated description",
-            PriceCategory = 2,
-            Categories = new List<string> { "Restaurant" },
-            Tags = new List<string> { "PET_FRIENDLY" }
-        };
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(() => 
-            _establishmentService.UpdateEstablishmentAsync(request));
-
-        Assert.Equal("Auth0Id", exception.ParamName);
-        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<EstablishmentDto>()), Times.Never);
-    }
-    
     [Fact]
     public async Task UpdateEstablishmentAsync_InvalidCategoriesOrTags_ShouldThrowArgumentException()
     {
         // Arrange
+        const string auth0Id = "auth0|123";
         var request = new EstablishmentUpdateRequest
         {
-            Auth0Id = "auth0|123",
             Name = "Test Establishment",
             Description = "Updated description",
             PriceCategory = 2,
@@ -706,7 +681,7 @@ public class EstablishmentServiceTests
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentException>(() => 
-            _establishmentService.UpdateEstablishmentAsync(request));
+            _establishmentService.UpdateEstablishmentAsync(auth0Id, request));
 
         Assert.Contains("Category", exception.Message);
         _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<EstablishmentDto>()), Times.Never);

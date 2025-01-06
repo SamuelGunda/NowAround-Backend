@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Newtonsoft.Json;
@@ -525,39 +526,10 @@ public class EstablishmentControllerTests
         var factory = new NowAroundWebApplicationFactory();
 
         var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Admin");
-
-        var establishmentUpdateRequest = new EstablishmentUpdateRequest
-        {
-            Auth0Id = "auth0|valid",
-            Name = "Updated Restaurant",
-            Description = "Updated Description",
-            PriceCategory = 2,
-            Categories = new List<string> { "RESTAURANT" },
-            Tags = new List<string> { "PET_FRIENDLY" }
-        };
-
-        var content = new StringContent(JsonConvert.SerializeObject(establishmentUpdateRequest), Encoding.UTF8, "application/json");
-
-        // Act
-        var response = await client.PutAsync("/api/establishment", content);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-    }
-    
-    [Fact]
-    public async Task UpdateEstablishmentAsync_WithInvalidRequest_ShouldReturnNoContent()
-    {
-        // Arrange
-        var factory = new NowAroundWebApplicationFactory();
-
-        var client = factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|valid");
 
         var establishmentUpdateRequest = new EstablishmentUpdateRequest
         {
-            Auth0Id = "auth0|valid",
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
@@ -584,7 +556,6 @@ public class EstablishmentControllerTests
 
         var establishmentUpdateRequest = new EstablishmentUpdateRequest
         {
-            Auth0Id = "auth0|valid",
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
@@ -608,11 +579,10 @@ public class EstablishmentControllerTests
         var factory = new NowAroundWebApplicationFactory();
 
         var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|invalid");
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "User auth0|user");
 
         var establishmentUpdateRequest = new EstablishmentUpdateRequest
         {
-            Auth0Id = "auth0|valid",
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
@@ -636,11 +606,10 @@ public class EstablishmentControllerTests
         var factory = new NowAroundWebApplicationFactory();
 
         var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Admin");
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|invalid");
 
         var establishmentUpdateRequest = new EstablishmentUpdateRequest
         {
-            Auth0Id = "auth0|invalid",
             Name = "Updated Restaurant",
             Description = "Updated Description",
             PriceCategory = 2,
@@ -655,6 +624,153 @@ public class EstablishmentControllerTests
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+    
+    // UpdateEstablishmentPictureAsync Tests
+    
+    [Fact]
+    public async Task UpdateEstablishmentPictureAsync_WithValidRequest_ShouldReturnCreated()
+    {
+        // Arrange
+        var factory = new NowAroundWebApplicationFactory();
+
+        var client = factory.CreateClient();
+        
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|valid");
+
+        var picture = new FormFile(new MemoryStream("Test picture"u8.ToArray()), 0, "Test picture".Length, "Picture",
+            "test.jpg")
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = "image/jpeg"
+        };
+        
+        var content = new MultipartFormDataContent();
+        
+        var pictureContent = new StreamContent(picture.OpenReadStream());
+        pictureContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(picture.ContentType);
+        content.Add(pictureContent, "Picture", picture.FileName);
+
+        // Act
+        var response = await client.PutAsync("/api/establishment/profile-picture", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+    
+    [Fact]
+    public async Task UpdateEstablishmentPictureAsync_WithUnauthorizedUser_ShouldReturnUnauthorized()
+    {
+        // Arrange
+        var factory = new NowAroundWebApplicationFactory();
+
+        var client = factory.CreateClient();
+
+        var picture = new FormFile(new MemoryStream("Test picture"u8.ToArray()), 0, "Test picture".Length, "Picture",
+            "test.jpg")
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = "image/jpeg"
+        };
+        
+        var content = new MultipartFormDataContent();
+        
+        var pictureContent = new StreamContent(picture.OpenReadStream());
+        pictureContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(picture.ContentType);
+        content.Add(pictureContent, "Picture", picture.FileName);
+
+        // Act
+        var response = await client.PutAsync("/api/establishment/profile-picture", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+    
+    [Fact]
+    public async Task UpdateEstablishmentPictureAsync_WithInvalidSub_ShouldReturnForbidden()
+    {
+        // Arrange
+        var factory = new NowAroundWebApplicationFactory();
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "User auth0|user");
+
+        var picture = new FormFile(new MemoryStream("Test picture"u8.ToArray()), 0, "Test picture".Length, "Picture",
+            "test.jpg")
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = "image/jpeg"
+        };
+        
+        var content = new MultipartFormDataContent();
+        
+        var pictureContent = new StreamContent(picture.OpenReadStream());
+        pictureContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(picture.ContentType);
+        content.Add(pictureContent, "Picture", picture.FileName);
+
+        // Act
+        var response = await client.PutAsync("/api/establishment/profile-picture", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+    
+    [Fact]
+    public async Task UpdateEstablishmentPictureAsync_WithInvalidAuth0Id_ShouldReturnNotFound()
+    {
+        // Arrange
+        var factory = new NowAroundWebApplicationFactory();
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|invalid");
+
+        var picture = new FormFile(new MemoryStream("Test picture"u8.ToArray()), 0, "Test picture".Length, "Picture",
+            "test.jpg")
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = "image/jpeg"
+        };
+        
+        var content = new MultipartFormDataContent();
+        
+        var pictureContent = new StreamContent(picture.OpenReadStream());
+        pictureContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(picture.ContentType);
+        content.Add(pictureContent, "Picture", picture.FileName);
+
+        // Act
+        var response = await client.PutAsync("/api/establishment/profile-picture", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+    
+    [Fact]
+    public async Task UpdateEstablishmentPictureAsync_WithInvalidFormat_ShouldReturnInternalServerError()
+    {
+        // Arrange
+        var factory = new NowAroundWebApplicationFactory();
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|valid");
+
+        var picture = new FormFile(new MemoryStream("Test picture"u8.ToArray()), 0, "Test picture".Length, "Picture",
+            "test.txt")
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = "text/plain"
+        };
+        
+        var content = new MultipartFormDataContent();
+        
+        var pictureContent = new StreamContent(picture.OpenReadStream());
+        pictureContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(picture.ContentType);
+        content.Add(pictureContent, "Picture", picture.FileName);
+
+        // Act
+        var response = await client.PutAsync("/api/establishment/profile-picture", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
     }
     
     // UpdateEstablishmentRegisterRequestAsync Tests

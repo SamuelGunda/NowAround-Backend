@@ -18,12 +18,22 @@
   &lt;Assembly Path="C:\Users\samue\.nuget\packages\auth0.managementapi\7.26.2\lib\netstandard2.0\Auth0.ManagementApi.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:String x:Key="/Default/Environment/Highlighting/HighlightingSourceSnapshotLocation/@EntryValue">C:\Users\samue\AppData\Local\JetBrains\Rider2024.2\resharper-host\temp\Rider\vAny\CoverageData\_NowAround.2079293406\Snapshot\snapshot.utdcvr</s:String>
+	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=29d7b019_002Def09_002D46e3_002D8d36_002D01cd760578ca/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=511cf13e_002D366f_002D49f8_002D8b30_002Deb8bdc9b31fb/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	
+	
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=58b1c3b6_002De48d_002D4445_002Dbbd8_002D183b2bb034de/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CreatePostAsync_ForValidRequestWithPicture_ShouldReturnCreated #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::D42EA0A4-B91B-4659-B20B-0457B7E25A88::net8.0::NowAround.Api.IntegrationTests.Controllers.PostControllerTests.CreatePostAsync_ForValidRequestWithPicture_ShouldReturnCreated&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=832b6cf1_002D7c3d_002D422e_002Dafca_002D370c098594bf/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	
+	
 	
 	
 	

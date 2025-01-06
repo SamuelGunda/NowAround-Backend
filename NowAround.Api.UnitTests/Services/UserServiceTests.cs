@@ -140,31 +140,31 @@ public class UserServiceTests
     // GetUserAsync tests
 
     [Fact]
-    public async Task GetUserAsync_ReturnsUser_ForValidAuth0Id()
+    public async Task GetUserByAuth0IdAsync_ReturnsUser_ForValidAuth0Id()
     {
         // Arrange
         const string auth0Id = "auth0|valid";
         var user = new User { Auth0Id = auth0Id, FullName = "Samuel Pačút" };
 
-        _userRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(user);
+        _userRepositoryMock.Setup(r => r.GetAsync(u => u.Auth0Id == auth0Id, false)).ReturnsAsync(user);
 
         // Act
-        var result = await _userService.GetUserAsync(auth0Id);
+        var result = await _userService.GetUserByAuth0IdAsync(auth0Id);
 
         // Assert
         Assert.Equal(user, result);
     }
 
     [Fact]
-    public async Task GetUserAsync_ThrowsException_ForInvalidAuth0Id()
+    public async Task GetUserByAuth0IdAsync_ThrowsException_ForInvalidAuth0Id()
     {
         // Arrange
         const string auth0Id = "auth0|invalid";
         User? user = null;
 
-        _userRepositoryMock.Setup(r => r.GetByAuth0IdAsync(auth0Id)).ReturnsAsync(user);
+        _userRepositoryMock.Setup(r => r.GetAsync(u => u.Auth0Id == auth0Id, false)).ReturnsAsync(user);
 
         // Act & Assert
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.GetUserAsync(auth0Id));
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.GetUserByAuth0IdAsync(auth0Id));
     }
 }

@@ -29,15 +29,16 @@ public class UserService : IUserService
         await _userRepository.CreateAsync(user);
     }
 
+    /*
     public Task<bool> CheckIfUserExistsAsync(string auth0Id)
     {
         return _userRepository.CheckIfExistsByPropertyAsync("Auth0Id", auth0Id);
     }
+    */
 
-    public async Task<User?> GetUserAsync(string auth0Id)
+    public async Task<User> GetUserByAuth0IdAsync(string auth0Id, bool tracked = false)
     {
-        var user = await _userRepository.GetByAuth0IdAsync(auth0Id);
-        
+        var user = await _userRepository.GetAsync(u => u.Auth0Id == auth0Id, tracked);
         if (user == null)
         {
             _logger.LogWarning("User with Auth0 ID: {Auth0Id} not found", auth0Id);
@@ -65,11 +66,10 @@ public class UserService : IUserService
         
         var pictureUrl = await _storageService.UploadPictureAsync(picture, "User", auth0Id, pictureContext, null);
         
-        var user = await GetUserAsync(auth0Id);
+        var user = await GetUserByAuth0IdAsync(auth0Id, true);
         
         user.ProfilePictureUrl = pictureUrl.Contains("profile-picture") ? pictureUrl : user.ProfilePictureUrl;
         user.BackgroundPictureUrl = pictureUrl.Contains("background-picture") ? pictureUrl : user.BackgroundPictureUrl;
-
         
         await _userRepository.UpdateAsync(user);
     }
