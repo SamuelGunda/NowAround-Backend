@@ -29,7 +29,7 @@ public class PostService : IPostService
             _storageService.CheckPictureType(pictureType);
         }
         
-        var establishment = await _establishmentService.GetEstablishmentByAuth0Id(auth0Id);
+        var establishment = await _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
         
         var post = new Post
         {
@@ -49,7 +49,7 @@ public class PostService : IPostService
         return id;
     }
 
-    public async Task<bool> CheckPostOwnershipByAuth0IdAsync(string auth0Id, int postId)
+    private async Task<bool> CheckPostOwnershipByAuth0IdAsync(string auth0Id, int postId)
     {
         var post = await GetPostAsync(postId);
         
@@ -81,13 +81,15 @@ public class PostService : IPostService
         await _postRepository.UpdateAsync(post);
     }
 
-    public async Task DeletePostAsync(int postId)
+    public async Task DeletePostAsync(string auth0Id, int postId)
     {
-        var result = await _postRepository.DeleteAsync(postId);
-        
-        if (!result)
+        if (!await CheckPostOwnershipByAuth0IdAsync(auth0Id, postId))
         {
-            throw new EntityNotFoundException("Post", "ID", postId.ToString());
+            throw new UnauthorizedAccessException("You are not the owner of this post");
         }
+        
+        await _postRepository.DeleteAsync(postId);
+        
+        await _storageService.DeletePictureAsync("Establishment", auth0Id, "post", postId);
     }
 }

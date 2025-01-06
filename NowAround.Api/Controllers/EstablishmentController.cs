@@ -79,17 +79,14 @@ public class EstablishmentController(
         return Ok(establishmentDtos);
     }
     
-    [Authorize]
+    [Authorize(Roles = "Establishment")]
     [HttpPut]
     public async Task<IActionResult> UpdateEstablishmentAsync(EstablishmentUpdateRequest establishmentUpdateRequest)
     {
-        if (AuthorizationHelper.HasAdminRightsOrMatchingAuth0Id(User, establishmentUpdateRequest.Auth0Id))
-        {
-            await establishmentService.UpdateEstablishmentAsync(establishmentUpdateRequest);
-            return NoContent();
-        }
-
-        return Forbid();
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        
+        await establishmentService.UpdateEstablishmentAsync(auth0Id, establishmentUpdateRequest);
+        return NoContent();
     }
     
     [Authorize(Roles = "Establishment")]

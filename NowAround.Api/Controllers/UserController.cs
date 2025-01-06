@@ -16,6 +16,13 @@ public class UserController(IUserService userService) : ControllerBase
         return Created("", new { message = "User created successfully" });
     }
     
+    [HttpGet]
+    public async Task<IActionResult> GetUserAsync(string auth0Id)
+    {
+        var user = await userService.GetUserByAuth0IdAsync(auth0Id);
+        return Ok(user);
+    }
+    
     [Authorize(Roles = "User")]
     [HttpPut("{pictureContext}")]
     public async Task<IActionResult> UpdateUserPictureAsync([FromRoute] string pictureContext, IFormFile picture)
@@ -24,12 +31,5 @@ public class UserController(IUserService userService) : ControllerBase
 
         await userService.UpdateUserPictureAsync(auth0Id, pictureContext, picture);
         return Created("", new { message = "Picture updated successfully" });
-    }
-    
-    [HttpGet]
-    public async Task<IActionResult> GetUserAsync(string auth0Id)
-    {
-        var user = await userService.GetUserAsync(auth0Id);
-        return Ok(user);
     }
 }

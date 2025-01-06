@@ -36,14 +36,7 @@ public class PostController(IPostService postService) : ControllerBase
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
         
-        var isOwner = await postService.CheckPostOwnershipByAuth0IdAsync(auth0Id, postId);
-        
-        if (!isOwner)
-        {
-            return Forbid();
-        }
-        
-        await postService.DeletePostAsync(postId);
+        await postService.DeletePostAsync(auth0Id, postId);
         
         return Ok(new { message = "Post deleted successfully" });
     }

@@ -62,7 +62,18 @@ public class StorageService : IStorageService
         
         return "https://nowaroundimagestorage.blob.core.windows.net/" + blobPath;
     }
-    
+
+    public Task DeletePictureAsync(string role, string auth0Id, string imageContext, int? contextId)
+    {
+        var sanitizedAuth0Id = auth0Id.Replace("|", "-").ToLower();
+        
+        var containerClient = _blobServiceClient.GetBlobContainerClient(role.ToLower());
+        var blobPath = contextId == null ? $"{sanitizedAuth0Id}/{imageContext}" : $"{sanitizedAuth0Id}/{imageContext}/{contextId}";
+        var blobClient = containerClient.GetBlobClient(blobPath);
+        
+        return blobClient.DeleteIfExistsAsync();
+    }
+
     /*private async Task AssignImageUrlToEntity(string role, string auth0Id, string imageContext, int? contextId, string imageUrl)
     {
         switch (role)
@@ -77,6 +88,8 @@ public class StorageService : IStorageService
                 throw new ArgumentException("Invalid role");
         }
     }*/
+    
+    
     
     public void CheckPictureType(string contentType)
     {

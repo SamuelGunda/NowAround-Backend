@@ -90,11 +90,14 @@ public class EstablishmentService : IEstablishmentService
         }
     }
 
+    /*
     public Task<bool> CheckIfEstablishmentExistsAsync(string auth0Id)
     {
         return _establishmentRepository.CheckIfExistsByPropertyAsync("Auth0Id", auth0Id);
     }
+    */
 
+    /*
     public async Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id)
     {
         var establishment = await _establishmentRepository.GetByIdAsync(id);
@@ -105,10 +108,11 @@ public class EstablishmentService : IEstablishmentService
 
         return establishment.ToDetailedResponse();
     }
-
-    public async Task<Establishment> GetEstablishmentByAuth0Id(string auth0Id)
+    */
+    
+    public async Task<Establishment> GetEstablishmentByAuth0IdAsync(string auth0Id, bool tracked = false)
     {
-        var establishment = await _establishmentRepository.GetByAuth0IdAsync(auth0Id);
+        var establishment = await _establishmentRepository.GetAsync(e => e.Auth0Id == auth0Id, tracked);
         if (establishment == null)
         {
             throw new EntityNotFoundException("Establishment","Auth0ID", auth0Id);
@@ -158,15 +162,8 @@ public class EstablishmentService : IEstablishmentService
         return await _establishmentRepository.GetCountByCreatedAtBetweenDatesAsync(monthStart, monthEnd);
     }
 
-    public async Task UpdateEstablishmentAsync(EstablishmentUpdateRequest request)
+    public async Task UpdateEstablishmentAsync(string auth0Id, EstablishmentUpdateRequest request)
     {
-        var auth0Id = request.Auth0Id;
-        if (auth0Id.IsNullOrEmpty())
-        {
-            _logger.LogWarning("auth0Id is null");
-            throw new ArgumentNullException(nameof(request.Auth0Id));
-        }
-        
         var catsAndTags = await GetCategoriesAndTagsAsync(request.Categories, request.Tags);
         
         var establishmentDto = new EstablishmentDto
