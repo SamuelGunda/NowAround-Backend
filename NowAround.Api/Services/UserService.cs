@@ -8,7 +8,6 @@ namespace NowAround.Api.Services;
 
 public class UserService : IUserService
 {
-    
     private readonly ILogger<UserService> _logger;
     private readonly IBaseAccountRepository<User> _userRepository;
     private readonly IAuth0Service _auth0Service;
@@ -26,6 +25,7 @@ public class UserService : IUserService
         var user = new User { Auth0Id = auth0Id, FullName = fullName };
         
         await _auth0Service.AssignRoleAsync(auth0Id, "user");
+        
         await _userRepository.CreateAsync(user);
     }
 
@@ -71,5 +71,20 @@ public class UserService : IUserService
         user.BackgroundPictureUrl = pictureUrl.Contains("background-picture") ? pictureUrl : user.BackgroundPictureUrl;
         
         await _userRepository.UpdateAsync(user);
+    }
+
+    public async Task DeleteUserAsync(string auth0Id)
+    {
+        await _auth0Service.DeleteAccountAsync(auth0Id);
+        
+        await _storageService.DeleteAccountFolderAsync("User", auth0Id);
+        
+        //TODO: Get whole user object and delete it
+        var result = await _userRepository.DeleteByAuth0IdAsync(auth0Id);
+        if (!result)
+        {
+            _logger.LogError("Failed to delete user with Auth0 ID: {Auth0Id}", auth0Id);
+            throw new EntityNotFoundException("User", "Auth0 ID", auth0Id);
+        }
     }
 }

@@ -48,16 +48,17 @@ public abstract class BaseAccountRepository<T> : BaseRepository<T>, IBaseAccount
     {
         try
         {
-            var establishment = await DbSet
+            //TODO: Get whole entity beforehand
+            var entity = await DbSet
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(e => e.Auth0Id == auth0Id);
-            if (establishment == null)
+            if (entity == null)
             {
                 Logger.LogWarning("{EntityType} with Auth0 ID: {auth0Id} does not exist", typeof(T).Name, auth0Id);
                 return false;
             }
             
-            DbSet.Remove(establishment);
+            DbSet.Remove(entity);
             await Context.SaveChangesAsync();
             return true;
         }

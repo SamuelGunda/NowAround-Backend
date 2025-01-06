@@ -13,6 +13,7 @@ public class UserController(IUserService userService) : ControllerBase
     public async Task<IActionResult> CreateUserAsync(string auth0Id, string fullName)
     {
         await userService.CreateUserAsync(auth0Id, fullName);
+        
         return Created("", new { message = "User created successfully" });
     }
     
@@ -20,6 +21,7 @@ public class UserController(IUserService userService) : ControllerBase
     public async Task<IActionResult> GetUserAsync(string auth0Id)
     {
         var user = await userService.GetUserByAuth0IdAsync(auth0Id);
+        
         return Ok(user);
     }
     
@@ -30,6 +32,19 @@ public class UserController(IUserService userService) : ControllerBase
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
 
         await userService.UpdateUserPictureAsync(auth0Id, pictureContext, picture);
+        
+        //TODO: Change to NoContent()
         return Created("", new { message = "Picture updated successfully" });
+    }
+    
+    [Authorize(Roles = "User")]
+    [HttpDelete]
+    public async Task<IActionResult> DeleteUserAsync()
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        
+        await userService.DeleteUserAsync(auth0Id);
+        
+        return NoContent();
     }
 }

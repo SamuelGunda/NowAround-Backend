@@ -12,10 +12,7 @@ namespace NowAround.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class EstablishmentController(
-    IEstablishmentService establishmentService,
-    ILogger<EstablishmentController> logger)
-    : ControllerBase
+public class EstablishmentController(IEstablishmentService establishmentService) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> RegisterEstablishmentAsync(EstablishmentRegisterRequest establishment)
@@ -98,6 +95,7 @@ public class EstablishmentController(
         
         await establishmentService.UpdateEstablishmentPictureAsync(auth0Id, pictureContext, picture);
         
+        //TODO: Change to NoContent()
         return Created("", new { message = "Picture updated successfully" });
     }
     
@@ -109,10 +107,10 @@ public class EstablishmentController(
             status is RequestStatus.Accepted or RequestStatus.Rejected)
         {
             await establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, status);
+            
             return NoContent();
         }
-
-        logger.LogWarning("Invalid action type provided: {Action}", action);
+        
         return BadRequest(new { message = "Invalid action type. Please use 'accept' or 'reject'." });
     }
     

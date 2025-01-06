@@ -9,4 +9,5 @@ public interface IUserService
     Task<User> GetUserByAuth0IdAsync(string auth0Id, bool tracked = false);
     Task<int> GetUsersCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd);
     Task UpdateUserPictureAsync(string auth0Id, string pictureContext, IFormFile picture);
+    Task DeleteUserAsync(string auth0Id);
 }

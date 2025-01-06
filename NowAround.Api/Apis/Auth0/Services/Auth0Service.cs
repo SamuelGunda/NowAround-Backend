@@ -146,10 +146,8 @@ public class Auth0Service : IAuth0Service
             throw new ArgumentNullException(nameof(auth0Id));
         }
         
-        // Get access token for Auth0 Management API
         var accessToken = await _tokenService.GetManagementAccessTokenAsync();
         
-        // Send request to Auth0 API to delete user
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"https://{_domain}/api/v2/users/{Uri.EscapeDataString(auth0Id)}");
         request.Headers.Add("Authorization" , $"Bearer {accessToken}");
         

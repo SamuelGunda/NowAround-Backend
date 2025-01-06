@@ -224,9 +224,11 @@ public class EstablishmentService : IEstablishmentService
         
         await _storageService.DeleteAccountFolderAsync("Establishment", auth0Id);
         
+        //TODO: Get whole establishment object and delete it
         var result = await _establishmentRepository.DeleteByAuth0IdAsync(auth0Id);
         if (!result)
         {
+            _logger.LogError("Failed to delete establishment with Auth0 ID: {Auth0Id}", auth0Id);
             throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
         }
     }
