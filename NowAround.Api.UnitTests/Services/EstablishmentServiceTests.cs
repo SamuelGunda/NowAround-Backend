@@ -751,6 +751,6 @@ public class EstablishmentServiceTests
         const string auth0Id = null;
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _establishmentService.DeleteEstablishmentAsync(auth0Id));
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.DeleteEstablishmentAsync(auth0Id));
     }
 }

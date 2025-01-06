@@ -86,6 +86,7 @@ public class EstablishmentController(
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
         
         await establishmentService.UpdateEstablishmentAsync(auth0Id, establishmentUpdateRequest);
+        
         return NoContent();
     }
     
@@ -96,6 +97,7 @@ public class EstablishmentController(
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
         
         await establishmentService.UpdateEstablishmentPictureAsync(auth0Id, pictureContext, picture);
+        
         return Created("", new { message = "Picture updated successfully" });
     }
     
@@ -114,16 +116,14 @@ public class EstablishmentController(
         return BadRequest(new { message = "Invalid action type. Please use 'accept' or 'reject'." });
     }
     
-    [Authorize]
+    [Authorize(Roles = "Establishment")]
     [HttpDelete]
-    public async Task<IActionResult> DeleteEstablishmentAsync(string auth0Id)
+    public async Task<IActionResult> DeleteEstablishmentAsync()
     {
-        if (AuthorizationHelper.HasAdminRightsOrMatchingAuth0Id(User, auth0Id))
-        {
-            await establishmentService.DeleteEstablishmentAsync(auth0Id);
-            return NoContent();
-        }
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        
+        await establishmentService.DeleteEstablishmentAsync(auth0Id);
 
-        return Forbid();
+        return NoContent();
     }
 }

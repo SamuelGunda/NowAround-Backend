@@ -93,9 +93,12 @@ public class PostControllerTests  : IClassFixture<StorageContextFixture>
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         
-        _containerName = "user";
-        _blobPath = "auth0-valid/profile-picture";
-        await CleanStorage();
+        if (response.StatusCode == HttpStatusCode.Created)
+        {
+            _containerName = "establishment";
+            _blobPath = "auth0-valid/post/2";
+            await CleanStorage();
+        }
     }
     
     [Fact]

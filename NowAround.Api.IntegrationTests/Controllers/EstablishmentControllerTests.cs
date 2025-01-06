@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -16,15 +17,31 @@ using NowAround.Api.Models.Responses;
 
 namespace NowAround.Api.IntegrationTests.Controllers;
 
-public class EstablishmentControllerTests
+public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture>
 {
     private readonly Mock<IAuth0Service> _auth0ServiceMock;
     private readonly Mock<IMapboxService> _mapboxServiceMock;
 
-    public EstablishmentControllerTests()
+    private readonly BlobServiceClient _blobServiceClient;
+    private string? _containerName;
+    private string? _blobPath;
+    
+    public EstablishmentControllerTests(StorageContextFixture fixture)
     {
         _auth0ServiceMock = new Mock<IAuth0Service>();
         _mapboxServiceMock = new Mock<IMapboxService>();
+        
+        _blobServiceClient = fixture.StorageContext.BlobServiceClient;
+    }
+    
+    private async Task CleanStorage()
+    {
+        if (!string.IsNullOrEmpty(_containerName) && !string.IsNullOrEmpty(_blobPath))
+        {
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            var blobClient = containerClient.GetBlobClient(_blobPath);
+            await blobClient.DeleteIfExistsAsync();
+        }
     }
     
     // RegisterEstablishmentAsync Tests
@@ -656,6 +673,13 @@ public class EstablishmentControllerTests
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        
+        if (response.StatusCode == HttpStatusCode.Created)
+        {
+            _containerName = "establishment";
+            _blobPath = "auth0-valid/profile-picture";
+            await CleanStorage();
+        }
     }
     
     [Fact]
@@ -883,26 +907,10 @@ public class EstablishmentControllerTests
         var factory = new NowAroundWebApplicationFactory();
         
         var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Admin");
-
-        // Act
-        var response = await client.DeleteAsync("/api/establishment?auth0Id=auth0|valid");
-
-        // Assert
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-    }
-    
-    [Fact]
-    public async Task DeleteEstablishmentAsync_WithValidSub_ShouldReturnNoContent()
-    {
-        // Arrange
-        var factory = new NowAroundWebApplicationFactory();
-        
-        var client = factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|valid");
 
         // Act
-        var response = await client.DeleteAsync("/api/establishment?auth0Id=auth0|valid");
+        var response = await client.DeleteAsync("/api/establishment");
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -915,10 +923,10 @@ public class EstablishmentControllerTests
         var factory = new NowAroundWebApplicationFactory();
         
         var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Admin");
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|invalid");
 
         // Act
-        var response = await client.DeleteAsync("/api/establishment?auth0Id=auth0|invalid");
+        var response = await client.DeleteAsync("/api/establishment");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -933,7 +941,7 @@ public class EstablishmentControllerTests
         var client = factory.CreateClient();
 
         // Act
-        var response = await client.DeleteAsync("/api/establishment?auth0Id=auth0|valid");
+        var response = await client.DeleteAsync("/api/establishment");
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -946,7 +954,7 @@ public class EstablishmentControllerTests
         var factory = new NowAroundWebApplicationFactory();
         
         var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|invalid");
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "User auth0|user");
 
         // Act
         var response = await client.DeleteAsync("/api/establishment?auth0Id=auth0|valid");

@@ -64,9 +64,8 @@ public class UserService : IUserService
         var pictureType = picture.ContentType;
         _storageService.CheckPictureType(pictureType);
         
-        var pictureUrl = await _storageService.UploadPictureAsync(picture, "User", auth0Id, pictureContext, null);
-        
         var user = await GetUserByAuth0IdAsync(auth0Id, true);
+        var pictureUrl = await _storageService.UploadPictureAsync(picture, "User", auth0Id, pictureContext, null);
         
         user.ProfilePictureUrl = pictureUrl.Contains("profile-picture") ? pictureUrl : user.ProfilePictureUrl;
         user.BackgroundPictureUrl = pictureUrl.Contains("background-picture") ? pictureUrl : user.BackgroundPictureUrl;

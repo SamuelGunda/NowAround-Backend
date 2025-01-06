@@ -57,7 +57,6 @@ public class EstablishmentService : IEstablishmentService
             throw new EstablishmentAlreadyExistsException(establishmentInfo.Name);
         }
         
-        // Get coordinates from address using Mapbox API 
         var coordinates = await _mapboxService.GetCoordinatesFromAddressAsync(establishmentInfo.Address, establishmentInfo.PostalCode, establishmentInfo.City);
         
         // Check if categories and tags exist by their name and get them from the database
@@ -85,7 +84,9 @@ public class EstablishmentService : IEstablishmentService
         catch (Exception)
         {
             _logger.LogWarning("Failed to create establishment in the database");
+            
             await _auth0Service.DeleteAccountAsync(auth0Id);
+            
             throw new Exception("Failed to create establishment in the database");
         }
     }
@@ -113,6 +114,7 @@ public class EstablishmentService : IEstablishmentService
     public async Task<Establishment> GetEstablishmentByAuth0IdAsync(string auth0Id, bool tracked = false)
     {
         var establishment = await _establishmentRepository.GetAsync(e => e.Auth0Id == auth0Id, tracked);
+        
         if (establishment == null)
         {
             throw new EntityNotFoundException("Establishment","Auth0ID", auth0Id);
@@ -190,15 +192,8 @@ public class EstablishmentService : IEstablishmentService
         var pictureType = picture.ContentType;
         _storageService.CheckPictureType(pictureType);
         
+        var establishment = await GetEstablishmentByAuth0IdAsync(auth0Id, true);
         var pictureUrl = await _storageService.UploadPictureAsync(picture, "Establishment", auth0Id, pictureContext, null);
-        
-        var establishment = await _establishmentRepository.GetByAuth0IdAsync(auth0Id);
-        
-        if (establishment == null)
-        {
-            _logger.LogWarning("User with Auth0 ID: {Auth0Id} not found", auth0Id);
-            throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
-        }
         
         establishment.ProfilePictureUrl = pictureUrl.Contains("profile-picture") ? pictureUrl : establishment.ProfilePictureUrl;
         establishment.BackgroundPictureUrl = pictureUrl.Contains("background-picture") ? pictureUrl : establishment.BackgroundPictureUrl;
@@ -225,13 +220,9 @@ public class EstablishmentService : IEstablishmentService
 
     public async Task DeleteEstablishmentAsync(string auth0Id)
     {
-        if (auth0Id.IsNullOrEmpty())
-        {
-            _logger.LogWarning("auth0Id is null");
-            throw new ArgumentNullException(nameof(auth0Id));
-        }
-        
         await _auth0Service.DeleteAccountAsync(auth0Id);
+        
+        await _storageService.DeleteAccountFolderAsync("Establishment", auth0Id);
         
         var result = await _establishmentRepository.DeleteByAuth0IdAsync(auth0Id);
         if (!result)

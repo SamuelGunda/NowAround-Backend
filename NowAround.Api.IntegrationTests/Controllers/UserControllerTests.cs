@@ -1,18 +1,34 @@
 ﻿using System.Net;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using NowAround.Api.Apis.Auth0.Interfaces;
 
 namespace NowAround.Api.IntegrationTests.Controllers;
 
-public class UserControllerTests
+public class UserControllerTests : IClassFixture<StorageContextFixture>
 {
-
     private readonly Mock<IAuth0Service> _auth0ServiceMock;
     
-    public UserControllerTests()
+    private readonly BlobServiceClient _blobServiceClient;
+    private string? _containerName;
+    private string? _blobPath;
+    
+    public UserControllerTests(StorageContextFixture fixture)
     {
         _auth0ServiceMock = new Mock<IAuth0Service>();
+        
+        _blobServiceClient = fixture.StorageContext.BlobServiceClient;
+    }
+    
+    private async Task CleanStorage()
+    {
+        if (!string.IsNullOrEmpty(_containerName) && !string.IsNullOrEmpty(_blobPath))
+        {
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            var blobClient = containerClient.GetBlobClient(_blobPath);
+            await blobClient.DeleteIfExistsAsync();
+        }
     }
     
     // CreateUserAsync Tests
@@ -145,6 +161,13 @@ public class UserControllerTests
         // Assert
         response.EnsureSuccessStatusCode();
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        
+        if (response.StatusCode == HttpStatusCode.Created)
+        {
+            _containerName = "user";
+            _blobPath = "auth0-valid/profile-picture";
+            await CleanStorage();
+        }
     }
     
     [Fact]

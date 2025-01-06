@@ -7,14 +7,9 @@ namespace NowAround.Api.Services;
 public class StorageService : IStorageService
 {
     private readonly BlobServiceClient _blobServiceClient;
-    /*private readonly IEstablishmentService _establishmentService;
-    private readonly IUserService _userService;*/
     
-     public StorageService(IConfiguration configuration/*, IEstablishmentService establishmentService, IUserService userService*/)
+     public StorageService(IConfiguration configuration)
     {
-        /*_establishmentService = establishmentService;
-        _userService = userService;*/
-        
         var storageKey = configuration.GetConnectionString("StorageKey") ?? throw new ArgumentNullException(configuration.GetConnectionString("StorageKey"));
         var storageAccount = configuration.GetConnectionString("StorageAccount") ?? throw new ArgumentNullException(configuration.GetConnectionString("StorageAccount"));
         
@@ -26,16 +21,8 @@ public class StorageService : IStorageService
     {
         var sanitizedAuth0Id = auth0Id.Replace("|", "-").ToLower();
         
-        /*
-        var accountExists = await _userService.CheckIfUserExistsAsync(auth0Id) || await _establishmentService.CheckIfEstablishmentExistsAsync(auth0Id);
-        
-        if (!accountExists)
-        {
-            throw new EntityNotFoundException("Account", "Auth0 ID", auth0Id);
-        }
-        */
-
         var containerClient = _blobServiceClient.GetBlobContainerClient(role.ToLower());
+        
         await containerClient.CreateIfNotExistsAsync();
 
         string blobPath;
@@ -55,15 +42,24 @@ public class StorageService : IStorageService
         await using var stream = file.OpenReadStream();
         await blobClient.UploadAsync(stream, overwrite: true);
         
-        /*
-        var imageUrl = blobClient.Uri.ToString();
-        await AssignImageUrlToEntity(role, auth0Id, imageContext, contextId, imageUrl);
-        */
-        
         return "https://nowaroundimagestorage.blob.core.windows.net/" + blobPath;
     }
+    
+    public async Task DeleteAccountFolderAsync(string role, string auth0Id)
+    {
+        var sanitizedAuth0Id = auth0Id.Replace("|", "-").ToLower();
+        
+        var containerClient = _blobServiceClient.GetBlobContainerClient(role.ToLower());
+        
+        await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: sanitizedAuth0Id + "/"))
+        {
+            var blobClient = containerClient.GetBlobClient(blobItem.Name);
 
-    public Task DeletePictureAsync(string role, string auth0Id, string imageContext, int? contextId)
+            await blobClient.DeleteAsync();
+        }
+    }
+
+    public async Task DeletePictureAsync(string role, string auth0Id, string imageContext, int? contextId)
     {
         var sanitizedAuth0Id = auth0Id.Replace("|", "-").ToLower();
         
@@ -71,25 +67,8 @@ public class StorageService : IStorageService
         var blobPath = contextId == null ? $"{sanitizedAuth0Id}/{imageContext}" : $"{sanitizedAuth0Id}/{imageContext}/{contextId}";
         var blobClient = containerClient.GetBlobClient(blobPath);
         
-        return blobClient.DeleteIfExistsAsync();
+        await blobClient.DeleteIfExistsAsync();
     }
-
-    /*private async Task AssignImageUrlToEntity(string role, string auth0Id, string imageContext, int? contextId, string imageUrl)
-    {
-        switch (role)
-        {
-            case "User":
-                await _userService.UpdateUserPictureAsync(auth0Id, imageUrl);
-                break;
-            case "Establishment":
-                await _establishmentService.UpdateEstablishmentPictureAsync(auth0Id, imageUrl);
-                break;
-            default:
-                throw new ArgumentException("Invalid role");
-        }
-    }*/
-    
-    
     
     public void CheckPictureType(string contentType)
     {
