@@ -4,7 +4,7 @@ namespace NowAround.Api.Models.Domain;
 
 public class Menu : BaseEntity
 {
-    public string Name { get; set; }
+    public required string Name { get; set; }
     
     public ICollection<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
     

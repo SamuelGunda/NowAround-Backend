@@ -8,7 +8,7 @@ public class Review : BaseEntity
     [Range(0, 5)]
     public required int Rating { get; set; }
     [MaxLength(512)]
-    public string Body { get; set; } = string.Empty;
+    public string? Body { get; set; }
     public DateTime CreatedAt { get; set; }  = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
     

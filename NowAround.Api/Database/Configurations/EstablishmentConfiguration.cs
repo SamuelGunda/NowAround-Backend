@@ -64,11 +64,6 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
                 "CuisineEstablishment",
                 j => j.HasOne<Cuisine>().WithMany().HasForeignKey("CuisineId").OnDelete(DeleteBehavior.Cascade),
                 j => j.HasOne<Establishment>().WithMany().HasForeignKey("EstablishmentId").OnDelete(DeleteBehavior.Cascade));
-        
-        builder.HasMany(e => e.Posts)
-            .WithOne(p => p.Establishment)
-            .HasForeignKey(p => p.EstablishmentId)
-            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(e => e.RequestStatus)
             .HasDefaultValue(RequestStatus.Pending);

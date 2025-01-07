@@ -6,11 +6,10 @@ namespace NowAround.Api.Models.Domain;
 public class MenuItem : BaseEntity
 {
     [MaxLength(64)]
-    public string Name { get; set; }
+    public required string Name { get; set; }
     [MaxLength(512)]
     public required string Description { get; set; }
-    [MaxLength(32)]
-    public required string Price { get; set; }
+    public required double Price { get; set; }
     [MaxLength(256)]
     public string? PictureUrl { get; set; }
     
