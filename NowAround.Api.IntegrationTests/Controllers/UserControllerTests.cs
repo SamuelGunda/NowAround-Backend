@@ -216,4 +216,56 @@ public class UserControllerTests : IClassFixture<StorageContextFixture>
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+    
+    // DeleteUserAsync Tests
+    
+    [Fact]
+    public async Task DeleteUserAsync_ShouldReturnNoContent()
+    {
+        // Arrange
+        var factory = new NowAroundWebApplicationFactory();
+
+        var client = factory.CreateClient();
+        
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "User auth0|valid");
+        
+        // Act
+        var response = await client.DeleteAsync("/api/user");
+        
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+    
+    [Fact]
+    public async Task DeleteUserAsync_IfUserDoesNotExist_ShouldReturnNotFound()
+    {
+        // Arrange
+        var factory = new NowAroundWebApplicationFactory();
+
+        var client = factory.CreateClient();
+        
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "User auth0|invalid");
+        
+        // Act
+        var response = await client.DeleteAsync("/api/user");
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+    
+    [Fact]
+    public async Task DeleteUserAsync_IfTokenIsNotProvided_ShouldReturnUnauthorized()
+    {
+        // Arrange
+        var factory = new NowAroundWebApplicationFactory();
+
+        var client = factory.CreateClient();
+        
+        // Act
+        var response = await client.DeleteAsync("/api/user");
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
 }

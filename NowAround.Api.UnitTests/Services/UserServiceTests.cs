@@ -3,7 +3,7 @@ using Moq;
 using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Domain;
-using NowAround.Api.Repositories;
+using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Services;
 using NowAround.Api.Services.Interfaces;
 

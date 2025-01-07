@@ -6,6 +6,7 @@ using NowAround.Api.Repositories.Interfaces;
 
 namespace NowAround.Api.Repositories;
 
+//TODO: Change Base Repository from abstract to normal class
 public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
 {
     protected AppDbContext Context { get; }

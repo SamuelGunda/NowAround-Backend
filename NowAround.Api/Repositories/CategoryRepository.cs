@@ -5,6 +5,7 @@ using NowAround.Api.Repositories.Interfaces;
 
 namespace NowAround.Api.Repositories;
 
+//TODO: Remove CategoryRepository and use BaseRepository
 public class CategoryRepository : BaseRepository<Category>, ICategoryRepository
 {
     
