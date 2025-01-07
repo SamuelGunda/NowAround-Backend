@@ -64,7 +64,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                         p.Body,
                         p.PictureUrl,
                         p.CreatedAt,
-                        p.PostLikes.Select(pl => pl.User.Auth0Id).ToList()
+                        p.Likes.Select(l => l.Auth0Id).ToList()
                     )).ToList()
                     ),
                 e.Menus.Select(m => new MenuDto(

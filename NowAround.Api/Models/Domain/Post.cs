@@ -15,14 +15,14 @@ public class Post : BaseEntity
     public DateTime CreatedAt { get; init; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
     
-    public ICollection<PostLike> PostLikes { get; init; } = new List<PostLike>();
+    public ICollection<User> Likes { get; init; } = new List<User>();
     public int EstablishmentId { get; init; }
     public Establishment Establishment { get; init; }
     
     public PostDto ToDto()
     {
         var establishmentAuth0Id = Establishment?.Auth0Id ?? null;
-        var postLikesAuth0Ids = PostLikes?.Select(pl => pl.User.Auth0Id).ToList() ?? [];
+        var postLikesAuth0Ids = Likes.Select(l => l.Auth0Id).ToList();
 
         return new PostDto(Id, establishmentAuth0Id, Headline, Body, PictureUrl, CreatedAt, postLikesAuth0Ids);
     }

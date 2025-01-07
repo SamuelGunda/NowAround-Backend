@@ -227,6 +227,11 @@ public class UserControllerTests : IClassFixture<StorageContextFixture>
 
         var client = factory.CreateClient();
         
+        await _blobServiceClient.GetBlobContainerClient("user").CreateIfNotExistsAsync();
+        
+        var blobClient = _blobServiceClient.GetBlobContainerClient("user").GetBlobClient("auth0-valid/profile-picture");
+        await blobClient.UploadAsync(new MemoryStream("Test picture"u8.ToArray()), overwrite: true);
+        
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "User auth0|valid");
         
         // Act
@@ -235,6 +240,9 @@ public class UserControllerTests : IClassFixture<StorageContextFixture>
         // Assert
         response.EnsureSuccessStatusCode();
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        
+        var blobExists = await blobClient.ExistsAsync();
+        Assert.False(blobExists.Value);
     }
     
     [Fact]

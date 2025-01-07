@@ -907,6 +907,12 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var factory = new NowAroundWebApplicationFactory();
         
         var client = factory.CreateClient();
+        
+        await _blobServiceClient.GetBlobContainerClient("establishment").CreateIfNotExistsAsync();
+        
+        var blobClient = _blobServiceClient.GetBlobContainerClient("establishment").GetBlobClient("auth0-valid/profile-picture");
+        await blobClient.UploadAsync(new MemoryStream("Test picture"u8.ToArray()), overwrite: true);
+        
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|valid");
 
         // Act

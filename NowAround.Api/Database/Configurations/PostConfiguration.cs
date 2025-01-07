@@ -21,9 +21,11 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
             .HasForeignKey(p => p.EstablishmentId)
             .OnDelete(DeleteBehavior.Cascade);
         
-        builder.HasMany(p => p.PostLikes)
-            .WithOne(pl => pl.Post)
-            .HasForeignKey(pl => pl.PostId)
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(p => p.Likes)
+            .WithMany(u => u.LikedPosts)
+            .UsingEntity<Dictionary<string, object>>(
+                "PostLike",
+                j => j.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.Cascade),
+                j => j.HasOne<Post>().WithMany().HasForeignKey("PostId").OnDelete(DeleteBehavior.Cascade));
     }
 }

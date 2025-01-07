@@ -32,23 +32,4 @@ public class Establishment : BaseAccountEntity
     public ICollection<Tag> Tags { get; set; } = new List<Tag>(); 
     public ICollection<Cuisine> Cuisines { get; set; } = new List<Cuisine>();
     public ICollection<Post> Posts { get; set; } = new List<Post>();
-
-    public EstablishmentResponse ToDetailedResponse()
-    {
-        return new EstablishmentResponse
-        {
-            Auth0Id = Auth0Id,
-            Name = Name,
-            Description = Description,
-            City = City,
-            Address = Address,
-            Latitude = Latitude,
-            Longitude = Longitude,
-            PriceCategory = PriceCategory,
-            RequestStatus = RequestStatus,
-
-            CategoryNames = Categories.Select(c => c.Name).ToList(),
-            TagNames = Tags.Select(t => t.Name).ToList()
-        };
-    }
 }

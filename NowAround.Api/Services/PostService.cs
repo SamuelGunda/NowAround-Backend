@@ -61,7 +61,7 @@ public class PostService : IPostService
 
         var post = await _postRepository.GetAsync(p => p.Id == postId, 
             tracked, 
-            p => p.Establishment);
+            p => p.Establishment, p => p.Likes);
         
         if (post == null)
         {

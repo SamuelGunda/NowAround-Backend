@@ -29,7 +29,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<FriendRequest> FriendRequests { get; set; }
     
     public DbSet<Post> Posts { get; set; }
-    public DbSet<PostLike> PostLikes { get; set; }
     
     public DbSet<Review> Reviews { get; set; }
     public DbSet<RatingStatistic> RatingStatistics { get; set; }
