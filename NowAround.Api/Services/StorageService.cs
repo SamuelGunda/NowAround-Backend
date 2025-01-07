@@ -47,7 +47,7 @@ public class StorageService : IStorageService
         await using var stream = file.OpenReadStream();
         await blobClient.UploadAsync(stream, overwrite: true);
         
-        return "https://nowaroundimagestorage.blob.core.windows.net/" + blobPath;
+        return $"https://nowaroundimagestorage.blob.core.windows.net/{role.ToLower()}/{blobPath}";
     }
     
     public async Task DeleteAccountFolderAsync(string role, string auth0Id)
