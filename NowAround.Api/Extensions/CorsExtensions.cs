@@ -8,7 +8,7 @@ public static class CorsExtensions
         {
             options.AddPolicy("AllowSpecificOrigin",
                 policyBuilder => policyBuilder
-                    .WithOrigins("http://localhost:4200", "https://nowaround.vercel.app/")
+                    .WithOrigins("http://localhost:4200", "https://nowaround.site")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials()

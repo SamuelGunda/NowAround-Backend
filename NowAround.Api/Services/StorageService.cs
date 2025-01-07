@@ -27,6 +27,9 @@ public class StorageService : IStorageService
 
         string blobPath;
         
+        var contentType = file.ContentType;
+        var fileFormat = contentType.Split("/")[1];
+        
         if (imageContext is "profile-picture" or "background-picture")
         {
             blobPath = $"{sanitizedAuth0Id}/{imageContext}";
@@ -36,6 +39,8 @@ public class StorageService : IStorageService
             ArgumentNullException.ThrowIfNull(contextId);
             blobPath = $"{sanitizedAuth0Id}/{imageContext}/{contextId}";
         }
+        
+        blobPath += "." + fileFormat;
         
         var blobClient = containerClient.GetBlobClient(blobPath);
 
