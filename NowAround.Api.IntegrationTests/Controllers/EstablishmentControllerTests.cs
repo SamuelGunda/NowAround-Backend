@@ -212,7 +212,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var factory = new NowAroundWebApplicationFactory();
 
         const string auth0Id = "auth0|valid";
-        var establishment = new EstablishmentResponse
+        var establishment = new Establishment
         {
             Auth0Id = auth0Id,
             Name = "Test Restaurant",
@@ -223,8 +223,8 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
             Longitude = 0,
             PriceCategory = PriceCategory.Affordable,
             RequestStatus = RequestStatus.Accepted,
-            CategoryNames = new List<string> { "RESTAURANT" },
-            TagNames = new List<string> { "PET_FRIENDLY" }
+            Categories = new List<Category> { new() { Name = "RESTAURANT" } },
+            Tags = new List<Tag> { new() { Name = "PET_FRIENDLY" } }
         };
 
         var client = factory.CreateClient();
@@ -303,7 +303,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishments = JsonConvert.DeserializeObject<List<EstablishmentResponse>>(responseContent);
+        var establishments = JsonConvert.DeserializeObject<List<Establishment>>(responseContent);
 
         Assert.NotEmpty(establishments);
     }
@@ -372,7 +372,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishments = JsonConvert.DeserializeObject<List<EstablishmentResponse>>(responseContent);
+        var establishments = JsonConvert.DeserializeObject<List<Establishment>>(responseContent);
 
         Assert.NotEmpty(establishments);
         Assert.Single(establishments);
@@ -392,7 +392,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishments = JsonConvert.DeserializeObject<List<EstablishmentResponse>>(responseContent);
+        var establishments = JsonConvert.DeserializeObject<List<Establishment>>(responseContent);
 
         Assert.NotEmpty(establishments);
         Assert.Single(establishments);
@@ -412,7 +412,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishments = JsonConvert.DeserializeObject<List<EstablishmentResponse>>(responseContent);
+        var establishments = JsonConvert.DeserializeObject<List<Establishment>>(responseContent);
 
         Assert.NotEmpty(establishments);
         Assert.Equal(2, establishments.Count);
@@ -478,7 +478,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishments = JsonConvert.DeserializeObject<List<EstablishmentResponse>>(responseContent);
+        var establishments = JsonConvert.DeserializeObject<List<Establishment>>(responseContent);
 
         Assert.NotEmpty(establishments);
         Assert.Equal(2, establishments.Count);
@@ -528,7 +528,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishments = JsonConvert.DeserializeObject<List<EstablishmentResponse>>(responseContent);
+        var establishments = JsonConvert.DeserializeObject<List<Establishment>>(responseContent);
 
         Assert.NotEmpty(establishments);
         Assert.Single(establishments);

@@ -91,6 +91,27 @@ public class EstablishmentService : IEstablishmentService
         }
     }
 
+    public async Task AddMenuAsync(string auth0Id, MenuCreateRequest menu)
+    {
+        var establishment = await GetEstablishmentByAuth0IdAsync(auth0Id, true);
+        
+        var menuEntity = new Menu
+        {
+            Name = menu.Name,
+            EstablishmentId = establishment.Id,
+            MenuItems = menu.MenuItems.Select(mi => new MenuItem
+            {
+                Name = mi.Name,
+                Description = mi.Description,
+                Price = mi.Price
+            }).ToList()
+        };
+        
+        establishment.Menus.Add(menuEntity);
+        
+        await _establishmentRepository.UpdateAsync(establishment);
+    }
+
     /*
     public Task<bool> CheckIfEstablishmentExistsAsync(string auth0Id)
     {
@@ -122,8 +143,7 @@ public class EstablishmentService : IEstablishmentService
 
         return establishment;
     }
-
-
+    
     public async Task<EstablishmentProfileResponse> GetEstablishmentProfileByAuth0IdAsync(string auth0Id)
     {
         var establishment = await _establishmentRepository.GetProfileByAuth0IdAsync(auth0Id);
@@ -139,12 +159,9 @@ public class EstablishmentService : IEstablishmentService
     {
         var establishments = await _establishmentRepository.GetAllWhereRegisterStatusPendingAsync();
         
-        var pendingEstablishments = establishments.Select(e => new PendingEstablishmentResponse
-        {
-            Auth0Id = e.Auth0Id,
-            Name = e.Name,
-            OwnerName = _auth0Service.GetEstablishmentOwnerFullNameAsync(e.Auth0Id).Result
-        }).ToList();
+        var pendingEstablishments = 
+            establishments.Select(e => new PendingEstablishmentResponse
+                (e.Auth0Id, e.Name, _auth0Service.GetEstablishmentOwnerFullNameAsync(e.Auth0Id).Result)).ToList();
         
         return pendingEstablishments;
     }

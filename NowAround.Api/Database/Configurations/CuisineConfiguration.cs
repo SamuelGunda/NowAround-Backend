@@ -9,6 +9,6 @@ public class CuisineConfiguration : IEntityTypeConfiguration<Cuisine>
     public void Configure(EntityTypeBuilder<Cuisine> builder)
     {
         builder.HasKey(c => c.Id);
-        builder.Property(c => c.Name).HasMaxLength(32).IsRequired();
+        builder.Property(c => c.Name).IsRequired();
     }
 }

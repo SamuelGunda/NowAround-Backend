@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NowAround.Api.Apis.Auth0.Models.Requests;
+using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;
@@ -20,6 +21,17 @@ public class EstablishmentController(IEstablishmentService establishmentService)
         await establishmentService.RegisterEstablishmentAsync(establishment);
         
         return Created("", new { message = "Establishment created successfully" });
+    }
+    
+    [Authorize(Roles = "Establishment")]
+    [HttpPost("menu")]
+    public async Task<IActionResult> AddMenuAsync(MenuCreateRequest menu)
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        
+        await establishmentService.AddMenuAsync(auth0Id, menu);
+        
+        return Created("", new { message = "Menu added successfully" });
     }
     
     [HttpGet("profile/{auth0Id}")]

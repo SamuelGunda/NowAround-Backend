@@ -2,7 +2,8 @@
 
 namespace NowAround.Api.Models.Responses;
 
-public sealed record EstablishmentProfileResponse(
+public sealed record EstablishmentProfileResponse
+(
     string Auth0Id,
     GenericInfo GenericInfo,
     LocationInfo LocationInfo,
@@ -11,7 +12,8 @@ public sealed record EstablishmentProfileResponse(
     RatingStatisticResponse RatingStatistic
 );
 
-public sealed record GenericInfo(
+public sealed record GenericInfo
+(
     string Name,
     string ProfilePictureUrl,
     string BackgroundPictureUrl,
@@ -24,7 +26,8 @@ public sealed record GenericInfo(
     List<SocialLinkDto> SocialLinks
 );
 
-public sealed record LocationInfo(
+public sealed record LocationInfo
+(
     string Address,
     string City,
     double Long,

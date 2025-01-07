@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using NowAround.Api.Database.Configurations;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
@@ -36,6 +37,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
         modelBuilder.Entity<Establishment>().HasQueryFilter(e => e.RequestStatus == RequestStatus.Accepted);
     }
 }

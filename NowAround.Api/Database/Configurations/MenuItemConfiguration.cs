@@ -9,21 +9,9 @@ public class MenuItemConfiguration : IEntityTypeConfiguration<MenuItem>
     public void Configure(EntityTypeBuilder<MenuItem> builder)
     {
         builder.HasKey(mi => mi.Id);
-        
-        builder.Property(mi => mi.Name)
-            .IsRequired()
-            .HasMaxLength(32);
-        
-        builder.Property(mi => mi.PictureUrl)
-            .IsRequired()
-            .HasMaxLength(256);
-        
-        builder.Property(mi => mi.Description)
-            .IsRequired()
-            .HasMaxLength(256);
-        
-        builder.Property(mi => mi.Price)
-            .IsRequired()
-            .HasMaxLength(16);
+        builder.Property(mi => mi.Name).IsRequired();
+        builder.Property(mi => mi.Description).IsRequired();
+        builder.Property(mi => mi.Price).IsRequired();
+        builder.Property(mi => mi.PictureUrl);
     }
 }

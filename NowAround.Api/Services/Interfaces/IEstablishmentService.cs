@@ -13,6 +13,7 @@ public interface IEstablishmentService
     Task RegisterEstablishmentAsync(EstablishmentRegisterRequest request);
     /*Task<bool> CheckIfEstablishmentExistsAsync(string auth0Id);*/
     /*Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id);*/
+    Task AddMenuAsync(string auth0Id, MenuCreateRequest menu);
     Task<Establishment> GetEstablishmentByAuth0IdAsync(string auth0Id, bool tracked = false);
     Task<EstablishmentProfileResponse> GetEstablishmentProfileByAuth0IdAsync(string auth0Id);
     Task<List<PendingEstablishmentResponse>> GetPendingEstablishmentsAsync();
