@@ -10,7 +10,5 @@ public class User : BaseAccountEntity
     public virtual ICollection<Friend> Friends { get; set; } = new List<Friend>();
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
     public virtual ICollection<Post> LikedPosts { get; set; } = new List<Post>();
-    /*
     public virtual ICollection<Event> InterestedInEvents { get; set; } = new List<Event>();
-*/
 }

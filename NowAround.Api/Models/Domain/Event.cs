@@ -4,8 +4,7 @@ using NowAround.Api.Models.Enum;
 
 namespace NowAround.Api.Models.Domain;
 
-//TODO: Implement Event, discuss with Rastik
-public class Event; /*: BaseEntity
+public class Event : BaseEntity
 {
     [MaxLength(64)]
     public required string Title { get; set; }
@@ -28,7 +27,7 @@ public class Event; /*: BaseEntity
     public DateTime CreatedAt { get; init; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
-    public ICollection<User> InterestedIn { get; init; } = new List<User>();
+    public ICollection<User> InterestedUsers { get; init; } = new List<User>();
     public int EstablishmentId { get; init; }
     public Establishment Establishment { get; init; }
-}*/
+}
