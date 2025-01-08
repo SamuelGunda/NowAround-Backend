@@ -370,15 +370,6 @@ public class EstablishmentServiceTests
         Assert.Equal(establishment.RequestStatus, result.RequestStatus);
     }
     
-    [Fact]
-    public async Task GetEstablishmentByAuth0IdAsync_InvalidId_ShouldThrowEstablishmentNotFoundException()
-    {
-        const string auth0Id = "test-auth0-id";
-        _establishmentRepositoryMock.Setup(r => r.GetAsync(e => e.Auth0Id == auth0Id, false)).ReturnsAsync(null as Establishment);
-
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id));
-    }
-    
     // GetEstablishmentByAuth0IdAsync tests
     
     [Fact]

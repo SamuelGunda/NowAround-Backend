@@ -1,4 +1,6 @@
-﻿namespace NowAround.Api.Models.Requests;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NowAround.Api.Models.Requests;
 
 public class MenuCreateRequest
 {
@@ -10,5 +12,6 @@ public class MenuItemCreateRequest
 {
     public required string Name { get; set; }
     public required string Description { get; set; }
+    [Range(0, 10000)]
     public required double Price { get; set; }
 }

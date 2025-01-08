@@ -1,4 +1,5 @@
-﻿using NowAround.Api.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Requests;
 using NowAround.Api.Repositories.Interfaces;
@@ -58,10 +59,13 @@ public class PostService : IPostService
 
     public async Task<Post> GetPostAsync(int postId, bool tracked = false)
     {
-
-        var post = await _postRepository.GetAsync(p => p.Id == postId, 
+        var post = await _postRepository.GetAsync
+        (
+            p => p.Id == postId, 
             tracked, 
-            p => p.Establishment, p => p.Likes);
+            query => query.Include(q => q.Establishment), 
+            query => query.Include(p => p.Likes)
+        );
         
         if (post == null)
         {

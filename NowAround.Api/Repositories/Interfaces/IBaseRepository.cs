@@ -9,10 +9,10 @@ public interface IBaseRepository<T> where T : BaseEntity
     Task<bool> CheckIfExistsByPropertyAsync(string propertyName, object propertyValue);
     Task<T?> GetByIdAsync(int id);
     Task<T?> GetByPropertyAsync(string propertyName, object propertyValue);
-    Task<T?> GetAsync(
+    Task<T> GetAsync(
         Expression<Func<T, bool>>? filter = null,
         bool tracked = true,
-        params Expression<Func<T, object>>[] includes);
+        params Func<IQueryable<T>, IQueryable<T>>[] includeProperties);
     Task<IEnumerable<T>> GetAllAsync();
     Task UpdateAsync(T entity);
     Task<bool> DeleteAsync(int id);

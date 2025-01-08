@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Auth0.Models.Requests;
@@ -91,27 +92,6 @@ public class EstablishmentService : IEstablishmentService
         }
     }
 
-    public async Task AddMenuAsync(string auth0Id, MenuCreateRequest menu)
-    {
-        var establishment = await GetEstablishmentByAuth0IdAsync(auth0Id, true);
-        
-        var menuEntity = new Menu
-        {
-            Name = menu.Name,
-            EstablishmentId = establishment.Id,
-            MenuItems = menu.MenuItems.Select(mi => new MenuItem
-            {
-                Name = mi.Name,
-                Description = mi.Description,
-                Price = mi.Price
-            }).ToList()
-        };
-        
-        establishment.Menus.Add(menuEntity);
-        
-        await _establishmentRepository.UpdateAsync(establishment);
-    }
-
     /*
     public Task<bool> CheckIfEstablishmentExistsAsync(string auth0Id)
     {
@@ -134,14 +114,7 @@ public class EstablishmentService : IEstablishmentService
     
     public async Task<Establishment> GetEstablishmentByAuth0IdAsync(string auth0Id, bool tracked = false)
     {
-        var establishment = await _establishmentRepository.GetAsync(e => e.Auth0Id == auth0Id, tracked);
-        
-        if (establishment == null)
-        {
-            throw new EntityNotFoundException("Establishment","Auth0ID", auth0Id);
-        }
-
-        return establishment;
+        return await _establishmentRepository.GetAsync(e => e.Auth0Id == auth0Id, tracked);
     }
     
     public async Task<EstablishmentProfileResponse> GetEstablishmentProfileByAuth0IdAsync(string auth0Id)
@@ -287,5 +260,114 @@ public class EstablishmentService : IEstablishmentService
             }
         }
         return (categories.ToArray(), tags.ToArray());
+    }
+    
+    // Menu methods
+    
+    public async Task AddMenuAsync(string auth0Id, MenuCreateRequest menu)
+    {
+        var establishment = await _establishmentRepository.GetAsync
+        (
+            e => e.Auth0Id == auth0Id, 
+            true, 
+            query => query
+                .Include(e => e.Menus)
+        );
+        
+        var menuEntity = new Menu
+        {
+            Name = menu.Name,
+            EstablishmentId = establishment.Id,
+            MenuItems = menu.MenuItems.Select(mi => new MenuItem
+            {
+                Name = mi.Name,
+                Description = mi.Description,
+                Price = mi.Price
+            }).ToList()
+        };
+        
+        establishment.Menus.Add(menuEntity);
+        
+        await _establishmentRepository.UpdateAsync(establishment);
+    }
+
+    public async Task AddMenuItemAsync(string auth0Id, int menuId, MenuItemCreateRequest menuItem)
+    {
+        var establishment = await _establishmentRepository.GetAsync
+        (
+            e => e.Auth0Id == auth0Id, 
+            true, 
+            query => query
+                .Include(e => e.Menus)
+                .ThenInclude(m => m.MenuItems)
+        );
+        
+        var menu = establishment.Menus.FirstOrDefault(m => m.Id == menuId);
+        
+        if (menu == null)
+        {
+            _logger.LogWarning("Menu with ID {MenuId} not found", menuId);
+            throw new EntityNotFoundException("Menu", "ID", menuId.ToString());
+        }
+        
+        var menuItemEntity = new MenuItem
+        {
+            Name = menuItem.Name,
+            Description = menuItem.Description,
+            Price = menuItem.Price
+        };
+        
+        menu.MenuItems.Add(menuItemEntity);
+        
+        await _establishmentRepository.UpdateAsync(establishment);
+    }
+
+    public async Task DeleteMenuAsync(string auth0Id, int menuId)
+    {
+        var establishment = await _establishmentRepository.GetAsync
+        (
+            e => e.Auth0Id == auth0Id, 
+            true, 
+            query => query
+                .Include(e => e.Menus)
+        );
+
+        if (establishment.Menus.All(m => m.Id != menuId))
+        {
+            _logger.LogWarning("Menu with ID {MenuId} not found", menuId);
+            throw new EntityNotFoundException("Menu", "ID", menuId.ToString());
+        }
+        
+        // Add picture deletion
+        
+        establishment.Menus = establishment.Menus.Where(m => m.Id != menuId).ToList();
+        
+        await _establishmentRepository.UpdateAsync(establishment);
+    }
+
+    public async Task DeleteMenuItemAsync(string auth0Id, int menuItemId)
+    {
+        var establishment = await _establishmentRepository.GetAsync
+        (
+            e => e.Auth0Id == auth0Id, 
+            true, 
+            query => query
+                .Include(e => e.Menus)
+                .ThenInclude(m => m.MenuItems)
+        );
+        
+        var menu = establishment.Menus.FirstOrDefault(m => m.MenuItems.Any(mi => mi.Id == menuItemId));
+        
+        if (menu == null)
+        {
+            _logger.LogWarning("Menu item with ID {MenuItemId} not found", menuItemId);
+            throw new EntityNotFoundException("Menu item", "ID", menuItemId.ToString());
+        }
+        
+        // Add picture deletion
+        
+        menu.MenuItems = menu.MenuItems.Where(mi => mi.Id != menuItemId).ToList();
+        
+        await _establishmentRepository.UpdateAsync(establishment);
     }
 }

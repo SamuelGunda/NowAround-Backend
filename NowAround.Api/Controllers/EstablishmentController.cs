@@ -23,17 +23,6 @@ public class EstablishmentController(IEstablishmentService establishmentService)
         return Created("", new { message = "Establishment created successfully" });
     }
     
-    [Authorize(Roles = "Establishment")]
-    [HttpPost("menu")]
-    public async Task<IActionResult> AddMenuAsync(MenuCreateRequest menu)
-    {
-        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
-        
-        await establishmentService.AddMenuAsync(auth0Id, menu);
-        
-        return Created("", new { message = "Menu added successfully" });
-    }
-    
     [HttpGet("profile/{auth0Id}")]
     public async Task<IActionResult> GetEstablishmentProfileInfoByAuth0IdAsync(string auth0Id)
     {
@@ -134,6 +123,52 @@ public class EstablishmentController(IEstablishmentService establishmentService)
         
         await establishmentService.DeleteEstablishmentAsync(auth0Id);
 
+        return NoContent();
+    }
+    
+    //Menu Endpoints
+    
+    [Authorize(Roles = "Establishment")]
+    [HttpPost("menu")]
+    public async Task<IActionResult> AddMenuAsync(MenuCreateRequest menu)
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        
+        await establishmentService.AddMenuAsync(auth0Id, menu);
+        
+        return Created("", new { message = "Menu added successfully" });
+    }
+
+    [Authorize(Roles = "Establishment")]
+    [HttpPost("menu/{menuId:int}")]
+    public async Task<IActionResult> AddMenuItemAsync( int menuId, MenuItemCreateRequest menuItem)
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        
+        await establishmentService.AddMenuItemAsync(auth0Id, menuId, menuItem);
+        
+        return Created("", new { message = "Menu item added successfully" });
+    }
+    
+    [Authorize(Roles = "Establishment")]
+    [HttpDelete("menu/{menuId:int}")]
+    public async Task<IActionResult> DeleteMenuAsync(int menuId)
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        
+        await establishmentService.DeleteMenuAsync(auth0Id, menuId);
+        
+        return NoContent();
+    }
+    
+    [Authorize(Roles = "Establishment")]
+    [HttpDelete("menu/item/{menuItemId:int}")]
+    public async Task<IActionResult> DeleteMenuItemAsync(int menuItemId)
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        
+        await establishmentService.DeleteMenuItemAsync(auth0Id, menuItemId);
+        
         return NoContent();
     }
 }

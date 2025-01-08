@@ -13,7 +13,6 @@ public interface IEstablishmentService
     Task RegisterEstablishmentAsync(EstablishmentRegisterRequest request);
     /*Task<bool> CheckIfEstablishmentExistsAsync(string auth0Id);*/
     /*Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id);*/
-    Task AddMenuAsync(string auth0Id, MenuCreateRequest menu);
     Task<Establishment> GetEstablishmentByAuth0IdAsync(string auth0Id, bool tracked = false);
     Task<EstablishmentProfileResponse> GetEstablishmentProfileByAuth0IdAsync(string auth0Id);
     Task<List<PendingEstablishmentResponse>> GetPendingEstablishmentsAsync();
@@ -23,4 +22,14 @@ public interface IEstablishmentService
     Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus);
     Task UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile image);
     Task DeleteEstablishmentAsync(string auth0Id);
+    
+    // Menu Methods
+    
+    Task AddMenuAsync(string auth0Id, MenuCreateRequest menu);
+    
+    Task AddMenuItemAsync(string auth0Id, int menuId, MenuItemCreateRequest menuItem);
+
+    Task DeleteMenuAsync(string auth0Id, int menuId);
+    
+    Task DeleteMenuItemAsync(string auth0Id, int menuItemId);
 }

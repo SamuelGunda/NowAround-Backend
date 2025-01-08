@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using NowAround.Api.Database;
+using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Repositories.Interfaces;
 
@@ -98,18 +99,18 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntit
         }
     }
     
-    public async Task<T?> GetAsync(
+    public async Task<T> GetAsync(
         Expression<Func<T, bool>>? filter = null,
         bool tracked = true,
-        params Expression<Func<T, object>>[] includes)
+        params Func<IQueryable<T>, IQueryable<T>>[] includeProperties)
     {
         try
         {
             IQueryable<T> query = DbSet;
 
-            foreach (var include in includes)
+            foreach (var include in includeProperties)
             {
-                query = query.Include(include);
+                query = include(query);
             }
 
             if (filter != null)
@@ -122,7 +123,19 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntit
                 query = query.AsNoTracking();
             }
 
-            return await query.FirstOrDefaultAsync();
+            var entity = await query.FirstOrDefaultAsync();
+
+            if (entity == null)
+            {
+                Logger.LogWarning("{EntityType} does not exist", typeof(T).Name);
+                throw new EntityNotFoundException(typeof(T).Name, "filter", filter?.ToString() ?? "null");
+            }
+
+            return entity;
+        }
+        catch (EntityNotFoundException e)
+        {
+            throw;
         }
         catch (Exception e)
         {

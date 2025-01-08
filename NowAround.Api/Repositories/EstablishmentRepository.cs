@@ -68,13 +68,15 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                     )).ToList()
                     ),
                 e.Menus.Select(m => new MenuDto(
+                    m.Id,
+                    null,
                     m.Name,
                     m.MenuItems.Select(mi => new MenuItemDto(
                         mi.Id,
                         mi.Name,
                         mi.PictureUrl,
                         mi.Description,
-                        mi.Price.ToString()
+                        mi.Price
                     )).ToList()
                 )).ToList(),
                 new RatingStatisticResponse(

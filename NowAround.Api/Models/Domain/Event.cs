@@ -12,8 +12,12 @@ public class Event; /*: BaseEntity
     [MaxLength(512)]
     public required string Body { get; set; }
     public double? Price { get; set; }
+    [MaxLength(32)]
+    public required string City { get; set; }
     [MaxLength(64)]
     public required string Address { get; set; }
+    public required double Latitude { get; set; }
+    public required double Longitude { get; set; }
     public required string MaxParticipants { get; set; }
     [MaxLength(256)]
     public string? PictureUrl { get; set; }
