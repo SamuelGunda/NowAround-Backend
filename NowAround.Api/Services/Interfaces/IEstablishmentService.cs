@@ -27,7 +27,7 @@ public interface IEstablishmentService
     
     Task AddMenuAsync(string auth0Id, MenuCreateRequest menu);
     
-    Task AddMenuItemAsync(string auth0Id, int menuId, MenuItemCreateRequest menuItem);
+    Task AddMenuItemAsync(string auth0Id, int menuId, ICollection<MenuItemCreateRequest> menuItem);
 
     Task DeleteMenuAsync(string auth0Id, int menuId);
     

@@ -18,7 +18,6 @@ namespace NowAround.Api.Services;
 
 public class EstablishmentService : IEstablishmentService
 {
-    
     private readonly IAuth0Service _auth0Service;
     private readonly IMapboxService _mapboxService;
     private readonly IEstablishmentRepository _establishmentRepository;
@@ -291,7 +290,7 @@ public class EstablishmentService : IEstablishmentService
         await _establishmentRepository.UpdateAsync(establishment);
     }
 
-    public async Task AddMenuItemAsync(string auth0Id, int menuId, MenuItemCreateRequest menuItem)
+    public async Task AddMenuItemAsync(string auth0Id, int menuId, ICollection<MenuItemCreateRequest> menuItem)
     {
         var establishment = await _establishmentRepository.GetAsync
         (
@@ -310,14 +309,19 @@ public class EstablishmentService : IEstablishmentService
             throw new EntityNotFoundException("Menu", "ID", menuId.ToString());
         }
         
-        var menuItemEntity = new MenuItem
+        var menuItemEntities = menuItem.Select(mi => new MenuItem
         {
-            Name = menuItem.Name,
-            Description = menuItem.Description,
-            Price = menuItem.Price
-        };
+            Name = mi.Name,
+            Description = mi.Description,
+            Price = mi.Price
+        }).ToList();
+
+        foreach (var menuItemEntity in menuItemEntities)
+        {
+            menu.MenuItems.Add(menuItemEntity);
+        }
         
-        menu.MenuItems.Add(menuItemEntity);
+        menu.UpdatedAt = DateTime.Now;
         
         await _establishmentRepository.UpdateAsync(establishment);
     }
@@ -338,7 +342,7 @@ public class EstablishmentService : IEstablishmentService
             throw new EntityNotFoundException("Menu", "ID", menuId.ToString());
         }
         
-        // Add picture deletion
+        //TODO: Add picture deletion
         
         establishment.Menus = establishment.Menus.Where(m => m.Id != menuId).ToList();
         
@@ -364,9 +368,11 @@ public class EstablishmentService : IEstablishmentService
             throw new EntityNotFoundException("Menu item", "ID", menuItemId.ToString());
         }
         
-        // Add picture deletion
+        //TODO: Add picture deletion
         
         menu.MenuItems = menu.MenuItems.Where(mi => mi.Id != menuItemId).ToList();
+        
+        menu.UpdatedAt = DateTime.Now;
         
         await _establishmentRepository.UpdateAsync(establishment);
     }

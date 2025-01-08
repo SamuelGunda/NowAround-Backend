@@ -1,13 +1,12 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NowAround.Api.Apis.Auth0.Models.Requests;
-using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;
 using NowAround.Api.Services.Interfaces;
-using NowAround.Api.Utilities;
 
 namespace NowAround.Api.Controllers;
 
@@ -141,7 +140,7 @@ public class EstablishmentController(IEstablishmentService establishmentService)
 
     [Authorize(Roles = "Establishment")]
     [HttpPost("menu/{menuId:int}")]
-    public async Task<IActionResult> AddMenuItemAsync( int menuId, MenuItemCreateRequest menuItem)
+    public async Task<IActionResult> AddMenuItemsAsync(int menuId, [MinLength(1)] ICollection<MenuItemCreateRequest> menuItem)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
         
