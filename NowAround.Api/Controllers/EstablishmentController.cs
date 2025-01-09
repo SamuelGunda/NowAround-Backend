@@ -139,12 +139,12 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     }
 
     [Authorize(Roles = "Establishment")]
-    [HttpPost("menu/{menuId:int}")]
-    public async Task<IActionResult> AddMenuItemsAsync(int menuId, [MinLength(1)] ICollection<MenuItemCreateRequest> menuItem)
+    [HttpPut("menu/{menuId:int}")]
+    public async Task<IActionResult> AddMenuItemsAsync(int menuId, MenuCreateRequest menu)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
         
-        await establishmentService.AddMenuItemAsync(auth0Id, menuId, menuItem);
+        await establishmentService.UpdateMenuAsync(auth0Id, menuId, menu);
         
         return Created("", new { message = "Menu item added successfully" });
     }

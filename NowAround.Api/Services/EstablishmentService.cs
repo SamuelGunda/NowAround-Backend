@@ -290,7 +290,7 @@ public class EstablishmentService : IEstablishmentService
         await _establishmentRepository.UpdateAsync(establishment);
     }
 
-    public async Task AddMenuItemAsync(string auth0Id, int menuId, ICollection<MenuItemCreateRequest> menuItem)
+    public async Task UpdateMenuAsync(string auth0Id, int menuId, MenuCreateRequest updatedMenu)
     {
         var establishment = await _establishmentRepository.GetAsync
         (
@@ -309,12 +309,16 @@ public class EstablishmentService : IEstablishmentService
             throw new EntityNotFoundException("Menu", "ID", menuId.ToString());
         }
         
-        var menuItemEntities = menuItem.Select(mi => new MenuItem
+        menu.MenuItems.Clear();
+        
+        var menuItemEntities = updatedMenu.MenuItems.Select(mi => new MenuItem
         {
             Name = mi.Name,
             Description = mi.Description,
             Price = mi.Price
         }).ToList();
+        
+        menu.Name = updatedMenu.Name;
 
         foreach (var menuItemEntity in menuItemEntities)
         {
