@@ -69,7 +69,6 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                     ),
                 e.Menus.Select(m => new MenuDto(
                     m.Id,
-                    null,
                     m.Name,
                     m.MenuItems.Select(mi => new MenuItemDto(
                         mi.Id,

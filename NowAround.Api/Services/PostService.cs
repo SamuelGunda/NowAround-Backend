@@ -94,6 +94,6 @@ public class PostService : IPostService
         
         await _postRepository.DeleteAsync(postId);
         
-        await _storageService.DeletePictureAsync("Establishment", auth0Id, "post", postId);
+        await _storageService.DeleteAsync("Establishment", auth0Id, $"post/{postId}");
     }
 }

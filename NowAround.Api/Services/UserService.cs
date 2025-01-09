@@ -77,7 +77,7 @@ public class UserService : IUserService
     {
         await _auth0Service.DeleteAccountAsync(auth0Id);
         
-        await _storageService.DeleteAccountFolderAsync("User", auth0Id);
+        await _storageService.DeleteAsync("User", auth0Id);
         
         //TODO: Get whole user object and delete it
         var result = await _userRepository.DeleteByAuth0IdAsync(auth0Id);

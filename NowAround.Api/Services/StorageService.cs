@@ -49,32 +49,22 @@ public class StorageService : IStorageService
         
         return $"https://nowaroundimagestorage.blob.core.windows.net/{role.ToLower()}/{blobPath}";
     }
-    
-    public async Task DeleteAccountFolderAsync(string role, string auth0Id)
+
+    public async Task DeleteAsync(string role, string auth0Id, string imageContext)
     {
         var sanitizedAuth0Id = auth0Id.Replace("|", "-").ToLower();
-        
-        var containerClient = _blobServiceClient.GetBlobContainerClient(role.ToLower());
-        
-        await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: sanitizedAuth0Id + "/"))
-        {
-            var blobClient = containerClient.GetBlobClient(blobItem.Name);
 
-            await blobClient.DeleteAsync();
+        var containerClient = _blobServiceClient.GetBlobContainerClient(role.ToLower());
+
+        var blobPath =  $"{sanitizedAuth0Id}/{imageContext}";
+        var blobClient = containerClient.GetBlobsAsync(prefix: blobPath);
+
+        await foreach (var blobItem in blobClient)
+        {
+            await containerClient.GetBlobClient(blobItem.Name).DeleteAsync();
         }
     }
 
-    public async Task DeletePictureAsync(string role, string auth0Id, string imageContext, int? contextId)
-    {
-        var sanitizedAuth0Id = auth0Id.Replace("|", "-").ToLower();
-        
-        var containerClient = _blobServiceClient.GetBlobContainerClient(role.ToLower());
-        var blobPath = contextId == null ? $"{sanitizedAuth0Id}/{imageContext}" : $"{sanitizedAuth0Id}/{imageContext}/{contextId}";
-        var blobClient = containerClient.GetBlobClient(blobPath);
-        
-        await blobClient.DeleteIfExistsAsync();
-    }
-    
     public void CheckPictureType(string contentType)
     {
         var permittedImageTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };

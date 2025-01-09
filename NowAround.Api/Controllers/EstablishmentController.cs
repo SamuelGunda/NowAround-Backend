@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NowAround.Api.Apis.Auth0.Models.Requests;
+using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;
@@ -139,12 +140,12 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     }
 
     [Authorize(Roles = "Establishment")]
-    [HttpPut("menu/{menuId:int}")]
-    public async Task<IActionResult> UpdateMenuAsync(int menuId, MenuCreateRequest menu)
+    [HttpPut("menu")]
+    public async Task<IActionResult> UpdateMenuAsync(MenuUpdateRequest menu)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
         
-        await establishmentService.UpdateMenuAsync(auth0Id, menuId, menu);
+        await establishmentService.UpdateMenuAsync(auth0Id, menu);
         
         return Created("", new { message = "Menu updated successfully" });
     }

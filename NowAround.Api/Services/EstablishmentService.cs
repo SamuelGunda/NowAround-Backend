@@ -211,7 +211,7 @@ public class EstablishmentService : IEstablishmentService
     {
         await _auth0Service.DeleteAccountAsync(auth0Id);
         
-        await _storageService.DeleteAccountFolderAsync("Establishment", auth0Id);
+        await _storageService.DeleteAsync("Establishment", auth0Id);
         
         //TODO: Get whole establishment object and delete it
         var result = await _establishmentRepository.DeleteByAuth0IdAsync(auth0Id);
@@ -290,7 +290,7 @@ public class EstablishmentService : IEstablishmentService
         await _establishmentRepository.UpdateAsync(establishment);
     }
 
-    public async Task UpdateMenuAsync(string auth0Id, int menuId, MenuCreateRequest updatedMenu)
+    public async Task UpdateMenuAsync(string auth0Id, MenuUpdateRequest updatedMenu)
     {
         var establishment = await _establishmentRepository.GetAsync
         (
@@ -301,6 +301,8 @@ public class EstablishmentService : IEstablishmentService
                 .ThenInclude(m => m.MenuItems)
         );
         
+        var menuId = updatedMenu.Id;
+        
         var menu = establishment.Menus.FirstOrDefault(m => m.Id == menuId);
         
         if (menu == null)
@@ -309,20 +311,32 @@ public class EstablishmentService : IEstablishmentService
             throw new EntityNotFoundException("Menu", "ID", menuId.ToString());
         }
         
-        menu.MenuItems.Clear();
+        var updatedMenuItems = updatedMenu.MenuItems.ToList();
+        var existingMenuItems = menu.MenuItems.ToList();
         
-        var menuItemEntities = updatedMenu.MenuItems.Select(mi => new MenuItem
+        foreach (var updatedMenuItem in updatedMenuItems)
         {
-            Name = mi.Name,
-            Description = mi.Description,
-            Price = mi.Price
-        }).ToList();
-        
-        menu.Name = updatedMenu.Name;
-
-        foreach (var menuItemEntity in menuItemEntities)
-        {
-            menu.MenuItems.Add(menuItemEntity);
+            if (updatedMenuItem.Id == null)
+            {
+                menu.MenuItems.Add(new MenuItem
+                {
+                    Name = updatedMenuItem.Name,
+                    Description = updatedMenuItem.Description,
+                    Price = updatedMenuItem.Price
+                });
+                continue;
+            }
+            
+            var existingMenuItem = existingMenuItems.FirstOrDefault(mi => mi.Id == updatedMenuItem.Id);
+            if (existingMenuItem == null)
+            {
+                _logger.LogWarning("Menu item with ID {MenuItemId} not found", updatedMenuItem.Id);
+                throw new EntityNotFoundException("Menu item", "ID", updatedMenuItem.Id.ToString());
+            }
+            
+            existingMenuItem.Name = updatedMenuItem.Name;
+            existingMenuItem.Description = updatedMenuItem.Description;
+            existingMenuItem.Price = updatedMenuItem.Price;
         }
         
         menu.UpdatedAt = DateTime.Now;
@@ -352,7 +366,7 @@ public class EstablishmentService : IEstablishmentService
             throw new EntityNotFoundException("Menu item", "ID", menuItemId.ToString());
         }
         
-        var pictureUrl = await _storageService.UploadPictureAsync(picture, "Establishment", auth0Id, "menu", menuItemId);
+        var pictureUrl = await _storageService.UploadPictureAsync(picture, "Establishment", auth0Id, $"menu/{menuItem.Menu.Id}", menuItemId);
         
         menuItem.PictureUrl = pictureUrl;
         menuItem.Menu.UpdatedAt = DateTime.Now;
@@ -376,7 +390,7 @@ public class EstablishmentService : IEstablishmentService
             throw new EntityNotFoundException("Menu", "ID", menuId.ToString());
         }
         
-        //TODO: Add picture deletion
+        await _storageService.DeleteAsync("Establishment", auth0Id, $"menu/{menuId}");
         
         establishment.Menus = establishment.Menus.Where(m => m.Id != menuId).ToList();
         
@@ -402,7 +416,7 @@ public class EstablishmentService : IEstablishmentService
             throw new EntityNotFoundException("Menu item", "ID", menuItemId.ToString());
         }
         
-        //TODO: Add picture deletion
+        await  _storageService.DeleteAsync("Establishment", auth0Id, $"menu/{menu.Id}/{menuItemId}");
         
         menu.MenuItems = menu.MenuItems.Where(mi => mi.Id != menuItemId).ToList();
         

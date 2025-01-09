@@ -26,7 +26,7 @@ public interface IEstablishmentService
     // Menu Methods
     
     Task AddMenuAsync(string auth0Id, MenuCreateRequest menu);
-    Task UpdateMenuAsync(string auth0Id, int menuId, MenuCreateRequest updatedMenu);
+    Task UpdateMenuAsync(string auth0Id, MenuUpdateRequest updatedMenu);
     Task UpdateMenuItemPictureAsync(string auth0Id, int menuItemId, IFormFile picture);
     Task DeleteMenuAsync(string auth0Id, int menuId);
     Task DeleteMenuItemAsync(string auth0Id, int menuItemId);
