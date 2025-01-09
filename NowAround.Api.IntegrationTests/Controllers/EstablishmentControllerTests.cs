@@ -669,7 +669,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         content.Add(pictureContent, "Picture", picture.FileName);
 
         // Act
-        var response = await client.PutAsync("/api/establishment/profile-picture", content);
+        var response = await client.PutAsync("/api/establishment/image/profile-picture", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -704,7 +704,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         content.Add(pictureContent, "Picture", picture.FileName);
 
         // Act
-        var response = await client.PutAsync("/api/establishment/profile-picture", content);
+        var response = await client.PutAsync("/api/establishment/image/profile-picture", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -733,7 +733,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         content.Add(pictureContent, "Picture", picture.FileName);
 
         // Act
-        var response = await client.PutAsync("/api/establishment/profile-picture", content);
+        var response = await client.PutAsync("/api/establishment/image/profile-picture", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -762,7 +762,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         content.Add(pictureContent, "Picture", picture.FileName);
 
         // Act
-        var response = await client.PutAsync("/api/establishment/profile-picture", content);
+        var response = await client.PutAsync("/api/establishment/image/profile-picture", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -791,7 +791,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         content.Add(pictureContent, "Picture", picture.FileName);
 
         // Act
-        var response = await client.PutAsync("/api/establishment/profile-picture", content);
+        var response = await client.PutAsync("/api/establishment/image/profile-picture", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);

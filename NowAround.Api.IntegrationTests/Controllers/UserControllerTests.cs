@@ -156,7 +156,7 @@ public class UserControllerTests : IClassFixture<StorageContextFixture>
         content.Add(pictureContent, "Picture", picture.FileName);
         
         // Act
-        var response = await client.PutAsync("/api/user/profile-picture", content);
+        var response = await client.PutAsync("/api/user/image/profile-picture", content);
         
         // Assert
         response.EnsureSuccessStatusCode();
@@ -181,7 +181,7 @@ public class UserControllerTests : IClassFixture<StorageContextFixture>
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "User auth0|valid");
         
         // Act
-        var response = await client.PutAsync("/api/user/profile-picture", null);
+        var response = await client.PutAsync("/api/user/image/profile-picture", null);
         
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -211,7 +211,7 @@ public class UserControllerTests : IClassFixture<StorageContextFixture>
         content.Add(pictureContent, "Picture", picture.FileName);
         
         // Act
-        var response = await client.PutAsync("/api/user/profile-picture", content);
+        var response = await client.PutAsync("/api/user/image/profile-picture", content);
         
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
