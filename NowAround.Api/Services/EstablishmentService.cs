@@ -330,6 +330,36 @@ public class EstablishmentService : IEstablishmentService
         await _establishmentRepository.UpdateAsync(establishment);
     }
 
+    public async Task UpdateMenuItemPictureAsync(string auth0Id, int menuItemId, IFormFile picture)
+    {
+        var pictureType = picture.ContentType;
+        _storageService.CheckPictureType(pictureType);
+        
+        var establishment = await _establishmentRepository.GetAsync
+        ( 
+            e => e.Auth0Id == auth0Id, 
+            true, 
+            query => query
+            .Include(e => e.Menus)
+            .ThenInclude(m => m.MenuItems)
+        );
+        
+        var menuItem = establishment.Menus.SelectMany(m => m.MenuItems).FirstOrDefault(mi => mi.Id == menuItemId);
+        
+        if (menuItem == null)
+        {
+            _logger.LogWarning("Menu item with ID {MenuItemId} not found", menuItemId);
+            throw new EntityNotFoundException("Menu item", "ID", menuItemId.ToString());
+        }
+        
+        var pictureUrl = await _storageService.UploadPictureAsync(picture, "Establishment", auth0Id, "menu", menuItemId);
+        
+        menuItem.PictureUrl = pictureUrl;
+        menuItem.Menu.UpdatedAt = DateTime.Now;
+        
+        await _establishmentRepository.UpdateAsync(establishment);
+    }
+
     public async Task DeleteMenuAsync(string auth0Id, int menuId)
     {
         var establishment = await _establishmentRepository.GetAsync

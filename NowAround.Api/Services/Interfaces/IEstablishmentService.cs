@@ -20,13 +20,14 @@ public interface IEstablishmentService
     Task<int> GetEstablishmentsCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd);
     Task UpdateEstablishmentAsync(string auth0Id, EstablishmentUpdateRequest request);
     Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus);
-    Task UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile image);
+    Task UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile picture);
     Task DeleteEstablishmentAsync(string auth0Id);
     
     // Menu Methods
     
     Task AddMenuAsync(string auth0Id, MenuCreateRequest menu);
     Task UpdateMenuAsync(string auth0Id, int menuId, MenuCreateRequest updatedMenu);
+    Task UpdateMenuItemPictureAsync(string auth0Id, int menuItemId, IFormFile picture);
     Task DeleteMenuAsync(string auth0Id, int menuId);
     Task DeleteMenuItemAsync(string auth0Id, int menuItemId);
 }

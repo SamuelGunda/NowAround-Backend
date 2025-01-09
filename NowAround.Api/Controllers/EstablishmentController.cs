@@ -88,7 +88,7 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     }
     
     [Authorize(Roles = "Establishment")]
-    [HttpPut ("{pictureContext}")]
+    [HttpPut ("image/{pictureContext}")]
     public async Task<IActionResult> UpdateEstablishmentPictureAsync([FromRoute] string pictureContext, IFormFile picture)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
@@ -140,15 +140,27 @@ public class EstablishmentController(IEstablishmentService establishmentService)
 
     [Authorize(Roles = "Establishment")]
     [HttpPut("menu/{menuId:int}")]
-    public async Task<IActionResult> AddMenuItemsAsync(int menuId, MenuCreateRequest menu)
+    public async Task<IActionResult> UpdateMenuAsync(int menuId, MenuCreateRequest menu)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
         
         await establishmentService.UpdateMenuAsync(auth0Id, menuId, menu);
         
-        return Created("", new { message = "Menu item added successfully" });
+        return Created("", new { message = "Menu updated successfully" });
     }
-    
+
+    [Authorize(Roles = "Establishment")]
+    [HttpPut("menu/item/image/{menuItemId:int}")]
+    public async Task<IActionResult> UpdateMenuItemPictureAsync(int menuItemId, IFormFile image)
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ??
+                      throw new ArgumentException("Auth0Id not found");
+
+        await establishmentService.UpdateMenuItemPictureAsync(auth0Id, menuItemId, image);
+
+        return Created("", new { message = "Menu item picture updated successfully" });
+    }
+
     [Authorize(Roles = "Establishment")]
     [HttpDelete("menu/{menuId:int}")]
     public async Task<IActionResult> DeleteMenuAsync(int menuId)
