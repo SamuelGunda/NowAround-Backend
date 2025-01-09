@@ -17,11 +17,12 @@ public class Event : BaseEntity
     public required string Address { get; set; }
     public required double Latitude { get; set; }
     public required double Longitude { get; set; }
+    [MaxLength(8)]
     public required string MaxParticipants { get; set; }
     [MaxLength(256)]
     public string? PictureUrl { get; set; }
-    public required DateOnly Start { get; set; }
-    public required DateOnly End { get; set; }
+    public required DateTime Start { get; set; }
+    public required DateTime End { get; set; }
     public required EventCategory EventCategory { get; set; }
 
     public DateTime CreatedAt { get; init; } = DateTime.Now;

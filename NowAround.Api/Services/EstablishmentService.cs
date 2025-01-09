@@ -182,7 +182,7 @@ public class EstablishmentService : IEstablishmentService
         _storageService.CheckPictureType(pictureType);
         
         var establishment = await GetEstablishmentByAuth0IdAsync(auth0Id, true);
-        var pictureUrl = await _storageService.UploadPictureAsync(picture, "Establishment", auth0Id, pictureContext, null);
+        var pictureUrl = await _storageService.UploadPictureAsync(picture, "Establishment", auth0Id, pictureContext);
         
         establishment.ProfilePictureUrl = pictureUrl.Contains("profile-picture") ? pictureUrl : establishment.ProfilePictureUrl;
         establishment.BackgroundPictureUrl = pictureUrl.Contains("background-picture") ? pictureUrl : establishment.BackgroundPictureUrl;
@@ -366,7 +366,7 @@ public class EstablishmentService : IEstablishmentService
             throw new EntityNotFoundException("Menu item", "ID", menuItemId.ToString());
         }
         
-        var pictureUrl = await _storageService.UploadPictureAsync(picture, "Establishment", auth0Id, $"menu/{menuItem.Menu.Id}", menuItemId);
+        var pictureUrl = await _storageService.UploadPictureAsync(picture, "Establishment", auth0Id, $"menu/{menuItem.Menu.Id}/{menuItemId}");
         
         menuItem.PictureUrl = pictureUrl;
         menuItem.Menu.UpdatedAt = DateTime.Now;

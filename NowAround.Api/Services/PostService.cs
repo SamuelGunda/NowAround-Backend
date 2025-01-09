@@ -43,7 +43,7 @@ public class PostService : IPostService
         
         if (postCreateRequest.Picture != null)
         {
-            var pictureUrl = await _storageService.UploadPictureAsync(postCreateRequest.Picture, "Establishment", auth0Id, "post", id);
+            var pictureUrl = await _storageService.UploadPictureAsync(postCreateRequest.Picture, "Establishment", auth0Id, $"post/{id}");
             await UpdatePictureAsync(id, pictureUrl);
         }
         

@@ -3,7 +3,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NowAround.Api.Apis.Auth0.Models.Requests;
-using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;

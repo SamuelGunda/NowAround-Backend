@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using NowAround.Api.Models.Enum;
 
 namespace NowAround.Api.Models.Requests;
 
@@ -10,20 +11,19 @@ public class EventCreateRequest
     public string Body { get; set; }
     public double? Price { get; set; }
     [Required]
-    public string City { get; set; }
-    [Required]
     public string Address { get; set; }
     [Required]
-    public double Latitude { get; set; }
+    public string PostalCode { get; set; }
     [Required]
-    public double Longitude { get; set; }
+    public string City { get; set; }
     [Required]
-    public int MaxParticipants { get; set; }
+    public string MaxParticipants { get; set; }
+    [Required]
+    public string EventCategory { get; set; }
     public IFormFile? Picture { get; set; }
     [Required]
     public DateTime Start { get; set; }
     [Required]
     public DateTime End { get; set; }
-    [Required]
-    public int EventCategory { get; set; }
+
 }

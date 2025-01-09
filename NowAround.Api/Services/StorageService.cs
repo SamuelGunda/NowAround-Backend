@@ -17,7 +17,7 @@ public class StorageService : IStorageService
         _blobServiceClient = new BlobServiceClient(new Uri($"https://{storageAccount}.blob.core.windows.net"), credential);
     }
     
-    public async Task<string> UploadPictureAsync(IFormFile file, string role, string auth0Id, string imageContext, int? contextId)
+    public async Task<string> UploadPictureAsync(IFormFile file, string role, string auth0Id, string imageContext)
     {
         var sanitizedAuth0Id = auth0Id.Replace("|", "-").ToLower();
         
@@ -30,15 +30,7 @@ public class StorageService : IStorageService
         var contentType = file.ContentType;
         var fileFormat = contentType.Split("/")[1];
         
-        if (imageContext is "profile-picture" or "background-picture")
-        {
-            blobPath = $"{sanitizedAuth0Id}/{imageContext}";
-        }
-        else
-        {
-            ArgumentNullException.ThrowIfNull(contextId);
-            blobPath = $"{sanitizedAuth0Id}/{imageContext}/{contextId}";
-        }
+        blobPath = $"{sanitizedAuth0Id}/{imageContext}";
         
         blobPath += "." + fileFormat;
         
