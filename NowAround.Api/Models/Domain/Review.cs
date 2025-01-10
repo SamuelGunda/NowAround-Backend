@@ -3,7 +3,8 @@ using NowAround.Api.Models.Entities;
 
 namespace NowAround.Api.Models.Domain;
 
-public class Review : BaseEntity
+public class 
+    Review : BaseEntity
 {
     [Range(0, 5)]
     public required int Rating { get; set; }

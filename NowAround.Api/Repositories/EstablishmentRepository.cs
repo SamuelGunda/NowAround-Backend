@@ -78,6 +78,24 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                         mi.Price
                     )).ToList()
                 )).ToList(),
+                    e.Events.Select(ev => new EventDto(
+                        ev.Id,
+                        null,
+                        ev.Title,
+                        ev.Body,
+                        ev.Price,
+                        ev.City,
+                        ev.Address,
+                        ev.Latitude,
+                        ev.Longitude,
+                        ev.MaxParticipants,
+                        ev.PictureUrl,
+                        ev.Start,
+                        ev.End,
+                        ev.EventCategory,
+                        ev.CreatedAt,
+                        ev.InterestedUsers.Select(iu => iu.Auth0Id).ToList()
+                    )).ToList(),
                 new RatingStatisticResponse(
                     e.RatingStatistic.OneStar,
                     e.RatingStatistic.TwoStars,

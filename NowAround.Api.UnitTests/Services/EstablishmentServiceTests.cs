@@ -426,6 +426,7 @@ public class EstablishmentServiceTests
             ),
             [],
             [],
+            [],
             new RatingStatisticResponse(
                 0, 0, 0, 0, 0,
                 new List<ReviewWithAuthIdsResponse>()

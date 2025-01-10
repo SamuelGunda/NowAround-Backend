@@ -9,6 +9,7 @@ public sealed record EstablishmentProfileResponse
     LocationInfo LocationInfo,
     List<PostDto> Posts,
     List<MenuDto> Menus,
+    List<EventDto> Events,
     RatingStatisticResponse RatingStatistic
 );
 
