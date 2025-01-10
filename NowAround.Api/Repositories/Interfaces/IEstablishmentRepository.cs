@@ -9,6 +9,6 @@ public interface IEstablishmentRepository : IBaseAccountRepository<Establishment
 {
     Task<EstablishmentProfileResponse> GetProfileByAuth0IdAsync(string auth0Id);
     Task<List<Establishment>> GetAllWhereRegisterStatusPendingAsync();
-    Task<List<EstablishmentDto>> GetRangeWithFilterAsync(SearchValues searchValues, int page);
+    Task<List<EstablishmentMarkerResponse>> GetRangeWithFilterAsync(SearchValues searchValues, int page);
     Task UpdateAsync(EstablishmentDto establishmentDto);
 }

@@ -155,7 +155,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
         }
     }
     
-    public async Task<List<EstablishmentDto>> GetRangeWithFilterAsync(SearchValues searchValues, int page)
+    public async Task<List<EstablishmentMarkerResponse>> GetRangeWithFilterAsync(SearchValues searchValues, int page)
     {
         try
         {
@@ -163,29 +163,36 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
             
             query = EstablishmentSearchQueryBuilder.ApplyFilters(query, searchValues);
 
-            List<EstablishmentDto> establishments;
+            List<EstablishmentMarkerResponse> establishments;
             
             if (page > 0)
             {
                 establishments = await query
                     .Skip((page - 1) * 5).Take(5)
-                    .Select(e => new EstablishmentDto
-                    {
-                        Auth0Id = e.Auth0Id,
-                        Name = e.Name
-                    })
+                    .Select(e => new EstablishmentMarkerResponse(
+                            e.Auth0Id,
+                            e.Name,
+                            e.Description,
+                            e.PriceCategory.ToString(),
+                            e.Tags.Select(et => et.Name).ToList(),
+                            null, 
+                            null
+                            )
+                    )
                     .ToListAsync();
             }
             else
             {
                 establishments = await query
-                    .Select(e => new EstablishmentDto
-                    {
-                        Auth0Id = e.Auth0Id,
-                        Name = e.Name,
-                        Latitude = e.Latitude,
-                        Longitude = e.Longitude
-                    })
+                    .Select(e => new EstablishmentMarkerResponse(
+                        e.Auth0Id,
+                        e.Name,
+                        e.Description,
+                        e.PriceCategory.ToString(),
+                        e.Tags.Select(et => et.Name).ToList(),
+                        e.Longitude,
+                        e.Latitude
+                        ))
                     .ToListAsync();
             }
             

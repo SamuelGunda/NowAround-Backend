@@ -138,14 +138,14 @@ public class EstablishmentService : IEstablishmentService
         return pendingEstablishments;
     }
 
-    public async Task<List<EstablishmentDto>> GetEstablishmentsWithFilterAsync(SearchValues searchValues, int page)
+    public async Task<List<EstablishmentMarkerResponse>> GetEstablishmentsWithFilterAsync(SearchValues searchValues, int page)
     {
         searchValues.ValidateProperties();
         page = page >= 0 ? page : throw new InvalidSearchActionException("Page must be greater than 0");
         
-        var establishmentDtos = await _establishmentRepository.GetRangeWithFilterAsync(searchValues, page);
+        var establishmentMarkers = await _establishmentRepository.GetRangeWithFilterAsync(searchValues, page);
         
-        return establishmentDtos;
+        return establishmentMarkers;
     }
 
     public async Task<int> GetEstablishmentsCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd)

@@ -36,7 +36,14 @@ public class EventService : IEventService
             throw new ArgumentException("Invalid event category");
         }
         
-        var coordinates = await _mapboxService.GetCoordinatesFromAddressAsync(eventCreateRequest.Address, eventCreateRequest.PostalCode, eventCreateRequest.City);
+        var addressParts = eventCreateRequest.Address.Split(',');
+        if (addressParts.Length != 2)
+        {
+            throw new ArgumentException("Address must contain street and postal code separated by a comma");
+        }
+        var street = addressParts[0].Trim();
+        var postalCode = addressParts[1].Trim();
+        var coordinates = await _mapboxService.GetCoordinatesFromAddressAsync(street, postalCode, eventCreateRequest.City);
         
         var eventEntity = new Event
         {
@@ -45,7 +52,7 @@ public class EventService : IEventService
             Price = eventCreateRequest.Price,
             Latitude = coordinates.lat,
             Longitude = coordinates.lng,
-            Address = $"{eventCreateRequest.Address}, {eventCreateRequest.PostalCode}",
+            Address = eventCreateRequest.Address,
             City = eventCreateRequest.City,
             MaxParticipants = eventCreateRequest.MaxParticipants,
             Start = eventCreateRequest.Start,

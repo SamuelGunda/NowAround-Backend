@@ -500,22 +500,17 @@ public class EstablishmentServiceTests
     [Fact]
     public async Task GetEstablishmentsWithFilterAsync_ValidRequest_ShouldReturnListOfEstablishmentMarkerDto()
     {
-        var establishmentDtos = new List<EstablishmentDto>
+        var establishmentMarkers = new List<EstablishmentMarkerResponse>
         {
-            new()
-            {
-                Auth0Id = "test-auth0-id",
-                Name = "test-name",
-                Description = "test-description",
-                City = "test-city",
-                Address = "test-address",
-                Latitude = 1.0,
-                Longitude = 1.0,
-                PriceCategory = PriceCategory.Moderate,
-                RequestStatus = RequestStatus.Pending,
-                Categories = new List<Category>(),
-                Tags = new List<Tag>()
-            }
+            new(
+                "test-auth0-id",
+                "test-name",
+                "test-description",
+                "Moderate",
+                new List<string> { "PET_FRIENDLY" },
+                1.0,
+                1.0
+                )
         };
         
         SearchValues searchValues = new()
@@ -532,7 +527,7 @@ public class EstablishmentServiceTests
             }
         };
         
-        _establishmentRepositoryMock.Setup(r => r.GetRangeWithFilterAsync(searchValues, 0)).ReturnsAsync(establishmentDtos);
+        _establishmentRepositoryMock.Setup(r => r.GetRangeWithFilterAsync(searchValues, 0)).ReturnsAsync(establishmentMarkers);
         
         var result = await _establishmentService.GetEstablishmentsWithFilterAsync(searchValues, 0);
         

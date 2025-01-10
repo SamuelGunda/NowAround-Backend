@@ -372,7 +372,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishments = JsonConvert.DeserializeObject<List<Establishment>>(responseContent);
+        var establishments = JsonConvert.DeserializeObject<List<EstablishmentMarkerResponse>>(responseContent);
 
         Assert.NotEmpty(establishments);
         Assert.Single(establishments);
@@ -392,7 +392,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishments = JsonConvert.DeserializeObject<List<Establishment>>(responseContent);
+        var establishments = JsonConvert.DeserializeObject<List<EstablishmentMarkerResponse>>(responseContent);
 
         Assert.NotEmpty(establishments);
         Assert.Single(establishments);
@@ -412,7 +412,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishments = JsonConvert.DeserializeObject<List<Establishment>>(responseContent);
+        var establishments = JsonConvert.DeserializeObject<List<EstablishmentMarkerResponse>>(responseContent);
 
         Assert.NotEmpty(establishments);
         Assert.Equal(2, establishments.Count);
@@ -478,7 +478,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishments = JsonConvert.DeserializeObject<List<Establishment>>(responseContent);
+        var establishments = JsonConvert.DeserializeObject<List<EstablishmentMarkerResponse>>(responseContent);
 
         Assert.NotEmpty(establishments);
         Assert.Equal(2, establishments.Count);
@@ -528,7 +528,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
-        var establishments = JsonConvert.DeserializeObject<List<Establishment>>(responseContent);
+        var establishments = JsonConvert.DeserializeObject<List<EstablishmentMarkerResponse>>(responseContent);
 
         Assert.NotEmpty(establishments);
         Assert.Single(establishments);
