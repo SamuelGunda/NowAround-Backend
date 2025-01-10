@@ -40,7 +40,7 @@ public class PostService : IPostService
             EstablishmentId = establishment.Id
         };
         
-        var id = await _postRepository.CreateAsync(postEntity);
+        var id = await _postRepository.CreateAsync(postEntity); 
         
         if (postCreateRequest.Picture is not null)
         {

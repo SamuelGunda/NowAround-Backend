@@ -58,10 +58,10 @@ public class BaseRepositoryTests
         var testEntity = new TestEntity { Name = "Test Name" };
 
         // Act
-        var resultEntity = await _repository.CreateAsync(testEntity);
+        var resultId = await _repository.CreateAsync(testEntity);
 
         // Assert
-        var entity = await _context.Set<TestEntity>().FindAsync(resultEntity.Id);
+        var entity = await _context.Set<TestEntity>().FindAsync(resultId);
         Assert.NotNull(entity);
         Assert.Equal("Test Name", entity.Name);
     }

@@ -5,7 +5,7 @@ namespace NowAround.Api.Repositories.Interfaces;
 
 public interface IBaseRepository<T> where T : BaseEntity
 {
-    Task<T> CreateAsync(T entity);
+    Task<int> CreateAsync(T entity);
     Task<bool> CheckIfExistsByPropertyAsync(string propertyName, object propertyValue);
     Task<T?> GetByIdAsync(int id);
     Task<T?> GetByPropertyAsync(string propertyName, object propertyValue);
