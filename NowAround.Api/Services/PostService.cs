@@ -32,19 +32,19 @@ public class PostService : IPostService
         
         var establishment = await _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
         
-        var post = new Post
+        var postEntity = new Post
         {
             Headline = postCreateRequest.Headline,
             Body = postCreateRequest.Body,
             EstablishmentId = establishment.Id
         };
         
-        var id = await _postRepository.CreateAsync(post);
+        var id = await _postRepository.CreateAsync(postEntity);
         
-        if (postCreateRequest.Picture != null)
+        if (postCreateRequest.Picture is not null)
         {
-            var pictureUrl = await _storageService.UploadPictureAsync(postCreateRequest.Picture, "Establishment", auth0Id, $"post/{id}");
-            await UpdatePictureAsync(id, pictureUrl);
+            postEntity.PictureUrl = await _storageService.UploadPictureAsync(postCreateRequest.Picture, "Establishment", auth0Id, $"post/{id}");
+            await _postRepository.UpdateAsync(postEntity);
         }
         
         return id;

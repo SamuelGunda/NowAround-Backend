@@ -162,7 +162,7 @@ public class EstablishmentService : IEstablishmentService
             Auth0Id = auth0Id,
             Name = request.Name,
             Description = request.Description,
-            PriceCategory = request.PriceCategory.HasValue ? (PriceCategory)request.PriceCategory.Value : null,
+            PriceCategory = request.PriceCategory.HasValue ? (PriceCategory) request.PriceCategory.Value : null,
             Categories = catsAndTags.categories,
             Tags = catsAndTags.tags
         };

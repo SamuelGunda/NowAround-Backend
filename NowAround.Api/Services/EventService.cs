@@ -61,11 +61,14 @@ public class EventService : IEventService
             EstablishmentId = establishment.Id
         };
         
+        await _eventRepository.CreateAsync(eventEntity);
+        
         if (eventCreateRequest.Picture is not null)
         {
             eventEntity.PictureUrl = await _storageService.UploadPictureAsync(eventCreateRequest.Picture, "Establishment", auth0Id, $"event/{eventEntity.Id}");
+            await _eventRepository.UpdateAsync(eventEntity);
         }
         
-        await _eventRepository.CreateAsync(eventEntity);
+        
     }
 }
