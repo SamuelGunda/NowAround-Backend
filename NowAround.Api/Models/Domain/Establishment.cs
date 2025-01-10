@@ -30,7 +30,6 @@ public class Establishment : BaseAccountEntity
     public ICollection<SocialLink> SocialLinks { get; set; } = new List<SocialLink>();
     public ICollection<Category> Categories { get; set; } = new List<Category>();
     public ICollection<Tag> Tags { get; set; } = new List<Tag>(); 
-    public ICollection<Cuisine> Cuisines { get; set; } = new List<Cuisine>();
     public ICollection<Post> Posts { get; set; } = new List<Post>();
     public ICollection<Event> Events { get; set; } = new List<Event>();
 }

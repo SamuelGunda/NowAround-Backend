@@ -35,7 +35,6 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                     e.PriceCategory.ToString(),
                     e.Tags.Select(et => et.Name).ToList(),
                     e.Categories.Select(ec => ec.Name).ToList(),
-                    e.Cuisines.Select(ec => ec.Name).ToList(),
                     e.SocialLinks.Select(sl => new SocialLinkDto(sl.Name, sl.Url)).ToList()
                 ),
                 new LocationInfo(

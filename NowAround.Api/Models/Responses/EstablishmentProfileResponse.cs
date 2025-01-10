@@ -23,7 +23,6 @@ public sealed record GenericInfo
     string PriceRange,
     List<string> Tags,
     List<string> Categories,
-    List<string> Cuisine,
     List<SocialLinkDto> SocialLinks
 );
 

@@ -646,7 +646,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
     // UpdateEstablishmentPictureAsync Tests
     
     [Fact]
-    public async Task UpdateEstablishmentPictureAsync_WithValidRequest_ShouldReturnCreated()
+    public async Task UpdateEstablishmentPictureAsync_WithValidRequest_ShouldReturnOk()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -669,12 +669,12 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         content.Add(pictureContent, "Picture", picture.FileName);
 
         // Act
-        var response = await client.PutAsync("/api/establishment/image/profile-picture", content);
+        var response = await client.PutAsync("/api/establishment/picture/profile-picture", content);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         
-        if (response.StatusCode == HttpStatusCode.Created)
+        if (response.StatusCode == HttpStatusCode.OK)
         {
             _containerName = "establishment";
             _blobPath = "auth0-valid/profile-picture";
@@ -704,7 +704,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         content.Add(pictureContent, "Picture", picture.FileName);
 
         // Act
-        var response = await client.PutAsync("/api/establishment/image/profile-picture", content);
+        var response = await client.PutAsync("/api/establishment/picture/profile-picture", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -733,7 +733,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         content.Add(pictureContent, "Picture", picture.FileName);
 
         // Act
-        var response = await client.PutAsync("/api/establishment/image/profile-picture", content);
+        var response = await client.PutAsync("/api/establishment/picture/profile-picture", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -791,7 +791,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         content.Add(pictureContent, "Picture", picture.FileName);
 
         // Act
-        var response = await client.PutAsync("/api/establishment/image/profile-picture", content);
+        var response = await client.PutAsync("/api/establishment/picture/profile-picture", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);

@@ -405,7 +405,6 @@ public class EstablishmentServiceTests
                 "Moderate",
                 [],
                 [],
-                [],
                 []
             ),
             new LocationInfo(

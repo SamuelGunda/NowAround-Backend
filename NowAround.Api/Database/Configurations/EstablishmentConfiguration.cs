@@ -58,13 +58,6 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
                 j => j.HasOne<Tag>().WithMany().HasForeignKey("TagId").OnDelete(DeleteBehavior.Cascade),
                 j => j.HasOne<Establishment>().WithMany().HasForeignKey("EstablishmentId").OnDelete(DeleteBehavior.Cascade));
 
-        builder.HasMany(e => e.Cuisines)
-            .WithMany(c => c.Establishments)
-            .UsingEntity<Dictionary<string, object>>(
-                "CuisineEstablishment",
-                j => j.HasOne<Cuisine>().WithMany().HasForeignKey("CuisineId").OnDelete(DeleteBehavior.Cascade),
-                j => j.HasOne<Establishment>().WithMany().HasForeignKey("EstablishmentId").OnDelete(DeleteBehavior.Cascade));
-
         builder.Property(e => e.RequestStatus)
             .HasDefaultValue(RequestStatus.Pending);
     }
