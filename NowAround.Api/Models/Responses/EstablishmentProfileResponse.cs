@@ -19,7 +19,6 @@ public sealed record GenericInfo
     string ProfilePictureUrl,
     string BackgroundPictureUrl,
     string Description,
-    string Website,
     string PriceRange,
     List<string> Tags,
     List<string> Categories,

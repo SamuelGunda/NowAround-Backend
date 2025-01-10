@@ -31,7 +31,6 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                     e.ProfilePictureUrl,
                     e.BackgroundPictureUrl,
                     e.Description,
-                    e.Website,
                     e.PriceCategory.ToString(),
                     e.Tags.Select(et => et.Name).ToList(),
                     e.Categories.Select(ec => ec.Name).ToList(),

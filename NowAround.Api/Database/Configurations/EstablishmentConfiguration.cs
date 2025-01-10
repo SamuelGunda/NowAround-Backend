@@ -23,7 +23,8 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
         builder.Property(e => e.PriceCategory).IsRequired();
         builder.Property(e => e.CreatedAt).IsRequired();
         builder.Property(e => e.UpdatedAt).IsRequired();
-        
+        builder.Property(e => e.RequestStatus).IsRequired();
+
         builder.HasOne(e => e.BusinessHours)
             .WithOne(bh => bh.Establishment)
             .HasForeignKey<BusinessHours>(bh => bh.EstablishmentId)
@@ -57,8 +58,5 @@ public class EstablishmentConfiguration : IEntityTypeConfiguration<Establishment
                 "TagEstablishment",
                 j => j.HasOne<Tag>().WithMany().HasForeignKey("TagId").OnDelete(DeleteBehavior.Cascade),
                 j => j.HasOne<Establishment>().WithMany().HasForeignKey("EstablishmentId").OnDelete(DeleteBehavior.Cascade));
-
-        builder.Property(e => e.RequestStatus)
-            .HasDefaultValue(RequestStatus.Pending);
     }
 }

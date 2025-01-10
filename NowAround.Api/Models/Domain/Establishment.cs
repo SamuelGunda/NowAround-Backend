@@ -12,8 +12,6 @@ public class Establishment : BaseAccountEntity
     public required string Name { get; set; }
     [MaxLength(512)]
     public string? Description { get; set; }
-    [MaxLength(512)]
-    public string? Website { get; set; }
     [MaxLength(32)]
     public required string City { get; set; }
     [MaxLength(64)]
