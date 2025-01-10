@@ -1,5 +1,6 @@
 ﻿using NowAround.Api.Apis.Mapbox.Interfaces;
 using NowAround.Api.Models.Domain;
+using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;
 using NowAround.Api.Repositories.Interfaces;
@@ -27,7 +28,7 @@ public class EventService : IEventService
         _eventRepository = eventRepository;
     }
     
-    public async Task CreateEventAsync(string auth0Id, EventCreateRequest eventCreateRequest)
+    public async Task<EventDto> CreateEventAsync(string auth0Id, EventCreateRequest eventCreateRequest)
     {
         if (eventCreateRequest.Picture != null)
         {
@@ -64,15 +65,22 @@ public class EventService : IEventService
             Start = eventCreateRequest.Start,
             End = eventCreateRequest.End,
             EventCategory = eventCategory,
-            Establishment = establishment
+            EstablishmentId = establishment.Id
         };
         
-        await _eventRepository.CreateAsync(eventEntity);
+        var id = await _eventRepository.CreateAsync(eventEntity);
         
         if (eventCreateRequest.Picture is not null)
         {
             eventEntity.PictureUrl = await _storageService.UploadPictureAsync(eventCreateRequest.Picture, "Establishment", auth0Id, $"event/{eventEntity.Id}");
             await _eventRepository.UpdateAsync(eventEntity);
         }
+
+        return eventEntity.ToDto();
+    }
+
+    public Task DeleteEventAsync(string auth0Id, int eventId)
+    {
+        throw new NotImplementedException();
     }
 }

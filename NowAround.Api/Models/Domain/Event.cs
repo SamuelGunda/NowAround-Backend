@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 
@@ -31,4 +32,26 @@ public class Event : BaseEntity
     public ICollection<User> InterestedUsers { get; init; } = new List<User>();
     public int EstablishmentId { get; init; }
     public Establishment Establishment { get; init; }
+    
+    public EventDto ToDto()
+    {
+        return new EventDto(
+            Id,
+            Establishment?.Auth0Id ?? null,
+            Title,
+            Body,
+            Price,
+            City,
+            Address,
+            Latitude,
+            Longitude,
+            MaxParticipants,
+            PictureUrl,
+            Start,
+            End,
+            EventCategory,
+            CreatedAt,
+            InterestedUsers.Select(u => u.Auth0Id).ToList()
+        );
+    }
 }

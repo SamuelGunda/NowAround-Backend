@@ -17,9 +17,9 @@ public class PostController(IPostService postService) : ControllerBase
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
 
-        var post = await postService.CreatePostAsync(postCreateRequest, auth0Id);
+        var postDto = await postService.CreatePostAsync(postCreateRequest, auth0Id);
         
-        return Created("", post);
+        return Created("", postDto);
     }
     
     [HttpGet("{postId:int}")]

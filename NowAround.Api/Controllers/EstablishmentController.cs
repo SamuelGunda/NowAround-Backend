@@ -80,7 +80,8 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     [HttpPut]
     public async Task<IActionResult> UpdateEstablishmentAsync(EstablishmentUpdateRequest establishmentUpdateRequest)
     {
-        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
+                      ?? throw new ArgumentException("Auth0Id not found");
         
         await establishmentService.UpdateEstablishmentAsync(auth0Id, establishmentUpdateRequest);
         
@@ -88,15 +89,15 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     }
     
     [Authorize(Roles = "Establishment")]
-    [HttpPut ("image/{pictureContext}")]
+    [HttpPut ("picture/{pictureContext}")]
     public async Task<IActionResult> UpdateEstablishmentPictureAsync([FromRoute] string pictureContext, IFormFile picture)
     {
-        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
+                      ?? throw new ArgumentException("Auth0Id not found");
         
-        await establishmentService.UpdateEstablishmentPictureAsync(auth0Id, pictureContext, picture);
+        var pictureUrl = await establishmentService.UpdateEstablishmentPictureAsync(auth0Id, pictureContext, picture);
         
-        //TODO: Change to NoContent()
-        return Created("", new { message = "Picture updated successfully" });
+        return Ok(new { pictureUrl });
     }
     
     [Authorize(Roles = "Admin")]
@@ -118,7 +119,8 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     [HttpDelete]
     public async Task<IActionResult> DeleteEstablishmentAsync()
     {
-        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
+                      ?? throw new ArgumentException("Auth0Id not found");
         
         await establishmentService.DeleteEstablishmentAsync(auth0Id);
 
@@ -131,41 +133,44 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     [HttpPost("menu")]
     public async Task<IActionResult> AddMenuAsync(MenuCreateRequest menu)
     {
-        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
+                      ?? throw new ArgumentException("Auth0Id not found");
         
-        await establishmentService.AddMenuAsync(auth0Id, menu);
+        var menuDto = await establishmentService.AddMenuAsync(auth0Id, menu);
         
-        return Created("", new { message = "Menu added successfully" });
+        return Created("", menuDto);
     }
 
     [Authorize(Roles = "Establishment")]
     [HttpPut("menu")]
     public async Task<IActionResult> UpdateMenuAsync(MenuUpdateRequest menu)
     {
-        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
+                      ?? throw new ArgumentException("Auth0Id not found");
         
-        await establishmentService.UpdateMenuAsync(auth0Id, menu);
+        var menuDto = await establishmentService.UpdateMenuAsync(auth0Id, menu);
         
-        return Created("", new { message = "Menu updated successfully" });
+        return Ok(menuDto);
     }
 
     [Authorize(Roles = "Establishment")]
     [HttpPut("menu/item/image/{menuItemId:int}")]
     public async Task<IActionResult> UpdateMenuItemPictureAsync(int menuItemId, IFormFile picture)
     {
-        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ??
-                      throw new ArgumentException("Auth0Id not found");
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
+                      ?? throw new ArgumentException("Auth0Id not found");
 
-        await establishmentService.UpdateMenuItemPictureAsync(auth0Id, menuItemId, picture);
+        var pictureUrl = await establishmentService.UpdateMenuItemPictureAsync(auth0Id, menuItemId, picture);
 
-        return Created("", new { message = "Menu item picture updated successfully" });
+        return Ok(new { pictureUrl });
     }
 
     [Authorize(Roles = "Establishment")]
     [HttpDelete("menu/{menuId:int}")]
     public async Task<IActionResult> DeleteMenuAsync(int menuId)
     {
-        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
+                      ?? throw new ArgumentException("Auth0Id not found");
         
         await establishmentService.DeleteMenuAsync(auth0Id, menuId);
         
@@ -176,7 +181,8 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     [HttpDelete("menu/item/{menuItemId:int}")]
     public async Task<IActionResult> DeleteMenuItemAsync(int menuItemId)
     {
-        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
+                      ?? throw new ArgumentException("Auth0Id not found");
         
         await establishmentService.DeleteMenuItemAsync(auth0Id, menuItemId);
         

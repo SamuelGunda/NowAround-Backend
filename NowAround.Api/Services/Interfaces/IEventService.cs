@@ -1,9 +1,10 @@
-﻿using NowAround.Api.Models.Requests;
+﻿using NowAround.Api.Models.Dtos;
+using NowAround.Api.Models.Requests;
 
 namespace NowAround.Api.Services.Interfaces;
 
 public interface IEventService
 {
-    Task CreateEventAsync(string auth0Id, EventCreateRequest eventCreateRequest);
-    
+    Task<EventDto> CreateEventAsync(string auth0Id, EventCreateRequest eventCreateRequest);
+    Task DeleteEventAsync(string auth0Id, int eventId);
 }

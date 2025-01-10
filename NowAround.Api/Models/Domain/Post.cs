@@ -21,9 +21,6 @@ public class Post : BaseEntity
     
     public PostDto ToDto()
     {
-        var establishmentAuth0Id = Establishment?.Auth0Id ?? null;
-        var postLikesAuth0Ids = Likes.Select(l => l.Auth0Id).ToList();
-
-        return new PostDto(Id, establishmentAuth0Id, Headline, Body, PictureUrl, CreatedAt, postLikesAuth0Ids);
+        return new PostDto(Id, Establishment?.Auth0Id ?? null, Headline, Body, PictureUrl, CreatedAt, Likes.Select(l => l.Auth0Id).ToList());
     }
 }

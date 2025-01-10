@@ -16,8 +16,8 @@ public class EventController(IEventService eventService) : ControllerBase
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
 
-        await eventService.CreateEventAsync(auth0Id, eventCreateRequest);
+        var eventDto = await eventService.CreateEventAsync(auth0Id, eventCreateRequest);
         
-        return Created("", new { message = "Event created successfully" });
+        return Created("", eventDto);
     }
 }

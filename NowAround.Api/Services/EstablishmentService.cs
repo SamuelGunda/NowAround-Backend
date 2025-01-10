@@ -170,7 +170,7 @@ public class EstablishmentService : IEstablishmentService
         await _establishmentRepository.UpdateAsync(establishmentDto);
     }
 
-    public async Task UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile picture)
+    public async Task<string> UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile picture)
     {
         if (pictureContext != "profile-picture" && pictureContext != "background-picture")
         {
@@ -188,6 +188,8 @@ public class EstablishmentService : IEstablishmentService
         establishment.BackgroundPictureUrl = pictureUrl.Contains("background-picture") ? pictureUrl : establishment.BackgroundPictureUrl;
         
         await _establishmentRepository.UpdateAsync(establishment);
+        
+        return pictureUrl;
     }
 
     public async Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus)
@@ -263,7 +265,7 @@ public class EstablishmentService : IEstablishmentService
     
     // Menu methods
     
-    public async Task AddMenuAsync(string auth0Id, MenuCreateRequest menu)
+    public async Task<MenuDto> AddMenuAsync(string auth0Id, MenuCreateRequest menu)
     {
         var establishment = await _establishmentRepository.GetAsync
         (
@@ -288,9 +290,11 @@ public class EstablishmentService : IEstablishmentService
         establishment.Menus.Add(menuEntity);
         
         await _establishmentRepository.UpdateAsync(establishment);
+        
+        return menuEntity.ToDto();
     }
 
-    public async Task UpdateMenuAsync(string auth0Id, MenuUpdateRequest updatedMenu)
+    public async Task<MenuDto> UpdateMenuAsync(string auth0Id, MenuUpdateRequest updatedMenu)
     {
         var establishment = await _establishmentRepository.GetAsync
         (
@@ -342,9 +346,11 @@ public class EstablishmentService : IEstablishmentService
         menu.UpdatedAt = DateTime.Now;
         
         await _establishmentRepository.UpdateAsync(establishment);
+        
+        return menu.ToDto();
     }
 
-    public async Task UpdateMenuItemPictureAsync(string auth0Id, int menuItemId, IFormFile picture)
+    public async Task<string> UpdateMenuItemPictureAsync(string auth0Id, int menuItemId, IFormFile picture)
     {
         var pictureType = picture.ContentType;
         _storageService.CheckPictureType(pictureType);
@@ -372,6 +378,8 @@ public class EstablishmentService : IEstablishmentService
         menuItem.Menu.UpdatedAt = DateTime.Now;
         
         await _establishmentRepository.UpdateAsync(establishment);
+        
+        return pictureUrl;
     }
 
     public async Task DeleteMenuAsync(string auth0Id, int menuId)
