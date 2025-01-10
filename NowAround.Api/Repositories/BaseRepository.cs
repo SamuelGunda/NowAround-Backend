@@ -21,14 +21,14 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntit
         Logger = logger;
     }
 
-    public async Task<int> CreateAsync(T entity)
+    public async Task<T> CreateAsync(T entity)
     {
         try
         {
             await DbSet.AddAsync(entity);
             await Context.SaveChangesAsync();
-            
-            return entity.Id;
+
+            return entity;
         }
         catch (Exception e)
         {

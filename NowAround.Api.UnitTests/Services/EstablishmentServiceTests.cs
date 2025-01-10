@@ -79,6 +79,22 @@ public class EstablishmentServiceTests
         const string auth0Id = "auth0|123";
         var categories = new[] { new Category { Name = "Restaurant"} };
         var tags = new[] { new Tag { Name = "Pet_Friendly"} };
+
+        var establishment = new Establishment
+        {
+            Id = 1,
+            Auth0Id = auth0Id,
+            Name = establishmentRequest.EstablishmentInfo.Name,
+            Description = null,
+            City = establishmentRequest.EstablishmentInfo.City,
+            Address = establishmentRequest.EstablishmentInfo.Address,
+            Latitude = coordinates.lat,
+            Longitude = coordinates.lng,
+            PriceCategory = (PriceCategory)establishmentRequest.EstablishmentInfo.PriceCategory,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(categories),
+            Tags = new List<Tag>(tags)
+        };
         
         _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(coordinates);
@@ -88,7 +104,7 @@ public class EstablishmentServiceTests
             .Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>()))
             .ReturnsAsync((string property, string value) =>
                 tags.FirstOrDefault(t => t.Name == value));
-        _establishmentRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<Establishment>())).ReturnsAsync(1);
+        _establishmentRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<Establishment>())).ReturnsAsync(establishment);
 
         // Act
         await _establishmentService.RegisterEstablishmentAsync(establishmentRequest);

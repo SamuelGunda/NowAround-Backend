@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Domain;
+using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Requests;
 using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Services.Interfaces;
@@ -22,7 +23,7 @@ public class PostService : IPostService
         _storageService = storageService;
     }
     
-    public async Task<int> CreatePostAsync(PostCreateRequest postCreateRequest, string auth0Id)
+    public async Task<PostDto> CreatePostAsync(PostCreateRequest postCreateRequest, string auth0Id)
     {
         if (postCreateRequest.Picture != null)
         {
@@ -47,7 +48,7 @@ public class PostService : IPostService
             await _postRepository.UpdateAsync(postEntity);
         }
         
-        return id;
+        return postEntity.ToDto();
     }
 
     private async Task<bool> CheckPostOwnershipByAuth0IdAsync(string auth0Id, int postId)

@@ -39,8 +39,10 @@ public class UserServiceTests
     {
         // Arrange
         const string auth0Id = "auth0|valid";
+        
+        var user = new User { Auth0Id = auth0Id, FullName = "Samuel Pačút" };
 
-        _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>())).ReturnsAsync(1);
+        _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>())).ReturnsAsync(user);
         _auth0ServiceMock.Setup(s => s.AssignRoleAsync(auth0Id, "user")).Returns(Task.CompletedTask);
 
         // Act
@@ -71,8 +73,10 @@ public class UserServiceTests
     {
         // Arrange
         const string auth0Id = "auth0|valid";
+        
+        var user = new User { Auth0Id = auth0Id, FullName = "Samuel Pačút" };
 
-        _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>())).ReturnsAsync(1);
+        _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<User>())).ReturnsAsync(user);
         _auth0ServiceMock.Setup(s => s.AssignRoleAsync(auth0Id, "user"))
             .ThrowsAsync(new Exception("Role assignment failed"));
 

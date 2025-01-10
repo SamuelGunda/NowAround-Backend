@@ -151,12 +151,12 @@ public class EstablishmentController(IEstablishmentService establishmentService)
 
     [Authorize(Roles = "Establishment")]
     [HttpPut("menu/item/image/{menuItemId:int}")]
-    public async Task<IActionResult> UpdateMenuItemPictureAsync(int menuItemId, IFormFile image)
+    public async Task<IActionResult> UpdateMenuItemPictureAsync(int menuItemId, IFormFile picture)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ??
                       throw new ArgumentException("Auth0Id not found");
 
-        await establishmentService.UpdateMenuItemPictureAsync(auth0Id, menuItemId, image);
+        await establishmentService.UpdateMenuItemPictureAsync(auth0Id, menuItemId, picture);
 
         return Created("", new { message = "Menu item picture updated successfully" });
     }

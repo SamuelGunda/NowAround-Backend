@@ -29,6 +29,12 @@ public class EventService : IEventService
     
     public async Task CreateEventAsync(string auth0Id, EventCreateRequest eventCreateRequest)
     {
+        if (eventCreateRequest.Picture != null)
+        {
+            var pictureType = eventCreateRequest.Picture.ContentType;
+            _storageService.CheckPictureType(pictureType);
+        }
+        
         var establishment = await _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
         
         if (!Enum.TryParse<EventCategory>(eventCreateRequest.EventCategory, true, out var eventCategory))
@@ -58,7 +64,7 @@ public class EventService : IEventService
             Start = eventCreateRequest.Start,
             End = eventCreateRequest.End,
             EventCategory = eventCategory,
-            EstablishmentId = establishment.Id
+            Establishment = establishment
         };
         
         await _eventRepository.CreateAsync(eventEntity);
