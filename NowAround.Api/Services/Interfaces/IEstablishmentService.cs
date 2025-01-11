@@ -13,7 +13,7 @@ public interface IEstablishmentService
     Task RegisterEstablishmentAsync(EstablishmentRegisterRequest request);
     /*Task<bool> CheckIfEstablishmentExistsAsync(string auth0Id);*/
     /*Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id);*/
-    Task<Establishment> GetEstablishmentByAuth0IdAsync(string auth0Id, bool tracked = false);
+    Task<Establishment> GetEstablishmentByAuth0IdAsync(string auth0Id, bool tracked = false, params Func<IQueryable<Establishment>, IQueryable<Establishment>>[] includeProperties);
     Task<EstablishmentProfileResponse> GetEstablishmentProfileByAuth0IdAsync(string auth0Id);
     Task<List<PendingEstablishmentResponse>> GetPendingEstablishmentsAsync();
     Task<List<EstablishmentMarkerResponse>> GetEstablishmentsWithFilterAsync(SearchValues searchValues, int page);
@@ -21,6 +21,7 @@ public interface IEstablishmentService
     Task UpdateEstablishmentAsync(string auth0Id, EstablishmentUpdateRequest request);
     Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus);
     Task<string> UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile picture);
+    Task UpdateRatingStatisticsAsync(string auth0Id, int rating);
     Task DeleteEstablishmentAsync(string auth0Id);
     
     // Menu Methods

@@ -6,22 +6,22 @@ namespace NowAround.Api.Models.Requests;
 public class EventCreateRequest
 {
     [Required]
-    public string Title { get; set; }
+    public required string Title { get; set; }
     [Required]
-    public string Body { get; set; }
+    public required string Body { get; set; }
     public double? Price { get; set; }
     [Required]
-    public string Address { get; set; }
+    public required string Address { get; set; }
     [Required]
-    public string City { get; set; }
+    public required string City { get; set; }
     [Required]
-    public string MaxParticipants { get; set; }
+    public required string MaxParticipants { get; set; }
     [Required]
-    public string EventCategory { get; set; }
+    public required string EventCategory { get; set; }
     public IFormFile? Picture { get; set; }
     [Required]
-    public DateTime Start { get; set; }
+    public required DateTime Start { get; set; }
     [Required]
-    public DateTime End { get; set; }
+    public required DateTime End { get; set; }
 
 }

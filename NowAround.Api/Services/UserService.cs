@@ -36,16 +36,9 @@ public class UserService : IUserService
     }
     */
 
-    public async Task<User> GetUserByAuth0IdAsync(string auth0Id, bool tracked = false)
+    public async Task<User> GetUserByAuth0IdAsync(string auth0Id, bool tracked = false, params Func<IQueryable<User>, IQueryable<User>>[] includeProperties)
     {
-        var user = await _userRepository.GetAsync(u => u.Auth0Id == auth0Id, tracked);
-        if (user == null)
-        {
-            _logger.LogWarning("User with Auth0 ID: {Auth0Id} not found", auth0Id);
-            throw new EntityNotFoundException("User", "Auth0 ID", auth0Id);
-        }
-        
-        return user;
+        return await _userRepository.GetAsync(u => u.Auth0Id == auth0Id, tracked, includeProperties);
     }
     
     public async Task<int> GetUsersCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd)

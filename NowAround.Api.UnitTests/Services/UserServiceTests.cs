@@ -154,17 +154,4 @@ public class UserServiceTests
         // Assert
         Assert.Equal(user, result);
     }
-
-    [Fact]
-    public async Task GetUserByAuth0IdAsync_ThrowsException_ForInvalidAuth0Id()
-    {
-        // Arrange
-        const string auth0Id = "auth0|invalid";
-        User? user = null;
-
-        _userRepositoryMock.Setup(r => r.GetAsync(u => u.Auth0Id == auth0Id, false)).ReturnsAsync(user);
-
-        // Act & Assert
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.GetUserByAuth0IdAsync(auth0Id));
-    }
 }

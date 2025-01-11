@@ -26,7 +26,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
     
     [Authorize(Roles = "User")]
-    [HttpPut("image/{pictureContext}")]
+    [HttpPut("picture/{pictureContext}")]
     public async Task<IActionResult> UpdateUserPictureAsync([FromRoute] string pictureContext, IFormFile picture)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");

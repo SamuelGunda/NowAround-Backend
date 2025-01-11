@@ -111,9 +111,9 @@ public class EstablishmentService : IEstablishmentService
     }
     */
     
-    public async Task<Establishment> GetEstablishmentByAuth0IdAsync(string auth0Id, bool tracked = false)
+    public async Task<Establishment> GetEstablishmentByAuth0IdAsync(string auth0Id, bool tracked = false, params Func<IQueryable<Establishment>, IQueryable<Establishment>>[] includeProperties)
     {
-        return await _establishmentRepository.GetAsync(e => e.Auth0Id == auth0Id, tracked);
+        return await _establishmentRepository.GetAsync(e => e.Auth0Id == auth0Id, tracked, includeProperties);
     }
     
     public async Task<EstablishmentProfileResponse> GetEstablishmentProfileByAuth0IdAsync(string auth0Id)
@@ -207,6 +207,36 @@ public class EstablishmentService : IEstablishmentService
         };
         
         await _establishmentRepository.UpdateAsync(establishmentDto);
+    }
+    
+    public async Task UpdateRatingStatisticsAsync(string auth0Id, int rating)
+    {
+        var establishment = await GetEstablishmentByAuth0IdAsync(auth0Id, true, query => query.Include(e => e.RatingStatistic));
+
+        if (establishment.RatingStatistic == null)
+        {
+            throw new Exception("RatingStatistic not found for the establishment.");
+        }
+
+        var ratingMap = new Dictionary<int, Action>
+        {
+            { 1, () => establishment.RatingStatistic.OneStar++ },
+            { 2, () => establishment.RatingStatistic.TwoStars++ },
+            { 3, () => establishment.RatingStatistic.ThreeStars++ },
+            { 4, () => establishment.RatingStatistic.FourStars++ },
+            { 5, () => establishment.RatingStatistic.FiveStars++ }
+        };
+
+        if (ratingMap.TryGetValue(rating, out var value))
+        {
+            value();
+        }
+        else
+        {
+            throw new ArgumentException("Invalid rating value", nameof(rating));
+        }
+
+        await _establishmentRepository.UpdateAsync(establishment);
     }
 
     public async Task DeleteEstablishmentAsync(string auth0Id)
