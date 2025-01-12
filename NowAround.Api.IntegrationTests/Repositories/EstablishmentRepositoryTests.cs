@@ -264,7 +264,7 @@ public class EstablishmentRepositoryTests
         await _context.SaveChangesAsync();
 
         // Act
-        await _repository.UpdateAsync(updatedEstablishment);
+        await _repository.UpdateGeneralInfoAsync(updatedEstablishment);
 
         // Assert
         var result = await _context.Set<Establishment>().FirstOrDefaultAsync(e => e.Auth0Id == "auth0|123");
@@ -293,7 +293,7 @@ public class EstablishmentRepositoryTests
         await _context.SaveChangesAsync();
 
         // Act
-        await _repository.UpdateAsync(updatedEstablishment);
+        await _repository.UpdateGeneralInfoAsync(updatedEstablishment);
 
         // Assert
         var result = await _context.Set<Establishment>().IgnoreQueryFilters().FirstOrDefaultAsync(e => e.Auth0Id == "auth0|123");
@@ -335,7 +335,7 @@ public class EstablishmentRepositoryTests
         await _context.SaveChangesAsync();
 
         // Act
-        await _repository.UpdateAsync(updatedEstablishment);
+        await _repository.UpdateGeneralInfoAsync(updatedEstablishment);
         
         // Assert
         var result = await _context.Set<Establishment>()
@@ -367,7 +367,7 @@ public class EstablishmentRepositoryTests
         };
 
         // Act & Assert
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => _repository.UpdateAsync(updatedEstablishment));
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => _repository.UpdateGeneralInfoAsync(updatedEstablishment));
     }
     
     [Fact]
@@ -377,6 +377,6 @@ public class EstablishmentRepositoryTests
         await _context.DisposeAsync();
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _repository.UpdateAsync(new EstablishmentDto()));
+        await Assert.ThrowsAsync<Exception>(() => _repository.UpdateGeneralInfoAsync(new EstablishmentDto()));
     }
 }

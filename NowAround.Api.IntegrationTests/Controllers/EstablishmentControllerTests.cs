@@ -557,7 +557,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var content = new StringContent(JsonConvert.SerializeObject(establishmentUpdateRequest), Encoding.UTF8, "application/json");
 
         // Act
-        var response = await client.PutAsync("/api/establishment", content);
+        var response = await client.PutAsync("/api/establishment/general-info", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -583,7 +583,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var content = new StringContent(JsonConvert.SerializeObject(establishmentUpdateRequest), Encoding.UTF8, "application/json");
 
         // Act
-        var response = await client.PutAsync("/api/establishment", content);
+        var response = await client.PutAsync("/api/establishment/general-info", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -610,7 +610,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var content = new StringContent(JsonConvert.SerializeObject(establishmentUpdateRequest), Encoding.UTF8, "application/json");
 
         // Act
-        var response = await client.PutAsync("/api/establishment", content);
+        var response = await client.PutAsync("/api/establishment/general-info", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -637,7 +637,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var content = new StringContent(JsonConvert.SerializeObject(establishmentUpdateRequest), Encoding.UTF8, "application/json");
 
         // Act
-        var response = await client.PutAsync("/api/establishment", content);
+        var response = await client.PutAsync("/api/establishment/general-info", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);

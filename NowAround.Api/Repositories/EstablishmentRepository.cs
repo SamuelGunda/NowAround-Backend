@@ -210,7 +210,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
         }
     }
 
-    public async Task UpdateAsync(EstablishmentDto establishmentDto)
+    public async Task UpdateGeneralInfoAsync(EstablishmentDto establishmentDto)
     {
         var auth0Id = establishmentDto.Auth0Id;
         

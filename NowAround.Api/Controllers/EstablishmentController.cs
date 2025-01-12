@@ -77,13 +77,13 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     }
     
     [Authorize(Roles = "Establishment")]
-    [HttpPut]
-    public async Task<IActionResult> UpdateEstablishmentAsync(EstablishmentUpdateRequest establishmentUpdateRequest)
+    [HttpPut("general-info")]
+    public async Task<IActionResult> UpdateEstablishmentGeneralInfoAsync(EstablishmentUpdateRequest establishmentUpdateRequest)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
                       ?? throw new ArgumentException("Auth0Id not found");
         
-        await establishmentService.UpdateEstablishmentAsync(auth0Id, establishmentUpdateRequest);
+        await establishmentService.UpdateEstablishmentGeneralInfoAsync(auth0Id, establishmentUpdateRequest);
         
         return NoContent();
     }

@@ -560,7 +560,7 @@ public class EstablishmentServiceTests
         var requestStatus = RequestStatus.Accepted;
 
         _establishmentRepositoryMock
-            .Setup(r => r.UpdateAsync(It.IsAny<EstablishmentDto>()))
+            .Setup(r => r.UpdateGeneralInfoAsync(It.IsAny<EstablishmentDto>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -568,7 +568,7 @@ public class EstablishmentServiceTests
 
         // Assert
         _establishmentRepositoryMock.Verify(
-            r => r.UpdateAsync(It.Is<EstablishmentDto>(dto => 
+            r => r.UpdateGeneralInfoAsync(It.Is<EstablishmentDto>(dto => 
                 dto.Auth0Id == auth0Id && dto.RequestStatus == requestStatus)), 
             Times.Once);
     }
@@ -581,7 +581,7 @@ public class EstablishmentServiceTests
         var requestStatus = RequestStatus.Pending;
 
         _establishmentRepositoryMock
-            .Setup(r => r.UpdateAsync(It.IsAny<EstablishmentDto>()))
+            .Setup(r => r.UpdateGeneralInfoAsync(It.IsAny<EstablishmentDto>()))
             .ThrowsAsync(new Exception("Database error"));
 
         // Act & Assert
@@ -589,7 +589,7 @@ public class EstablishmentServiceTests
             _establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, requestStatus));
 
         Assert.Equal("Database error", exception.Message);
-        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<EstablishmentDto>()), Times.Once);
+        _establishmentRepositoryMock.Verify(r => r.UpdateGeneralInfoAsync(It.IsAny<EstablishmentDto>()), Times.Once);
     }
     
     [Theory]
@@ -605,7 +605,7 @@ public class EstablishmentServiceTests
             _establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, requestStatus));
 
         Assert.Equal("auth0Id", exception.ParamName);
-        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<EstablishmentDto>()), Times.Never);
+        _establishmentRepositoryMock.Verify(r => r.UpdateGeneralInfoAsync(It.IsAny<EstablishmentDto>()), Times.Never);
     }
     
     // UpdateEstablishmentAsync tests
@@ -632,14 +632,14 @@ public class EstablishmentServiceTests
             tags.FirstOrDefault(t => t.Name == value));
 
         _establishmentRepositoryMock
-            .Setup(r => r.UpdateAsync(It.IsAny<EstablishmentDto>()))
+            .Setup(r => r.UpdateGeneralInfoAsync(It.IsAny<EstablishmentDto>()))
             .Returns(Task.CompletedTask);
 
         // Act
-        await _establishmentService.UpdateEstablishmentAsync(auth0Id, request);
+        await _establishmentService.UpdateEstablishmentGeneralInfoAsync(auth0Id, request);
 
         // Assert
-        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.Is<EstablishmentDto>(dto =>
+        _establishmentRepositoryMock.Verify(r => r.UpdateGeneralInfoAsync(It.Is<EstablishmentDto>(dto =>
             dto.Name == request.Name &&
             dto.Description == request.Description &&
             dto.PriceCategory == (PriceCategory)request.PriceCategory
@@ -665,10 +665,10 @@ public class EstablishmentServiceTests
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentException>(() => 
-            _establishmentService.UpdateEstablishmentAsync(auth0Id, request));
+            _establishmentService.UpdateEstablishmentGeneralInfoAsync(auth0Id, request));
 
         Assert.Contains("Category", exception.Message);
-        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<EstablishmentDto>()), Times.Never);
+        _establishmentRepositoryMock.Verify(r => r.UpdateGeneralInfoAsync(It.IsAny<EstablishmentDto>()), Times.Never);
     }
     
     // DeleteEstablishmentAsync tests

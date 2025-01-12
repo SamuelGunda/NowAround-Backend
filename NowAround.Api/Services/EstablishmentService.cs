@@ -153,7 +153,7 @@ public class EstablishmentService : IEstablishmentService
         return await _establishmentRepository.GetCountByCreatedAtBetweenDatesAsync(monthStart, monthEnd);
     }
 
-    public async Task UpdateEstablishmentAsync(string auth0Id, EstablishmentUpdateRequest request)
+    public async Task UpdateEstablishmentGeneralInfoAsync(string auth0Id, EstablishmentUpdateRequest request)
     {
         var catsAndTags = await GetCategoriesAndTagsAsync(request.Categories, request.Tags);
         
@@ -167,7 +167,7 @@ public class EstablishmentService : IEstablishmentService
             Tags = catsAndTags.tags
         };
         
-        await _establishmentRepository.UpdateAsync(establishmentDto);
+        await _establishmentRepository.UpdateGeneralInfoAsync(establishmentDto);
     }
 
     public async Task<string> UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile picture)
@@ -206,7 +206,7 @@ public class EstablishmentService : IEstablishmentService
             RequestStatus = requestStatus
         };
         
-        await _establishmentRepository.UpdateAsync(establishmentDto);
+        await _establishmentRepository.UpdateGeneralInfoAsync(establishmentDto);
     }
     
     public async Task UpdateRatingStatisticsAsync(string auth0Id, int rating)
