@@ -29,6 +29,7 @@ public static class ServiceExtensions
         services.AddScoped<IReviewService, ReviewService>();
 
         services.AddSingleton<IMapboxService, MapboxService>();
+        services.AddSingleton<IMailService, MailService>();
         
         // Repositories
         services.AddScoped<IBaseAccountRepository<User>, UserRepository>();

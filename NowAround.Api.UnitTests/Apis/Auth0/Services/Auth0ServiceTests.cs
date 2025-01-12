@@ -8,12 +8,15 @@ using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Auth0.Models.Requests;
 using NowAround.Api.Apis.Auth0.Services;
+using NowAround.Api.Services;
+using NowAround.Api.Services.Interfaces;
 
 namespace NowAround.Api.UnitTests.Apis.Auth0.Services;
 
 public class Auth0ServiceTests
 {
     private Mock<ITokenService> _mockTokenService;
+    private Mock<IMailService> _mockMailService;
     private Mock<HttpMessageHandler> _mockHttpMessageHandler;
     private Auth0Service _auth0Service;
     
@@ -25,10 +28,11 @@ public class Auth0ServiceTests
         mockConfiguration.Setup(c => c["Auth0:Roles:User"]).Returns("user-role-id");
         
         _mockTokenService = new Mock<ITokenService>();
+        _mockMailService = new Mock<IMailService>();
         
         _mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         
-        _auth0Service = new Auth0Service(new HttpClient(_mockHttpMessageHandler.Object), _mockTokenService.Object, mockConfiguration.Object, Mock.Of<ILogger<Auth0Service>>());
+        _auth0Service = new Auth0Service(new HttpClient(_mockHttpMessageHandler.Object), _mockTokenService.Object, _mockMailService.Object, mockConfiguration.Object, Mock.Of<ILogger<Auth0Service>>());
     }
     
     // RegisterEstablishmentAccountAsync tests

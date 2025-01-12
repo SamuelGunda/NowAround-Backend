@@ -7,6 +7,8 @@ using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Auth0.Models.Requests;
 using NowAround.Api.Apis.Auth0.Utilities;
+using NowAround.Api.Services;
+using NowAround.Api.Services.Interfaces;
 
 namespace NowAround.Api.Apis.Auth0.Services;
 
@@ -15,6 +17,7 @@ public class Auth0Service : IAuth0Service
     
     private readonly HttpClient _httpClient;
     private readonly ITokenService _tokenService;
+    private readonly IMailService _mailService;
     private readonly ILogger<Auth0Service> _logger;
     
     private readonly string _domain;
@@ -23,12 +26,14 @@ public class Auth0Service : IAuth0Service
     
     public Auth0Service(
         HttpClient httpClient, 
-        ITokenService tokenService, 
+        ITokenService tokenService,
+        IMailService mailService,
         IConfiguration configuration, 
         ILogger<Auth0Service> logger)
     {
         _httpClient = httpClient;
         _tokenService = tokenService;
+        _mailService = mailService;
         _logger = logger;
         
         _domain = configuration["Auth0:Domain"] ?? throw new ArgumentNullException(configuration["Auth0:Domain"]);
@@ -89,6 +94,8 @@ public class Auth0Service : IAuth0Service
         var user = JsonConvert.DeserializeObject<User>(responseBody) ?? throw new JsonException("Failed to deserialize Auth0 response");
         
         await AssignRoleAsync(user.UserId, "establishment");
+        
+        await _mailService.SendWelcomeEmailAsync($"{ownerInfo.FirstName} {ownerInfo.LastName}", ownerInfo.Email);
         
         return user.UserId;
     }
