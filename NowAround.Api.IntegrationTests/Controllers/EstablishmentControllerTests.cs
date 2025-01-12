@@ -794,7 +794,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var response = await client.PutAsync("/api/establishment/picture/profile-picture", content);
 
         // Assert
-        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
     
     // UpdateEstablishmentRegisterRequestAsync Tests
