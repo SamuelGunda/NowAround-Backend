@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NowAround.Api.Database;
 
@@ -11,9 +12,11 @@ using NowAround.Api.Database;
 namespace NowAround.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250112103227_EventPriceChange")]
+    partial class EventPriceChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,7 +256,6 @@ namespace NowAround.Api.Migrations
                         .HasDefaultValue(4);
 
                     b.Property<string>("EventPriceCategory")
-                        .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("nvarchar(8)");
 
@@ -264,6 +266,7 @@ namespace NowAround.Api.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("MaxParticipants")
+                        .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("nvarchar(16)");
 
@@ -272,7 +275,6 @@ namespace NowAround.Api.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Price")
-                        .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("nvarchar(16)");
 

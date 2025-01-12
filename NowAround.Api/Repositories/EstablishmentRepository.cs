@@ -82,6 +82,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                         ev.Title,
                         ev.Body,
                         ev.Price,
+                        ev.EventPriceCategory,
                         ev.City,
                         ev.Address,
                         ev.Latitude,
@@ -90,7 +91,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                         ev.PictureUrl,
                         ev.Start,
                         ev.End,
-                        ev.EventCategory,
+                        ev.EventCategory.ToString(),
                         ev.CreatedAt,
                         ev.InterestedUsers.Select(iu => iu.Auth0Id).ToList()
                     )).ToList(),

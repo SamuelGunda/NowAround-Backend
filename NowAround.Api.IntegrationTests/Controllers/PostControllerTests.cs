@@ -38,7 +38,7 @@ public class PostControllerTests  : IClassFixture<StorageContextFixture>
         
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|valid");
 
-        var postCreateRequest = new PostCreateRequest
+        var postCreateRequest = new PostCreateUpdateRequest
         {
             Headline = "Test headline",
             Body = "Test body"
@@ -66,7 +66,7 @@ public class PostControllerTests  : IClassFixture<StorageContextFixture>
 
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|valid");
 
-        var postCreateRequest = new PostCreateRequest
+        var postCreateRequest = new PostCreateUpdateRequest
         {
             Headline = "Test headline",
             Body = "Test body",
@@ -110,7 +110,7 @@ public class PostControllerTests  : IClassFixture<StorageContextFixture>
 
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|valid");
 
-        var postCreateRequest = new PostCreateRequest
+        var postCreateRequest = new PostCreateUpdateRequest
         {
             Headline = "Test headline",
             Body = "Test body"

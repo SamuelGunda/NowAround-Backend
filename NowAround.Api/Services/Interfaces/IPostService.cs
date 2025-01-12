@@ -6,8 +6,9 @@ namespace NowAround.Api.Services.Interfaces;
 
 public interface IPostService
 {
-    Task<PostDto> CreatePostAsync(PostCreateRequest postCreateRequest, string auth0Id);
+    Task<PostDto> CreatePostAsync(PostCreateUpdateRequest postCreateRequest, string auth0Id);
     Task<Post> GetPostAsync(int postId, bool tracked = false);
+    Task<PostDto> UpdatePostAsync(int postId, string auth0Id, PostCreateUpdateRequest postCreateUpdateRequest);
     Task UpdatePictureAsync(int postId, string pictureUrl);
     Task DeletePostAsync(string auth0Id, int postId);
 }

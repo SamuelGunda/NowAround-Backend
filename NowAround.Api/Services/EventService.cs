@@ -30,18 +30,7 @@ public class EventService : IEventService
     
     public async Task<EventDto> CreateEventAsync(string auth0Id, EventCreateRequest eventCreateRequest)
     {
-        if (eventCreateRequest.Picture != null)
-        {
-            var pictureType = eventCreateRequest.Picture.ContentType;
-            _storageService.CheckPictureType(pictureType);
-        }
-        
         var establishment = await _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
-        
-        if (!Enum.TryParse<EventCategory>(eventCreateRequest.EventCategory, true, out var eventCategory))
-        {
-            throw new ArgumentException("Invalid event category");
-        }
         
         var addressParts = eventCreateRequest.Address.Split(',');
         if (addressParts.Length != 2)
@@ -57,6 +46,7 @@ public class EventService : IEventService
             Title = eventCreateRequest.Title,
             Body = eventCreateRequest.Body,
             Price = eventCreateRequest.Price,
+            EventPriceCategory = eventCreateRequest.EventPriceCategory,
             Latitude = coordinates.lat,
             Longitude = coordinates.lng,
             Address = eventCreateRequest.Address,
@@ -64,11 +54,11 @@ public class EventService : IEventService
             MaxParticipants = eventCreateRequest.MaxParticipants,
             Start = eventCreateRequest.Start,
             End = eventCreateRequest.End,
-            EventCategory = eventCategory,
+            EventCategory = Enum.Parse<EventCategory>(eventCreateRequest.EventCategory, true),
             EstablishmentId = establishment.Id
         };
         
-        var id = await _eventRepository.CreateAsync(eventEntity);
+        await _eventRepository.CreateAsync(eventEntity);
         
         if (eventCreateRequest.Picture is not null)
         {

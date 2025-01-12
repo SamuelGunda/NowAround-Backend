@@ -23,14 +23,8 @@ public class PostService : IPostService
         _storageService = storageService;
     }
     
-    public async Task<PostDto> CreatePostAsync(PostCreateRequest postCreateRequest, string auth0Id)
+    public async Task<PostDto> CreatePostAsync(PostCreateUpdateRequest postCreateRequest, string auth0Id)
     {
-        if (postCreateRequest.Picture != null)
-        {
-            var pictureType = postCreateRequest.Picture.ContentType;
-            _storageService.CheckPictureType(pictureType);
-        }
-        
         var establishment = await _establishmentService.GetEstablishmentByAuth0IdAsync(auth0Id);
         
         var postEntity = new Post
@@ -40,11 +34,11 @@ public class PostService : IPostService
             EstablishmentId = establishment.Id
         };
         
-        var id = await _postRepository.CreateAsync(postEntity); 
+        await _postRepository.CreateAsync(postEntity); 
         
         if (postCreateRequest.Picture is not null)
         {
-            postEntity.PictureUrl = await _storageService.UploadPictureAsync(postCreateRequest.Picture, "Establishment", auth0Id, $"post/{id}");
+            postEntity.PictureUrl = await _storageService.UploadPictureAsync(postCreateRequest.Picture, "Establishment", auth0Id, $"post/{postEntity.Id}");
             await _postRepository.UpdateAsync(postEntity);
         }
         
@@ -75,6 +69,11 @@ public class PostService : IPostService
         }
         
         return post;
+    }
+
+    public Task<PostDto> UpdatePostAsync(int postId, string auth0Id, PostCreateUpdateRequest postCreateUpdateRequest)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdatePictureAsync(int postId, string pictureUrl)

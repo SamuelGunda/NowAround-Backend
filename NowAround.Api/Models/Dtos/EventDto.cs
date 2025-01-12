@@ -7,7 +7,8 @@ public sealed record EventDto(
     string CreatorAuth0Id,
     string Title,
     string Body,
-    double? Price,
+    string? Price,
+    string? EventPriceCategory,
     string City,
     string Address,
     double Latitude,
@@ -16,7 +17,7 @@ public sealed record EventDto(
     string? PictureUrl,
     DateTime Start,
     DateTime End,
-    EventCategory EventCategory,
+    string EventCategory,
     DateTime CreatedAt,
     List<string> InterestedUsers
 );

@@ -12,12 +12,13 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Title).IsRequired();
         builder.Property(e => e.Body).IsRequired();
-        builder.Property(e => e.Price);
+        builder.Property(e => e.Price).IsRequired();
+        builder.Property(e => e.EventPriceCategory).IsRequired();
         builder.Property(e => e.City).IsRequired();
         builder.Property(e => e.Address).IsRequired();
         builder.Property(e => e.Latitude).IsRequired();
         builder.Property(e => e.Longitude).IsRequired();
-        builder.Property(e => e.MaxParticipants).IsRequired();
+        builder.Property(e => e.MaxParticipants);
         builder.Property(e => e.PictureUrl);
         builder.Property(e => e.Start).IsRequired();
         builder.Property(e => e.End).IsRequired();
