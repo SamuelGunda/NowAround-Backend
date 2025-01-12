@@ -33,15 +33,11 @@ public static class ServiceExtensions
         // Repositories
         services.AddScoped<IBaseAccountRepository<User>, UserRepository>();
         services.AddScoped<IEstablishmentRepository, EstablishmentRepository>();
-        services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<IMonthlyStatisticRepository, MonthlyStatisticRepository>();
         services.AddScoped<IPostRepository, PostRepository>();
         services.AddScoped<IEventRepository, EventRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
-        /*
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-        */
         
         // Helpers
         services.AddTransient<IDateHelper, DateHelper>();

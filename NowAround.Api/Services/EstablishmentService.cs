@@ -21,8 +21,8 @@ public class EstablishmentService : IEstablishmentService
     private readonly IAuth0Service _auth0Service;
     private readonly IMapboxService _mapboxService;
     private readonly IEstablishmentRepository _establishmentRepository;
-    private readonly ICategoryRepository _categoryRepository;
-    private readonly ITagRepository _tagRepository;
+    private readonly IBaseRepository<Category> _categoryRepository;
+    private readonly IBaseRepository<Tag> _tagRepository;
     private readonly IStorageService _storageService;
     private readonly ILogger<EstablishmentService> _logger;
 
@@ -30,8 +30,8 @@ public class EstablishmentService : IEstablishmentService
         IAuth0Service auth0Service, 
         IMapboxService mapboxService,
         IEstablishmentRepository establishmentRepository,
-        ICategoryRepository categoryRepository,
-        ITagRepository tagRepository,
+        IBaseRepository<Category> categoryRepository,
+        IBaseRepository<Tag> tagRepository,
         IStorageService storageService,
         ILogger<EstablishmentService> logger)
     {

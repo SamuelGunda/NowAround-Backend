@@ -24,8 +24,8 @@ public class EstablishmentServiceTests
     private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock;
     private readonly Mock<IAuth0Service> _auth0ServiceMock;
     private readonly Mock<IMapboxService> _mapboxServiceMock;
-    private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
-    private readonly Mock<ITagRepository> _tagRepositoryMock;
+    private readonly Mock<IBaseRepository<Category>> _categoryRepositoryMock;
+    private readonly Mock<IBaseRepository<Tag>> _tagRepositoryMock;
     private readonly Mock<IStorageService> _storageServiceMock;
 
     private readonly EstablishmentService _establishmentService;
@@ -35,8 +35,8 @@ public class EstablishmentServiceTests
         _establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
         _auth0ServiceMock = new Mock<IAuth0Service>();
         _mapboxServiceMock = new Mock<IMapboxService>();
-        _categoryRepositoryMock = new Mock<ICategoryRepository>();
-        _tagRepositoryMock = new Mock<ITagRepository>();
+        _categoryRepositoryMock = new Mock<IBaseRepository<Category>>();
+        _tagRepositoryMock = new Mock<IBaseRepository<Tag>>();
         _storageServiceMock = new Mock<IStorageService>();
         Mock<ILogger<EstablishmentService>> loggerMock = new();
         
