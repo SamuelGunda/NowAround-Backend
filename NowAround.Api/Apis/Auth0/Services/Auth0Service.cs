@@ -181,11 +181,7 @@ public class Auth0Service : IAuth0Service
         
         var requestBody = new
         {
-            roles = new[] { role },
-            app_metadata = new
-            {
-                registeredInApi = true
-            }
+            roles = new[] { role }
         };
         
         using var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
@@ -200,6 +196,33 @@ public class Auth0Service : IAuth0Service
         {
             _logger.LogError("Failed to assign role. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
             throw new HttpRequestException($"Failed to assign role. Status Code: {response.StatusCode}, Response: {responseBody}");
+        }
+        
+        await UpdateAppMetadataAsync(auth0Id, accessToken);
+    }
+    
+    private async Task UpdateAppMetadataAsync(string auth0Id, string accessToken)
+    {
+        var requestBody = new
+        {
+            app_metadata = new
+            {
+                registeredInApi = true
+            }
+        };
+        
+        using var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+        using var request = new HttpRequestMessage(HttpMethod.Patch, $"https://{_domain}/api/v2/users/{auth0Id}");
+        request.Headers.Add("Authorization" , $"Bearer {accessToken}");
+        request.Content = content;
+        
+        var response = await _httpClient.SendAsync(request);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError("Failed to update app metadata. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
+            throw new HttpRequestException($"Failed to update app metadata. Status Code: {response.StatusCode}, Response: {responseBody}");
         }
     }
 }
