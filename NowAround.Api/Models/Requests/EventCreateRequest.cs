@@ -29,5 +29,4 @@ public class EventCreateRequest
     public required DateTime Start { get; set; }
     [Required]
     public required DateTime End { get; set; }
-
 }

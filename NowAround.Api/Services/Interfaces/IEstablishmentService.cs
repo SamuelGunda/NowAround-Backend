@@ -18,7 +18,7 @@ public interface IEstablishmentService
     Task<List<PendingEstablishmentResponse>> GetPendingEstablishmentsAsync();
     Task<List<EstablishmentMarkerResponse>> GetEstablishmentsWithFilterAsync(SearchValues searchValues, int page);
     Task<int> GetEstablishmentsCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd);
-    Task UpdateEstablishmentGeneralInfoAsync(string auth0Id, EstablishmentUpdateRequest request);
+    Task<GenericInfo> UpdateEstablishmentGenericInfoAsync(string auth0Id, EstablishmentGenericInfoUpdateRequest request);
     Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus);
     Task<string> UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile picture);
     Task UpdateRatingStatisticsAsync(string auth0Id, int rating);

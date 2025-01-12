@@ -38,7 +38,7 @@ public class UserService : IUserService
 
     public async Task<User> GetUserByAuth0IdAsync(string auth0Id, bool tracked = false, params Func<IQueryable<User>, IQueryable<User>>[] includeProperties)
     {
-        return await _userRepository.GetAsync(u => u.Auth0Id == auth0Id, tracked, includeProperties);
+        return await _userRepository.GetAsync(u => u.Auth0Id == auth0Id, tracked);
     }
     
     public async Task<int> GetUsersCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd)
@@ -46,16 +46,13 @@ public class UserService : IUserService
         return await _userRepository.GetCountByCreatedAtBetweenDatesAsync(monthStart, monthEnd);
     }
 
-    public async Task UpdateUserPictureAsync(string auth0Id, string pictureContext, IFormFile picture)
+    public async Task<string> UpdateUserPictureAsync(string auth0Id, string pictureContext, IFormFile picture)
     {
         if (pictureContext != "profile-picture" && pictureContext != "background-picture")
         {
             _logger.LogWarning("Invalid image context: {ImageContext}", pictureContext);
             throw new ArgumentException("Invalid image context", nameof(pictureContext));
         }
-        
-        var pictureType = picture.ContentType;
-        _storageService.CheckPictureType(pictureType);
         
         var user = await GetUserByAuth0IdAsync(auth0Id, true);
         var pictureUrl = await _storageService.UploadPictureAsync(picture, "User", auth0Id, pictureContext);
@@ -64,6 +61,8 @@ public class UserService : IUserService
         user.BackgroundPictureUrl = pictureUrl.Contains("background-picture") ? pictureUrl : user.BackgroundPictureUrl;
         
         await _userRepository.UpdateAsync(user);
+        
+        return pictureUrl;
     }
 
     public async Task DeleteUserAsync(string auth0Id)
@@ -72,7 +71,6 @@ public class UserService : IUserService
         
         await _storageService.DeleteAsync("User", auth0Id);
         
-        //TODO: Get whole user object and delete it
         var result = await _userRepository.DeleteByAuth0IdAsync(auth0Id);
         if (!result)
         {

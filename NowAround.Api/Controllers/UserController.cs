@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NowAround.Api.Services.Interfaces;
+using NowAround.Api.Utilities;
 
 namespace NowAround.Api.Controllers;
 
@@ -27,11 +28,11 @@ public class UserController(IUserService userService) : ControllerBase
     
     [Authorize(Roles = "User")]
     [HttpPut("picture/{pictureContext}")]
-    public async Task<IActionResult> UpdateUserPictureAsync([FromRoute] string pictureContext, IFormFile picture)
+    public async Task<IActionResult> UpdateUserPictureAsync([FromRoute] string pictureContext, [ContentType([ "image/jpeg", "image/png", "image/gif", "image/webp"])] IFormFile picture)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
 
-        await userService.UpdateUserPictureAsync(auth0Id, pictureContext, picture);
+        var pictureUrl = await userService.UpdateUserPictureAsync(auth0Id, pictureContext, picture);
         
         //TODO: Change to NoContent()
         return Created("", new { message = "Picture updated successfully" });

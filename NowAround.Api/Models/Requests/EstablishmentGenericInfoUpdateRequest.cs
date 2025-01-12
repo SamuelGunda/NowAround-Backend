@@ -1,6 +1,6 @@
 ﻿namespace NowAround.Api.Models.Requests;
 
-public class EstablishmentUpdateRequest
+public class EstablishmentGenericInfoUpdateRequest
 {
     public string? Name { get; set; }
     public string? Description { get; set; }

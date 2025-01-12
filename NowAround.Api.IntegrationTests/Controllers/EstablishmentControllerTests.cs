@@ -545,7 +545,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var client = factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|valid");
 
-        var establishmentUpdateRequest = new EstablishmentUpdateRequest
+        var establishmentUpdateRequest = new EstablishmentGenericInfoUpdateRequest
         {
             Name = "Updated Restaurant",
             Description = "Updated Description",
@@ -557,10 +557,10 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var content = new StringContent(JsonConvert.SerializeObject(establishmentUpdateRequest), Encoding.UTF8, "application/json");
 
         // Act
-        var response = await client.PutAsync("/api/establishment/general-info", content);
+        var response = await client.PutAsync("/api/establishment/generic-info", content);
 
         // Assert
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
     
     [Fact]
@@ -571,7 +571,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
 
         var client = factory.CreateClient();
 
-        var establishmentUpdateRequest = new EstablishmentUpdateRequest
+        var establishmentUpdateRequest = new EstablishmentGenericInfoUpdateRequest
         {
             Name = "Updated Restaurant",
             Description = "Updated Description",
@@ -583,7 +583,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var content = new StringContent(JsonConvert.SerializeObject(establishmentUpdateRequest), Encoding.UTF8, "application/json");
 
         // Act
-        var response = await client.PutAsync("/api/establishment/general-info", content);
+        var response = await client.PutAsync("/api/establishment/generic-info", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -598,7 +598,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var client = factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "User auth0|user");
 
-        var establishmentUpdateRequest = new EstablishmentUpdateRequest
+        var establishmentUpdateRequest = new EstablishmentGenericInfoUpdateRequest
         {
             Name = "Updated Restaurant",
             Description = "Updated Description",
@@ -610,7 +610,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var content = new StringContent(JsonConvert.SerializeObject(establishmentUpdateRequest), Encoding.UTF8, "application/json");
 
         // Act
-        var response = await client.PutAsync("/api/establishment/general-info", content);
+        var response = await client.PutAsync("/api/establishment/generic-info", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -625,7 +625,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var client = factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "Establishment auth0|invalid");
 
-        var establishmentUpdateRequest = new EstablishmentUpdateRequest
+        var establishmentUpdateRequest = new EstablishmentGenericInfoUpdateRequest
         {
             Name = "Updated Restaurant",
             Description = "Updated Description",
@@ -637,7 +637,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var content = new StringContent(JsonConvert.SerializeObject(establishmentUpdateRequest), Encoding.UTF8, "application/json");
 
         // Act
-        var response = await client.PutAsync("/api/establishment/general-info", content);
+        var response = await client.PutAsync("/api/establishment/generic-info", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);

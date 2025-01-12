@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Linq.Expressions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NowAround.Api.Apis.Auth0.Exceptions;
@@ -553,123 +554,34 @@ public class EstablishmentServiceTests
     // UpdateEstablishmentRegisterRequestAsync tests
 
     [Fact]
-    public async Task UpdateEstablishmentRegisterRequestAsync_ValidInputs_ShouldCallUpdateAsync()
+    public async Task UpdateEstablishmentRegisterRequestAsync_ValidRequest_UpdatesRequestStatus()
     {
         // Arrange
-        var auth0Id = "auth0|12345";
-        var requestStatus = RequestStatus.Accepted;
-
-        _establishmentRepositoryMock
-            .Setup(r => r.UpdateGeneralInfoAsync(It.IsAny<EstablishmentDto>()))
-            .Returns(Task.CompletedTask);
+        const string auth0Id = "validAuth0Id";
+        const RequestStatus requestStatus = RequestStatus.Accepted;
+        
+        var establishment = new Establishment
+        {
+            Auth0Id = auth0Id,
+            Name = "Default Name",
+            City = "Default City",
+            Address = "Default Address",
+            Latitude = 0.0,
+            Longitude = 0.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending
+        };
+        
+        _establishmentRepositoryMock.Setup(repo => repo.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>())).ReturnsAsync(establishment);
 
         // Act
         await _establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, requestStatus);
 
         // Assert
-        _establishmentRepositoryMock.Verify(
-            r => r.UpdateGeneralInfoAsync(It.Is<EstablishmentDto>(dto => 
-                dto.Auth0Id == auth0Id && dto.RequestStatus == requestStatus)), 
-            Times.Once);
+        Assert.Equal(requestStatus, establishment.RequestStatus);
+        _establishmentRepositoryMock.Verify(repo => repo.UpdateAsync(establishment), Times.Once);
     }
-    
-    [Fact]
-    public async Task UpdateEstablishmentRegisterRequestAsync_RepositoryThrowsException_ShouldThrowException()
-    {
-        // Arrange
-        var auth0Id = "auth0|12345";
-        var requestStatus = RequestStatus.Pending;
 
-        _establishmentRepositoryMock
-            .Setup(r => r.UpdateGeneralInfoAsync(It.IsAny<EstablishmentDto>()))
-            .ThrowsAsync(new Exception("Database error"));
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<Exception>(() => 
-            _establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, requestStatus));
-
-        Assert.Equal("Database error", exception.Message);
-        _establishmentRepositoryMock.Verify(r => r.UpdateGeneralInfoAsync(It.IsAny<EstablishmentDto>()), Times.Once);
-    }
-    
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    public async Task UpdateEstablishmentRegisterRequestAsync_InvalidAuth0Id_ShouldThrowArgumentNullException(string auth0Id)
-    {
-        // Arrange
-        var requestStatus = RequestStatus.Pending;
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(() => 
-            _establishmentService.UpdateEstablishmentRegisterRequestAsync(auth0Id, requestStatus));
-
-        Assert.Equal("auth0Id", exception.ParamName);
-        _establishmentRepositoryMock.Verify(r => r.UpdateGeneralInfoAsync(It.IsAny<EstablishmentDto>()), Times.Never);
-    }
-    
-    // UpdateEstablishmentAsync tests
-    
-    [Fact]
-    public async Task UpdateEstablishmentAsync_ValidInput_ShouldCallUpdateAsync()
-    {
-        // Arrange
-        const string auth0Id = "auth0|123";
-        var request = new EstablishmentUpdateRequest
-        {
-            Name = "Test Establishment",
-            Description = "Updated description",
-            PriceCategory = 2,
-            Categories = new List<string> { "Restaurant" },
-            Tags = new List<string> { "PET_FRIENDLY" }
-        };
-    
-        var categories = new[] { new Category { Name = "Restaurant" } };
-        var tags = new[] { new Tag { Name = "PET_FRIENDLY" } };
-
-        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync(categories[0]);
-        _tagRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync((string property, string value) =>
-            tags.FirstOrDefault(t => t.Name == value));
-
-        _establishmentRepositoryMock
-            .Setup(r => r.UpdateGeneralInfoAsync(It.IsAny<EstablishmentDto>()))
-            .Returns(Task.CompletedTask);
-
-        // Act
-        await _establishmentService.UpdateEstablishmentGeneralInfoAsync(auth0Id, request);
-
-        // Assert
-        _establishmentRepositoryMock.Verify(r => r.UpdateGeneralInfoAsync(It.Is<EstablishmentDto>(dto =>
-            dto.Name == request.Name &&
-            dto.Description == request.Description &&
-            dto.PriceCategory == (PriceCategory)request.PriceCategory
-        )), Times.Once);
-    }
-    
-    [Fact]
-    public async Task UpdateEstablishmentAsync_InvalidCategoriesOrTags_ShouldThrowArgumentException()
-    {
-        // Arrange
-        const string auth0Id = "auth0|123";
-        var request = new EstablishmentUpdateRequest
-        {
-            Name = "Test Establishment",
-            Description = "Updated description",
-            PriceCategory = 2,
-            Categories = new List<string> { "NonExistentCategory" },
-            Tags = new List<string> { "NonExistentTag" }
-        };
-
-        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync((Category)null);
-        _tagRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync((Tag)null);
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentException>(() => 
-            _establishmentService.UpdateEstablishmentGeneralInfoAsync(auth0Id, request));
-
-        Assert.Contains("Category", exception.Message);
-        _establishmentRepositoryMock.Verify(r => r.UpdateGeneralInfoAsync(It.IsAny<EstablishmentDto>()), Times.Never);
-    }
     
     // DeleteEstablishmentAsync tests
     

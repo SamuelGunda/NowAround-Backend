@@ -153,21 +153,40 @@ public class EstablishmentService : IEstablishmentService
         return await _establishmentRepository.GetCountByCreatedAtBetweenDatesAsync(monthStart, monthEnd);
     }
 
-    public async Task UpdateEstablishmentGeneralInfoAsync(string auth0Id, EstablishmentUpdateRequest request)
+    public async Task<GenericInfo> UpdateEstablishmentGenericInfoAsync(string auth0Id, EstablishmentGenericInfoUpdateRequest request)
     {
+        var establishment = await _establishmentRepository.GetAsync
+        (
+            e => e.Auth0Id == auth0Id, 
+            true, 
+            query => query
+                .Include(e => e.Tags)
+                .Include(e => e.Categories)
+                .Include(e => e.SocialLinks)
+        );
+        
         var catsAndTags = await GetCategoriesAndTagsAsync(request.Categories, request.Tags);
         
-        var establishmentDto = new EstablishmentDto
-        {
-            Auth0Id = auth0Id,
-            Name = request.Name,
-            Description = request.Description,
-            PriceCategory = request.PriceCategory.HasValue ? (PriceCategory) request.PriceCategory.Value : null,
-            Categories = catsAndTags.categories,
-            Tags = catsAndTags.tags
-        };
+        establishment.Name = request.Name ?? establishment.Name;
+        establishment.Description = request.Description ?? establishment.Description;
+        establishment.PriceCategory = request.PriceCategory.HasValue ? (PriceCategory) request.PriceCategory.Value : establishment.PriceCategory;
+        establishment.Categories = catsAndTags.categories.Length > 0 ? catsAndTags.categories.ToList() : establishment.Categories.ToList();
+        establishment.Tags = catsAndTags.tags.Length > 0 ? catsAndTags.tags.ToList() : establishment.Tags.ToList();
         
-        await _establishmentRepository.UpdateGeneralInfoAsync(establishmentDto);
+        await _establishmentRepository.UpdateAsync(establishment);
+        
+        var genericInfo = new GenericInfo(
+            establishment.Name,
+            establishment.ProfilePictureUrl,
+            establishment.BackgroundPictureUrl,
+            establishment.Description,
+            establishment.PriceCategory.ToString(),
+            establishment.Categories.Select(c => c.Name).ToList(),
+            establishment.Tags.Select(t => t.Name).ToList(),
+            establishment.SocialLinks.Select(sl => new SocialLinkDto(sl.Name, sl.Url)).ToList()
+        );
+        
+        return genericInfo;
     }
 
     public async Task<string> UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile picture)
@@ -177,9 +196,6 @@ public class EstablishmentService : IEstablishmentService
             _logger.LogWarning("Invalid image context: {ImageContext}", pictureContext);
             throw new ArgumentException("Invalid image context", nameof(pictureContext));
         }
-        
-        var pictureType = picture.ContentType;
-        _storageService.CheckPictureType(pictureType);
         
         var establishment = await GetEstablishmentByAuth0IdAsync(auth0Id, true);
         var pictureUrl = await _storageService.UploadPictureAsync(picture, "Establishment", auth0Id, pictureContext);
@@ -194,27 +210,26 @@ public class EstablishmentService : IEstablishmentService
 
     public async Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus)
     {
-        if (auth0Id.IsNullOrEmpty())
-        {
-            _logger.LogWarning("auth0Id is null");
-            throw new ArgumentNullException(nameof(auth0Id));
-        }
+        var establishment = await GetEstablishmentByAuth0IdAsync(
+            auth0Id, 
+            true, 
+            query => query.IgnoreQueryFilters());
         
-        var establishmentDto = new EstablishmentDto
-        {
-            Auth0Id = auth0Id,
-            RequestStatus = requestStatus
-        };
+        establishment.RequestStatus = requestStatus;
         
-        await _establishmentRepository.UpdateGeneralInfoAsync(establishmentDto);
+        await _establishmentRepository.UpdateAsync(establishment);
     }
     
     public async Task UpdateRatingStatisticsAsync(string auth0Id, int rating)
     {
-        var establishment = await GetEstablishmentByAuth0IdAsync(auth0Id, true, query => query.Include(e => e.RatingStatistic));
+        var establishment = await GetEstablishmentByAuth0IdAsync(
+            auth0Id, 
+            true, 
+            query => query.Include(e => e.RatingStatistic));
 
         if (establishment.RatingStatistic == null)
         {
+            _logger.LogWarning("RatingStatistic not found for the establishment with Auth0 ID: {Auth0Id}", auth0Id);
             throw new Exception("RatingStatistic not found for the establishment.");
         }
 
@@ -233,6 +248,7 @@ public class EstablishmentService : IEstablishmentService
         }
         else
         {
+            _logger.LogWarning("Invalid rating value: {Rating}", rating);
             throw new ArgumentException("Invalid rating value", nameof(rating));
         }
 

@@ -55,11 +55,7 @@ public class Auth0Service : IAuth0Service
             password = PasswordUtils.Generate(),
             given_name = ownerInfo.FirstName,
             family_name = ownerInfo.LastName,
-            connection = "Username-Password-Authentication",
-            app_metadata = new
-            {
-                registeredInApi = true
-            }
+            connection = "Username-Password-Authentication"
         };
         
         // Get access token for Auth0 Management API
@@ -185,7 +181,11 @@ public class Auth0Service : IAuth0Service
         
         var requestBody = new
         {
-            roles = new[] { role }
+            roles = new[] { role },
+            app_metadata = new
+            {
+                registeredInApi = true
+            }
         };
         
         using var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");

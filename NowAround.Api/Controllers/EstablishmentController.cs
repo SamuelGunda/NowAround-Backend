@@ -7,6 +7,7 @@ using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;
 using NowAround.Api.Services.Interfaces;
+using NowAround.Api.Utilities;
 
 namespace NowAround.Api.Controllers;
 
@@ -77,20 +78,20 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     }
     
     [Authorize(Roles = "Establishment")]
-    [HttpPut("general-info")]
-    public async Task<IActionResult> UpdateEstablishmentGeneralInfoAsync(EstablishmentUpdateRequest establishmentUpdateRequest)
+    [HttpPut("generic-info")]
+    public async Task<IActionResult> UpdateEstablishmentGenericInfoAsync(EstablishmentGenericInfoUpdateRequest establishmentGenericInfoUpdateRequest)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
                       ?? throw new ArgumentException("Auth0Id not found");
         
-        await establishmentService.UpdateEstablishmentGeneralInfoAsync(auth0Id, establishmentUpdateRequest);
+        var genericInfo = await establishmentService.UpdateEstablishmentGenericInfoAsync(auth0Id, establishmentGenericInfoUpdateRequest);
         
-        return NoContent();
+        return Ok(genericInfo);
     }
     
     [Authorize(Roles = "Establishment")]
     [HttpPut ("picture/{pictureContext}")]
-    public async Task<IActionResult> UpdateEstablishmentPictureAsync([FromRoute] string pictureContext, IFormFile picture)
+    public async Task<IActionResult> UpdateEstablishmentPictureAsync([FromRoute] string pictureContext, [ContentType([ "image/jpeg", "image/png", "image/gif", "image/webp"])] IFormFile picture)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
                       ?? throw new ArgumentException("Auth0Id not found");
@@ -155,7 +156,7 @@ public class EstablishmentController(IEstablishmentService establishmentService)
 
     [Authorize(Roles = "Establishment")]
     [HttpPut("menu/item/image/{menuItemId:int}")]
-    public async Task<IActionResult> UpdateMenuItemPictureAsync(int menuItemId, IFormFile picture)
+    public async Task<IActionResult> UpdateMenuItemPictureAsync(int menuItemId, [ContentType([ "image/jpeg", "image/png", "image/gif", "image/webp"])] IFormFile picture)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
                       ?? throw new ArgumentException("Auth0Id not found");
