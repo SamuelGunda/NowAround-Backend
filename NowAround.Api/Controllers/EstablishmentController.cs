@@ -45,10 +45,13 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     
     [HttpGet("search")]
     public async Task<IActionResult> GetEstablishmentsWithFilterAsync(
-        double? northWestLat, double? northWestLong, 
-        double? southEastLat, double? southEastLong, 
-        string? name, int? priceCategory, 
-        string? categoryName, string? tagNames, int? page)
+        [Range(-90, 90)] double? northWestLat, [Range(-180, 180)] double? northWestLong, 
+        [Range(-90, 90)]double? southEastLat, [Range(-180, 180)] double? southEastLong, 
+        [StringLength(32, MinimumLength = 3)] string? name, 
+        [EnumDataType(typeof(PriceCategory))] int? priceCategory, 
+        string? categoryName, 
+        string? tagNames, 
+        int? page)
     {
         var tagNamesList = tagNames?.Split(',').ToList();
         var searchValues = new SearchValues

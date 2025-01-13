@@ -131,7 +131,12 @@ public class EstablishmentService : IEstablishmentService
 
     public async Task<List<EstablishmentMarkerResponse>> GetEstablishmentsWithFilterAsync(SearchValues searchValues, int page)
     {
-        searchValues.ValidateProperties();
+        if (!searchValues.ValidateProperties())
+        {
+            _logger.LogWarning("Invalid search values");
+            throw new InvalidSearchActionException("Invalid search values");
+        }
+        
         page = page >= 0 ? page : throw new InvalidSearchActionException("Page must be greater than 0");
         
         var establishmentMarkers = await _establishmentRepository.GetRangeWithFilterAsync(searchValues, page);
