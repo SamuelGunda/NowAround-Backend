@@ -51,10 +51,10 @@ public class EstablishmentService : IEstablishmentService
         var establishmentInfo = request.EstablishmentInfo;
         var personalInfo = request.OwnerInfo;
         
-        if (await _establishmentRepository.CheckIfExistsByPropertyAsync("Name", establishmentInfo.Name))
+        if (await _establishmentRepository.CheckIfExistsAsync("Name", establishmentInfo.Name))
         {
             _logger.LogWarning("An establishment with the name {Name} already exists.", establishmentInfo.Name);
-            throw new EstablishmentAlreadyExistsException(establishmentInfo.Name);
+            throw new EntityAlreadyExistsException("Establishment", "Name", establishmentInfo.Name);
         }
         
         var coordinates = await _mapboxService.GetCoordinatesFromAddressAsync(establishmentInfo.Address, establishmentInfo.PostalCode, establishmentInfo.City);
@@ -119,10 +119,6 @@ public class EstablishmentService : IEstablishmentService
     public async Task<EstablishmentProfileResponse> GetEstablishmentProfileByAuth0IdAsync(string auth0Id)
     {
         var establishment = await _establishmentRepository.GetProfileByAuth0IdAsync(auth0Id);
-        if (establishment == null)
-        {
-            throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
-        }
 
         return establishment;
     }
@@ -197,7 +193,7 @@ public class EstablishmentService : IEstablishmentService
             throw new ArgumentException("Invalid image context", nameof(pictureContext));
         }
         
-        var establishment = await GetEstablishmentByAuth0IdAsync(auth0Id, true);
+        var establishment = await _establishmentRepository.GetAsync(e => e.Auth0Id == auth0Id);
         var pictureUrl = await _storageService.UploadPictureAsync(picture, "Establishment", auth0Id, pictureContext);
         
         establishment.ProfilePictureUrl = pictureUrl.Contains("profile-picture") ? pictureUrl : establishment.ProfilePictureUrl;
@@ -210,8 +206,8 @@ public class EstablishmentService : IEstablishmentService
 
     public async Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus)
     {
-        var establishment = await GetEstablishmentByAuth0IdAsync(
-            auth0Id, 
+        var establishment = await _establishmentRepository.GetAsync(
+            e => e.Auth0Id == auth0Id, 
             true, 
             query => query.IgnoreQueryFilters());
         
@@ -222,8 +218,8 @@ public class EstablishmentService : IEstablishmentService
     
     public async Task UpdateRatingStatisticsAsync(string auth0Id, int rating)
     {
-        var establishment = await GetEstablishmentByAuth0IdAsync(
-            auth0Id, 
+        var establishment = await _establishmentRepository.GetAsync(
+            e => e.Auth0Id == auth0Id, 
             true, 
             query => query.Include(e => e.RatingStatistic));
 
@@ -279,13 +275,7 @@ public class EstablishmentService : IEstablishmentService
         {
             foreach (var categoryName in categoryNames)
             {
-                var categoryEntity = await _categoryRepository.GetByPropertyAsync("Name", categoryName);
-
-                if (categoryEntity == null)
-                {
-                    _logger.LogWarning("Category {CategoryName} not found", categoryName);
-                    throw new ArgumentException($"Category {categoryName} not found", nameof(Category));
-                }
+                var categoryEntity = await _categoryRepository.GetAsync(c => c.Name == categoryName);
 
                 categories.Add(categoryEntity);
             }
@@ -295,13 +285,7 @@ public class EstablishmentService : IEstablishmentService
         {
             foreach (var tag in tagNames)
             {
-                var tagEntity = await _tagRepository.GetByPropertyAsync("Name", tag);
-
-                if (tagEntity == null)
-                {
-                    _logger.LogWarning("Tag {TagName} not found", tag);
-                    throw new ArgumentException($"Tag {tag} not found", nameof(Tag));
-                }
+                var tagEntity = await _tagRepository.GetAsync(t => t.Name == tag);
                 
                 tags.Add(tagEntity);
             }
@@ -311,34 +295,34 @@ public class EstablishmentService : IEstablishmentService
     
     // Menu methods
     
-    public async Task<MenuDto> AddMenuAsync(string auth0Id, MenuCreateRequest menu)
-    {
-        var establishment = await _establishmentRepository.GetAsync
-        (
-            e => e.Auth0Id == auth0Id, 
-            true, 
-            query => query
-                .Include(e => e.Menus)
-        );
-        
-        var menuEntity = new Menu
+        public async Task<MenuDto> AddMenuAsync(string auth0Id, MenuCreateRequest menu)
         {
-            Name = menu.Name,
-            EstablishmentId = establishment.Id,
-            MenuItems = menu.MenuItems.Select(mi => new MenuItem
+            var establishment = await _establishmentRepository.GetAsync
+            (
+                e => e.Auth0Id == auth0Id, 
+                true, 
+                query => query
+                    .Include(e => e.Menus)
+            );
+            
+            var menuEntity = new Menu
             {
-                Name = mi.Name,
-                Description = mi.Description,
-                Price = mi.Price
-            }).ToList()
-        };
-        
-        establishment.Menus.Add(menuEntity);
-        
-        await _establishmentRepository.UpdateAsync(establishment);
-        
-        return menuEntity.ToDto();
-    }
+                Name = menu.Name,
+                EstablishmentId = establishment.Id,
+                MenuItems = menu.MenuItems.Select(mi => new MenuItem
+                {
+                    Name = mi.Name,
+                    Description = mi.Description,
+                    Price = mi.Price
+                }).ToList()
+            };
+            
+            establishment.Menus.Add(menuEntity);
+            
+            await _establishmentRepository.UpdateAsync(establishment);
+            
+            return menuEntity.ToDto();
+        }
 
     public async Task<MenuDto> UpdateMenuAsync(string auth0Id, MenuUpdateRequest updatedMenu)
     {

@@ -37,7 +37,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
         }
     }
     
-    public async Task<bool> CheckIfExistsByPropertyAsync(string propertyName, object propertyValue)
+    public async Task<bool> CheckIfExistsAsync(string propertyName, object propertyValue)
     {
         try
         {
@@ -55,7 +55,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
         }
     }
     
-    public async Task<T?> GetByIdAsync(int id)
+    public async Task<T> GetByIdAsync(int id)
     {
         try
         {
@@ -63,39 +63,19 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
             if (entity == null)
             {
                 Logger.LogWarning("{EntityType} with ID: {Id} does not exist", typeof(T).Name, id);
-                return null;
+                throw new EntityNotFoundException(typeof(T).Name, "ID", id.ToString());
             }
 
             return entity;
+        }
+        catch (EntityNotFoundException)
+        {
+            throw;
         }
         catch (Exception e)
         {
             Logger.LogError(e, "Failed to get {EntityType} by ID: {message}", typeof(T).Name, e.Message);
             throw new Exception($"Failed to get {typeof(T).Name} by ID", e);
-        }
-    }
-
-    public Task<T?> GetByPropertyAsync(string propertyName, object propertyValue)
-    {
-        try
-        {
-            var entity = DbSet.FirstOrDefault(e => EF.Property<object>(e, propertyName) == propertyValue);
-            if (entity == null)
-            {
-                Logger.LogWarning("{EntityType} with {propertyName}: {propertyValue} does not exist", typeof(T).Name,propertyName ,propertyValue);
-                return Task.FromResult<T?>(null);
-            }
-            return Task.FromResult<T?>(entity);
-        }
-        catch (InvalidOperationException e)
-        {
-            Logger.LogWarning("{EntityType} does not have property {propertyName}: {message}", typeof(T).Name, propertyName, e.Message);
-            throw new InvalidOperationException();
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Failed to get {EntityType} by {propertyName}: {message}", typeof(T).Name, propertyName, ex.Message);
-            throw new Exception($"Failed to get {typeof(T).Name} by {propertyName}", ex);
         }
     }
     
@@ -133,7 +113,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
 
             return entity;
         }
-        catch (EntityNotFoundException e)
+        catch (EntityNotFoundException)
         {
             throw;
         }

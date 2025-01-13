@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NowAround.Api.Database;
+using NowAround.Api.Exceptions;
 using NowAround.Api.IntegrationTests.Database;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Repositories;
@@ -94,7 +95,7 @@ public class BaseRepositoryTests
         await _context.SaveChangesAsync();
 
         // Act
-        var exists = await _repository.CheckIfExistsByPropertyAsync(nameof(TestEntity.Name), "Test Name");
+        var exists = await _repository.CheckIfExistsAsync(nameof(TestEntity.Name), "Test Name");
 
         // Assert
         Assert.True(exists);
@@ -109,7 +110,7 @@ public class BaseRepositoryTests
         await _context.SaveChangesAsync();
 
         // Act
-        var exists = await _repository.CheckIfExistsByPropertyAsync(nameof(TestEntity.Name), "Invalid Name");
+        var exists = await _repository.CheckIfExistsAsync(nameof(TestEntity.Name), "Invalid Name");
 
         // Assert
         Assert.False(exists);
@@ -125,7 +126,7 @@ public class BaseRepositoryTests
         
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _repository.CheckIfExistsByPropertyAsync("InvalidPropertyName", "Test Name"));
+            _repository.CheckIfExistsAsync("InvalidPropertyName", "Test Name"));
     }
 
     // GetByIdAsync tests
@@ -147,18 +148,16 @@ public class BaseRepositoryTests
     }
     
     [Fact]
-    public async Task GetByIdAsync_WhenEntityDoesNotExist_ShouldReturnNull()
+    public async Task GetByIdAsync_WhenEntityDoesNotExist_ShouldThrowEntityNowFoundException()
     {
         // Arrange
         var testEntity = new TestEntity { Name = "Test Name" };
         await _context.Set<TestEntity>().AddAsync(testEntity);
         await _context.SaveChangesAsync();
 
-        // Act
-        var entity = await _repository.GetByIdAsync(testEntity.Id + 1);
-
-        // Assert
-        Assert.Null(entity);
+        // Act & Assert
+        
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => _repository.GetByIdAsync(testEntity.Id + 1));
     }
     
     [Fact]
@@ -176,53 +175,6 @@ public class BaseRepositoryTests
         
         return; 
         async Task Act() => await _repository.GetByIdAsync(testEntity.Id);
-    }
-    
-    // GetByPropertyAsync tests
-    
-    [Fact]
-    public async Task GetByPropertyAsync_WhenEntityExists_ShouldReturnEntity()
-    {
-        // Arrange
-        var testEntity = new TestEntity { Name = "Test Name" };
-        await _context.Set<TestEntity>().AddAsync(testEntity);
-        await _context.SaveChangesAsync();
-
-        // Act
-        var entity = await _repository.GetByPropertyAsync(nameof(TestEntity.Name), "Test Name");
-
-        // Assert
-        Assert.NotNull(entity);
-        Assert.Equal("Test Name", entity.Name);
-    }
-    
-    [Fact]
-    public async Task GetByPropertyAsync_WhenEntityDoesNotExist_ShouldReturnNull()
-    {
-        // Arrange
-        var testEntity = new TestEntity { Name = "Test Name" };
-        await _context.Set<TestEntity>().AddAsync(testEntity);
-        await _context.SaveChangesAsync();
-
-        // Act
-        var entity = await _repository.GetByPropertyAsync(nameof(TestEntity.Name), "Invalid Name");
-
-        // Assert
-        Assert.Null(entity);
-    }
-    
-    [Fact]
-    public async Task GetByPropertyAsync_WhenPropertyDoesNotExist_ShouldThrowInvalidOperationException()
-    {
-        // Arrange
-        var testEntity = new TestEntity { Name = "Test Name" };
-        await _context.Set<TestEntity>().AddAsync(testEntity);
-        await _context.SaveChangesAsync();
-
-
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _repository.GetByPropertyAsync("InvalidPropertyName", "Test Name"));
     }
     
     // GetAllAsync tests

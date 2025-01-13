@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Requests;
@@ -33,7 +34,7 @@ public class ReviewService : IReviewService
         if (user.Reviews.Any(r => r.RatingCollectionId == establishment.RatingStatistic.Id))
         {
             _logger.LogWarning("User {Auth0Id} has already reviewed establishment {EstablishmentAuth0Id}", auth0Id, reviewCreateRequest.EstablishmentAuth0Id);
-            throw new InvalidOperationException("User has already reviewed this establishment");
+            throw new EntityAlreadyExistsException("Review", "User", "User has already reviewed this establishment");        
         }
         
         var reviewEntity = new Review
