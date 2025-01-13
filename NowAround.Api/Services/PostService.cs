@@ -45,13 +45,6 @@ public class PostService : IPostService
         return postEntity.ToDto();
     }
 
-    private async Task<bool> CheckPostOwnershipByAuth0IdAsync(string auth0Id, int postId)
-    {
-        var post = await GetPostAsync(postId);
-        
-        return auth0Id == post.Establishment.Auth0Id;
-    }
-
     public async Task<Post> GetPostAsync(int postId, bool tracked = false)
     {
         var post = await _postRepository.GetAsync
@@ -61,12 +54,6 @@ public class PostService : IPostService
             query => query.Include(q => q.Establishment), 
             query => query.Include(p => p.Likes)
         );
-        
-        if (post == null)
-        {
-            _logger.LogWarning("Post with ID: {PostId} not found", postId);
-            throw new EntityNotFoundException("Post", "ID", postId.ToString());
-        }
         
         return post;
     }
@@ -87,13 +74,19 @@ public class PostService : IPostService
 
     public async Task DeletePostAsync(string auth0Id, int postId)
     {
-        if (!await CheckPostOwnershipByAuth0IdAsync(auth0Id, postId))
+        var post = await GetPostAsync(postId);
+        
+        if (auth0Id != post.Establishment.Auth0Id)
         {
-            throw new UnauthorizedAccessException("You are not the owner of this post");
+            _logger.LogWarning("User {Auth0Id} is not the owner of post {PostId}", auth0Id, postId);
+            throw new UnauthorizedAccessException("User is not the owner of the post");
         }
         
         await _postRepository.DeleteAsync(postId);
         
-        await _storageService.DeleteAsync("Establishment", auth0Id, $"post/{postId}");
+        if (post.PictureUrl is not null)
+        {
+            await _storageService.DeleteAsync("Establishment", auth0Id, $"post/{postId}");
+        }
     }
 }
