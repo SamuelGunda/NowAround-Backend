@@ -216,26 +216,26 @@ public class EstablishmentService : IEstablishmentService
         await _establishmentRepository.UpdateAsync(establishment);
     }
     
-    public async Task UpdateRatingStatisticsAsync(string auth0Id, int rating)
+    public async Task UpdateRatingStatisticsAsync(int id, int rating, bool increment = true)
     {
         var establishment = await _establishmentRepository.GetAsync(
-            e => e.Auth0Id == auth0Id, 
+            e => e.RatingStatistic.Id == id, 
             true, 
             query => query.Include(e => e.RatingStatistic));
 
         if (establishment.RatingStatistic == null)
         {
-            _logger.LogWarning("RatingStatistic not found for the establishment with Auth0 ID: {Auth0Id}", auth0Id);
+            _logger.LogWarning("RatingStatistic not found for the establishment with Auth0 ID: {establishment.Auth0Id}", establishment.Auth0Id);
             throw new Exception("RatingStatistic not found for the establishment.");
         }
 
         var ratingMap = new Dictionary<int, Action>
         {
-            { 1, () => establishment.RatingStatistic.OneStar++ },
-            { 2, () => establishment.RatingStatistic.TwoStars++ },
-            { 3, () => establishment.RatingStatistic.ThreeStars++ },
-            { 4, () => establishment.RatingStatistic.FourStars++ },
-            { 5, () => establishment.RatingStatistic.FiveStars++ }
+            { 1, () => { if (increment) establishment.RatingStatistic.OneStar++; else establishment.RatingStatistic.OneStar--; } },
+            { 2, () => { if (increment) establishment.RatingStatistic.TwoStars++; else establishment.RatingStatistic.TwoStars--; } },
+            { 3, () => { if (increment) establishment.RatingStatistic.ThreeStars++; else establishment.RatingStatistic.ThreeStars--; } },
+            { 4, () => { if (increment) establishment.RatingStatistic.FourStars++; else establishment.RatingStatistic.FourStars--; } },
+            { 5, () => { if (increment) establishment.RatingStatistic.FiveStars++; else establishment.RatingStatistic.FiveStars--; } }
         };
 
         if (ratingMap.TryGetValue(rating, out var value))

@@ -6,5 +6,4 @@ public sealed class EmailAlreadyInUseException : Exception
         : base($"The email address: {email} is already in use by another existing account")
     {
     }
-    
 }

@@ -21,7 +21,7 @@ public interface IEstablishmentService
     Task<GenericInfo> UpdateEstablishmentGenericInfoAsync(string auth0Id, EstablishmentGenericInfoUpdateRequest request);
     Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus);
     Task<string> UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile picture);
-    Task UpdateRatingStatisticsAsync(string auth0Id, int rating);
+    Task UpdateRatingStatisticsAsync(int id, int rating, bool increment = true);
     Task DeleteEstablishmentAsync(string auth0Id);
     
     // Menu Methods
