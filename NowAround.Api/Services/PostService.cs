@@ -12,13 +12,20 @@ public class PostService : IPostService
 {
     private readonly ILogger<PostService> _logger;
     private readonly IEstablishmentService _establishmentService;
+    private readonly IUserService _userService;
     private readonly IPostRepository _postRepository;
     private readonly IStorageService _storageService;
     
-    public PostService(ILogger<PostService> logger ,IEstablishmentService establishmentService, IPostRepository postRepository, IStorageService storageService)
+    public PostService(
+        ILogger<PostService> logger, 
+        IEstablishmentService establishmentService,
+        IUserService userService,
+        IPostRepository postRepository, 
+        IStorageService storageService)
     {
         _logger = logger;
         _establishmentService = establishmentService;
+        _userService = userService;
         _postRepository = postRepository;
         _storageService = storageService;
     }
@@ -56,6 +63,24 @@ public class PostService : IPostService
         );
         
         return post;
+    }
+    public async Task ReactToPostAsync(int postId, string auth0Id)
+    {
+        var post = await _postRepository.GetAsync(
+            p => p.Id == postId, 
+            true, 
+            query => query.Include(p => p.Likes));
+        
+        if (post.Likes.Any(l => l.Auth0Id == auth0Id))
+        {
+            post.Likes.Remove(post.Likes.First(l => l.Auth0Id == auth0Id));
+        }
+        else
+        {
+            post.Likes.Add(await _userService.GetUserByAuth0IdAsync(auth0Id));
+        }
+        
+        await _postRepository.UpdateAsync(post);
     }
 
     public Task<PostDto> UpdatePostAsync(int postId, string auth0Id, PostCreateUpdateRequest postCreateUpdateRequest)
