@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
-using NowAround.Api.Apis.Auth0.Models.Requests;
-using NowAround.Api.Apis.Mapbox.Interfaces;
+using NowAround.Api.Apis.Mapbox.Services.Interfaces;
 using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
@@ -46,10 +44,8 @@ public class EstablishmentService : IEstablishmentService
     
     public async Task RegisterEstablishmentAsync(EstablishmentRegisterRequest request)
     {
-        request.ValidateProperties();
-        
         var establishmentInfo = request.EstablishmentInfo;
-        var personalInfo = request.OwnerInfo;
+        var personalInfo = request.EstablishmentOwnerInfo;
         
         if (await _establishmentRepository.CheckIfExistsAsync("Name", establishmentInfo.Name))
         {
@@ -59,7 +55,6 @@ public class EstablishmentService : IEstablishmentService
         
         var coordinates = await _mapboxService.GetCoordinatesFromAddressAsync(establishmentInfo.Address, establishmentInfo.PostalCode, establishmentInfo.City);
         
-        // Check if categories and tags exist by their name and get them from the database
         var catsAndTags = await GetCategoriesAndTagsAsync(establishmentInfo.Category, establishmentInfo.Tags);
         
         var auth0Id = await _auth0Service.RegisterEstablishmentAccountAsync(personalInfo);

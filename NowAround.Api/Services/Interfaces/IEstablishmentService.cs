@@ -1,5 +1,4 @@
-﻿using NowAround.Api.Apis.Auth0.Models.Requests;
-using NowAround.Api.Models.Domain;
+﻿using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
 using NowAround.Api.Models.Entities;
 using NowAround.Api.Models.Enum;

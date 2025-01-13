@@ -1,8 +1,8 @@
 ﻿using Azure.Storage.Blobs;
 using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Auth0.Services;
-using NowAround.Api.Apis.Mapbox.Interfaces;
 using NowAround.Api.Apis.Mapbox.Services;
+using NowAround.Api.Apis.Mapbox.Services.Interfaces;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Repositories;
 using NowAround.Api.Repositories.Interfaces;

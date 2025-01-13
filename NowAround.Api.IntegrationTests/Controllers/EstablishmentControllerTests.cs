@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Newtonsoft.Json;
-using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
-using NowAround.Api.Apis.Auth0.Models.Requests;
-using NowAround.Api.Apis.Mapbox.Interfaces;
+using NowAround.Api.Apis.Mapbox.Services.Interfaces;
 using NowAround.Api.Database;
+using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Enum;
 using NowAround.Api.Models.Requests;
@@ -50,7 +49,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
     public async Task RegisterEstablishmentAsync_WithValidRequest_ShouldReturnCreated()
     {
         _auth0ServiceMock
-            .Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>()))
+            .Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<EstablishmentOwnerInfo>()))
             .ReturnsAsync("auth0|valid_register");
 
         _mapboxServiceMock
@@ -74,7 +73,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
                 Category = new List<string> { "BAR" },
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            OwnerInfo = new OwnerInfo
+            EstablishmentOwnerInfo = new EstablishmentOwnerInfo
             {
                 FirstName = "Test",
                 LastName = "Bar",
@@ -110,10 +109,11 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
                 Category = new List<string> { "BAR" },
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            OwnerInfo = new OwnerInfo
+            EstablishmentOwnerInfo = new EstablishmentOwnerInfo
             {
                 FirstName = "Test",
-                LastName = "Bar"
+                LastName = "Bar",
+                Email = "InvalidEmail"
             }
         };
         
@@ -145,7 +145,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
                 Category = new List<string> { "BAR" },
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            OwnerInfo = new OwnerInfo
+            EstablishmentOwnerInfo = new EstablishmentOwnerInfo
             {
                 FirstName = "Test",
                 LastName = "Bar",
@@ -166,7 +166,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
     public async Task RegisterEstablishmentAsync_WithEmailTaken_ShouldReturnConflict()
     {
         _auth0ServiceMock
-            .Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>()))
+            .Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<EstablishmentOwnerInfo>()))
             .ThrowsAsync(new EmailAlreadyInUseException("Email already in use"));
 
         var factory = new NowAroundWebApplicationFactory(_auth0ServiceMock);
@@ -185,7 +185,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
                 Category = new List<string> { "BAR" },
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            OwnerInfo = new OwnerInfo
+            EstablishmentOwnerInfo = new EstablishmentOwnerInfo
             {
                 FirstName = "Test",
                 LastName = "Bar",

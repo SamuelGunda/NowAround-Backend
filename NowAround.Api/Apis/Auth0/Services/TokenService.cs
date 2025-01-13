@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using NowAround.Api.Apis.Auth0.Interfaces;
-using NowAround.Api.Apis.Auth0.Models.Responses;
+using NowAround.Api.Models.Responses;
 
 namespace NowAround.Api.Apis.Auth0.Services;
 
@@ -31,15 +31,8 @@ public class TokenService : ITokenService
         _managementScopes = configuration["Auth0:ManagementScopes"] ?? throw new ArgumentNullException(configuration["Auth0:ManagementScopes"]);
     }
     
-    /// <summary>
-    /// Get access token for Auth0 Management API
-    /// Token is either fetched from cache or requested from Auth0 API
-    /// and then cached for future use
-    /// </summary>
-    
     public async Task<string> GetManagementAccessTokenAsync()
     {
-        // Check if token is already cached
         var accessToken = _memoryCache.Get<string>("managementAccessToken");
         
         if (accessToken != null)
@@ -56,7 +49,6 @@ public class TokenService : ITokenService
             scope =  _managementScopes
         };
         
-        // Send request to Auth0 API to get access token
         var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
         var response = await _httpClient.PostAsync($"https://{_domain}/oauth/token", content);
         

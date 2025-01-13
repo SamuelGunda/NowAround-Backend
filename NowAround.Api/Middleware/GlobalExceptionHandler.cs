@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Exceptions;
 
 namespace NowAround.Api.Middleware;

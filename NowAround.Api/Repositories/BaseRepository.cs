@@ -108,7 +108,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
             if (entity == null)
             {
                 Logger.LogWarning("{EntityType} does not exist", typeof(T).Name);
-                throw new EntityNotFoundException(typeof(T).Name, "filter", filter?.ToString() ?? "null");
+                throw new EntityNotFoundException(typeof(T).Name);
             }
 
             return entity;

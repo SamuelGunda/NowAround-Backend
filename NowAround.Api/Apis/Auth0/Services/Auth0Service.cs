@@ -3,12 +3,12 @@ using System.Text;
 using Auth0.ManagementApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
-using NowAround.Api.Apis.Auth0.Models.Requests;
-using NowAround.Api.Apis.Auth0.Utilities;
+using NowAround.Api.Exceptions;
+using NowAround.Api.Models.Requests;
 using NowAround.Api.Services;
 using NowAround.Api.Services.Interfaces;
+using NowAround.Api.Utilities;
 
 namespace NowAround.Api.Apis.Auth0.Services;
 
@@ -45,21 +45,19 @@ public class Auth0Service : IAuth0Service
     /// Registers a new establishment account by creating a new user in Auth0 and assigning a role to the user.
     /// Establishment goes into a pending state until the establishment is verified.
     /// </summary>
-    /// <param name="ownerInfo"> The personal information of the establishment owner </param>
+    /// <param name="establishmentOwnerInfo"> The personal information of the establishment owner </param>
     /// <returns> The Auth0 user ID of the newly created establishment account </returns>
     /// <exception cref="EmailAlreadyInUseException"> Thrown when the email is already in use </exception>
     /// <exception cref="HttpRequestException"> Thrown when the request to Auth0 API fails </exception>
     /// <exception cref="JsonException"> Thrown when the response from Auth0 API cannot be deserialized </exception>
-    public async Task<string> RegisterEstablishmentAccountAsync(OwnerInfo ownerInfo)
+    public async Task<string> RegisterEstablishmentAccountAsync(EstablishmentOwnerInfo establishmentOwnerInfo)
     {
-        ownerInfo.ValidateProperties();
-        
         var requestBody = new
         {
-            email = ownerInfo.Email,
+            email = establishmentOwnerInfo.Email,
             password = PasswordUtils.Generate(),
-            given_name = ownerInfo.FirstName,
-            family_name = ownerInfo.LastName,
+            given_name = establishmentOwnerInfo.FirstName,
+            family_name = establishmentOwnerInfo.LastName,
             connection = "Username-Password-Authentication"
         };
         
@@ -82,7 +80,7 @@ public class Auth0Service : IAuth0Service
             if (response is {StatusCode: HttpStatusCode.Conflict})
             {
                 _logger.LogWarning("Failed to create establishment. Email already in use. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
-                throw new EmailAlreadyInUseException(ownerInfo.Email);
+                throw new EmailAlreadyInUseException(establishmentOwnerInfo.Email);
             }
             
             // If request failed, throw an exception
@@ -95,7 +93,7 @@ public class Auth0Service : IAuth0Service
         
         await AssignRoleAsync(user.UserId, "establishment");
         
-        await _mailService.SendWelcomeEmailAsync($"{ownerInfo.FirstName} {ownerInfo.LastName}", ownerInfo.Email);
+        await _mailService.SendWelcomeEmailAsync($"{establishmentOwnerInfo.FirstName} {establishmentOwnerInfo.LastName}", establishmentOwnerInfo.Email);
         
         return user.UserId;
     }

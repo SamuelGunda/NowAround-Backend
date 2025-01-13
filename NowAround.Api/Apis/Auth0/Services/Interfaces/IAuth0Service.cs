@@ -1,11 +1,11 @@
-﻿using NowAround.Api.Apis.Auth0.Models.Requests;
+﻿using NowAround.Api.Models.Requests;
 
 namespace NowAround.Api.Apis.Auth0.Interfaces;
 
 public interface IAuth0Service
 {
     // Establishment account functions
-    Task<string> RegisterEstablishmentAccountAsync(OwnerInfo ownerInfo);
+    Task<string> RegisterEstablishmentAccountAsync(EstablishmentOwnerInfo establishmentOwnerInfo);
     Task<string> GetEstablishmentOwnerFullNameAsync(string auth0Id);
     
     Task DeleteAccountAsync(string auth0Id);

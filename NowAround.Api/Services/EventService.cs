@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NowAround.Api.Apis.Mapbox.Interfaces;
+using NowAround.Api.Apis.Mapbox.Services.Interfaces;
 using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;

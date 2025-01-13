@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NowAround.Api.Apis.Mapbox.Interfaces;
+using NowAround.Api.Apis.Mapbox.Services.Interfaces;
 
 namespace NowAround.Api.Apis.Mapbox.Services;
 

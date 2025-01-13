@@ -31,7 +31,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Apis\Gmail\Services\" />
         <Folder Include="Migrations\" />
     </ItemGroup>
     
