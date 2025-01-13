@@ -56,4 +56,56 @@ public class MapboxService : IMapboxService
         
         return (lat, lng);
     }
+
+    public async Task<(string address, string city)> GetAddressFromCoordinatesAsync(double lat, double lng)
+    {
+        var url = $"https://api.mapbox.com/geocoding/v5/mapbox.places/{lng},{lat}.json?access_token={_mapboxAccessToken}";
+
+        try
+        {
+            var response = await _httpClient.GetStringAsync(url);
+            var responseJson = JsonConvert.DeserializeObject<JObject>(response);
+        
+            if (responseJson == null)
+            {
+                _logger.LogError("Unable to deserialize the API response.");
+                throw new InvalidOperationException("Unable to deserialize the API response.");
+            }
+
+            var placeName = responseJson["features"]?[0]?["place_name"]?.ToString();
+
+            if (string.IsNullOrEmpty(placeName))
+            {
+                _logger.LogError("Unable to retrieve address from the API response.");
+                throw new InvalidOperationException("Unable to retrieve address from the API response.");
+            }
+            
+            var (address, city) = ParsePlaceName(placeName);
+            return (address, city);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while retrieving the address from Mapbox.");
+            throw new InvalidOperationException("An error occurred while retrieving the address.", ex);
+        }
+    }
+    
+    private (string address, string city) ParsePlaceName(string placeName)
+    {
+        var parts = placeName.Split(',');
+
+        if (parts.Length >= 2)
+        {
+            var address = parts[0].Trim();
+
+            var city = parts[1].Trim();
+
+            return (address, city);
+        }
+        else
+        {
+            _logger.LogError("The place name format is unexpected.");
+            throw new InvalidOperationException("Unable to parse the place name.");
+        }
+    }
 }

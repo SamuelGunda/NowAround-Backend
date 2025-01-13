@@ -163,11 +163,11 @@ public class EstablishmentService : IEstablishmentService
         
         var catsAndTags = await GetCategoriesAndTagsAsync(request.Categories, request.Tags);
         
-        establishment.Name = request.Name ?? establishment.Name;
-        establishment.Description = request.Description ?? establishment.Description;
-        establishment.PriceCategory = request.PriceCategory.HasValue ? (PriceCategory) request.PriceCategory.Value : establishment.PriceCategory;
-        establishment.Categories = catsAndTags.categories.Length > 0 ? catsAndTags.categories.ToList() : establishment.Categories.ToList();
-        establishment.Tags = catsAndTags.tags.Length > 0 ? catsAndTags.tags.ToList() : establishment.Tags.ToList();
+        establishment.Name = request.Name;
+        establishment.Description = request.Description;
+        establishment.PriceCategory = (PriceCategory)request.PriceCategory;
+        establishment.Categories = catsAndTags.categories.ToList();
+        establishment.Tags = catsAndTags.tags.ToList();
         
         await _establishmentRepository.UpdateAsync(establishment);
         
@@ -183,6 +183,59 @@ public class EstablishmentService : IEstablishmentService
         );
         
         return genericInfo;
+    }
+
+    public async Task<LocationInfo> UpdateEstablishmentLocationInfoAsync(string auth0Id, EstablishmentLocationInfoUpdateRequest request)
+    {
+        var establishment = await _establishmentRepository.GetAsync(
+            e => e.Auth0Id == auth0Id,
+            true,
+            query => query.Include(e => e.BusinessHours));
+
+        var addressAndCity = await _mapboxService.GetAddressFromCoordinatesAsync(request.Lat, request.Long);
+        establishment.Latitude = request.Lat;
+        establishment.Longitude = request.Long;
+        establishment.Address = addressAndCity.address;
+        establishment.City = addressAndCity.city;
+
+        var businessHours = request.BusinessHours;
+        establishment.BusinessHours.Monday = businessHours.Monday;
+        establishment.BusinessHours.Tuesday = businessHours.Tuesday;
+        establishment.BusinessHours.Wednesday = businessHours.Wednesday;
+        establishment.BusinessHours.Thursday = businessHours.Thursday;
+        establishment.BusinessHours.Friday = businessHours.Friday;
+        establishment.BusinessHours.Saturday = businessHours.Saturday;
+        establishment.BusinessHours.Sunday = businessHours.Sunday;
+        
+        foreach (var exception in request.BusinessHours.BusinessHoursExceptions)
+        {
+            establishment.BusinessHours.BusinessHoursExceptions.Add(new BusinessHoursException
+            {
+                Date = exception.Date,
+                Status = exception.Status
+            });
+        }
+        
+        await _establishmentRepository.UpdateAsync(establishment);
+        
+        return new LocationInfo(
+            establishment.Address,
+            establishment.City,
+            establishment.Latitude,
+            establishment.Longitude,
+            new BusinessHoursDto(
+                establishment.BusinessHours.Monday,
+                establishment.BusinessHours.Tuesday,
+                establishment.BusinessHours.Wednesday,
+                establishment.BusinessHours.Thursday,
+                establishment.BusinessHours.Friday,
+                establishment.BusinessHours.Saturday,
+                establishment.BusinessHours.Sunday,
+                establishment.BusinessHours.BusinessHoursExceptions
+                    .Select(e => new BusinessHoursExceptionsDto(e.Date, e.Status))
+                    .ToList()
+            )
+        );
     }
 
     public async Task<string> UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile picture)
@@ -257,7 +310,6 @@ public class EstablishmentService : IEstablishmentService
         
         await _storageService.DeleteAsync("Establishment", auth0Id);
         
-        //TODO: Get whole establishment object and delete it
         var result = await _establishmentRepository.DeleteByAuth0IdAsync(auth0Id);
         if (!result)
         {
@@ -266,30 +318,25 @@ public class EstablishmentService : IEstablishmentService
         }
     }
 
-    private async Task<(Category[] categories, Tag[] tags)> GetCategoriesAndTagsAsync(ICollection<string>? categoryNames, ICollection<string>? tagNames)
+    private async Task<(Category[] categories, Tag[] tags)> GetCategoriesAndTagsAsync(ICollection<string> categoryNames, ICollection<string> tagNames)
     {
         List<Category> categories = [];
         List<Tag> tags = [];
-
-        if (categoryNames != null)
+        
+        foreach (var categoryName in categoryNames)
         {
-            foreach (var categoryName in categoryNames)
-            {
-                var categoryEntity = await _categoryRepository.GetAsync(c => c.Name == categoryName);
+            var categoryEntity = await _categoryRepository.GetAsync(c => c.Name == categoryName);
 
-                categories.Add(categoryEntity);
-            }
+            categories.Add(categoryEntity);
         }
-
-        if (tagNames != null)
+        
+        foreach (var tag in tagNames)
         {
-            foreach (var tag in tagNames)
-            {
-                var tagEntity = await _tagRepository.GetAsync(t => t.Name == tag);
-                
-                tags.Add(tagEntity);
-            }
+            var tagEntity = await _tagRepository.GetAsync(t => t.Name == tag);
+            
+            tags.Add(tagEntity);
         }
+        
         return (categories.ToArray(), tags.ToArray());
     }
     

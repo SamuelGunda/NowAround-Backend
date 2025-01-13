@@ -90,6 +90,18 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     }
     
     [Authorize(Roles = "Establishment")]
+    [HttpPut("location-info")]
+    public async Task<IActionResult> UpdateEstablishmentLocationInfoAsync(EstablishmentLocationInfoUpdateRequest establishmentLocationInfoUpdateRequest)
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
+                      ?? throw new ArgumentException("Auth0Id not found");
+        
+        var locationInfo = await establishmentService.UpdateEstablishmentLocationInfoAsync(auth0Id, establishmentLocationInfoUpdateRequest);
+        
+        return Ok(locationInfo);
+    }
+    
+    [Authorize(Roles = "Establishment")]
     [HttpPut ("picture/{pictureContext}")]
     public async Task<IActionResult> UpdateEstablishmentPictureAsync([FromRoute] string pictureContext, [ContentType([ "image/jpeg", "image/png", "image/gif", "image/webp"])] IFormFile picture)
     {
