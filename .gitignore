@@ -5,3 +5,4 @@ riderModule.iml
 /_ReSharper.Caches/
 *.idea/
 NowAround.Api/appsettings.Development.json
+NowAround.WebApi/appsettings.Development.json
