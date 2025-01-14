@@ -6,8 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using NowAround.Application.Common.Exceptions;
 using NowAround.Application.Common.Helpers;
-using NowAround.Application.Dtos;
 using NowAround.Application.Interfaces;
+using NowAround.Application.Requests;
 using NowAround.Application.Services;
 using User = Auth0.ManagementApi.Models.User;
 

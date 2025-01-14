@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NowAround.Api.Models.Requests;
+namespace NowAround.Application.Requests;
 
 public class EstablishmentOwnerInfo
 {

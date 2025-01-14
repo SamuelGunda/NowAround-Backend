@@ -1,10 +1,6 @@
 ﻿using System.Text;
 
-<<<<<<<< HEAD:NowAround.Application/Common/Helpers/PasswordUtils.cs
 namespace NowAround.Application.Common.Helpers;
-========
-namespace NowAround.Api.Utilities;
->>>>>>>> main:NowAround.Api/Utilities/PasswordUtils.cs
 
 public static class PasswordUtils
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NowAround.Api.Exceptions;
 using NowAround.Application.Common.Exceptions;
 
 namespace NowAround.WebApi.Middleware;

@@ -1,4 +1,9 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+using NowAround.Domain.Enum;
+
+namespace NowAround.Application.Requests;
+
 public class EstablishmentInfo
 {
     [Required]

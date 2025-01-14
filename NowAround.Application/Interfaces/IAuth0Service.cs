@@ -1,4 +1,5 @@
 ﻿using NowAround.Application.Dtos;
+using NowAround.Application.Requests;
 
 namespace NowAround.Application.Interfaces;
 

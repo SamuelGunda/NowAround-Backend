@@ -1,4 +1,4 @@
-﻿using NowAround.Application.Dtos;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace NowAround.Application.Requests;
 

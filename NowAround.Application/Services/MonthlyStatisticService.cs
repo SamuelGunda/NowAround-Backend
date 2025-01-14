@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using NowAround.Application.Common.Helpers;
 using NowAround.Domain.Interfaces.Specific;
 using NowAround.Domain.Models;
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using NowAround.Api.Exceptions;
 using NowAround.Application.Common.Exceptions;
 using NowAround.Application.Dtos;
 using NowAround.Application.Interfaces;
