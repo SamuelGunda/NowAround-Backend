@@ -1,5 +1,4 @@
-﻿using Azure.Storage.Blobs;
-using NowAround.Api.Apis.Auth0.Interfaces;
+﻿using NowAround.Api.Apis.Auth0.Interfaces;
 using NowAround.Api.Apis.Auth0.Services;
 using NowAround.Api.Apis.Mapbox.Services;
 using NowAround.Api.Apis.Mapbox.Services.Interfaces;
@@ -8,8 +7,6 @@ using NowAround.Api.Repositories;
 using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Services;
 using NowAround.Api.Services.Interfaces;
-using NowAround.Api.Utilities;
-using NowAround.Api.Utilities.Interface;
 
 namespace NowAround.Api.Extensions;
 
@@ -39,8 +36,5 @@ public static class ServiceExtensions
         services.AddScoped<IEventRepository, EventRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-        
-        // Helpers
-        services.AddTransient<IDateHelper, DateHelper>();
     }
 }

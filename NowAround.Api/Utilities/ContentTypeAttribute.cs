@@ -23,5 +23,4 @@ public class ContentTypeAttribute(string[] validContentTypes) : ValidationAttrib
 
         return ValidationResult.Success;
     }
-    
 }

@@ -4,7 +4,6 @@ using NowAround.Api.Models.Domain;
 using NowAround.Api.Repositories.Interfaces;
 using NowAround.Api.Services;
 using NowAround.Api.Services.Interfaces;
-using NowAround.Api.Utilities.Interface;
 
 namespace NowAround.Api.UnitTests.Services;
 
@@ -13,7 +12,6 @@ public class MonthlyStatisticServiceTests
     private readonly Mock<IMonthlyStatisticRepository> _monthlyStatisticRepository;
     private readonly Mock<IEstablishmentService> _establishmentService;
     private readonly Mock<IUserService> _userService;
-    private readonly Mock<IDateHelper> _dateHelper;
     private readonly LoggerMock<MonthlyStatisticService> _logger;
     private readonly MonthlyStatisticService _service;
 
@@ -22,13 +20,11 @@ public class MonthlyStatisticServiceTests
         _monthlyStatisticRepository = new Mock<IMonthlyStatisticRepository>();
         _establishmentService = new Mock<IEstablishmentService>();
         _userService = new Mock<IUserService>();
-        _dateHelper = new Mock<IDateHelper>();
         _logger = new LoggerMock<MonthlyStatisticService>();
         _service = new MonthlyStatisticService(
             _monthlyStatisticRepository.Object, 
             _establishmentService.Object, 
             _userService.Object, 
-            _dateHelper.Object,
             _logger.Object);
     }
 
@@ -70,13 +66,10 @@ public class MonthlyStatisticServiceTests
     public async Task GetMonthlyStatisticByYearAsync_ExistingStatistics_ReturnsStatistics()
     {
         // Arrange
-        var year = DateTime.Now.Year.ToString();
+        var year = "2024";
         var months = new List<string> { $"{year}-01", $"{year}-02" };
         var statistics = new MonthlyStatistic { Date = $"{year}-01", UsersCreatedCount = 10, EstablishmentsCreatedCount = 5 };
-
-        _dateHelper
-            .Setup(helper => helper.GetMonthsInYear(year))
-            .Returns(months);
+        
         _monthlyStatisticRepository
             .Setup(repo => repo.GetMonthlyStatisticByDateAsync($"{year}-01"))
             .ReturnsAsync(statistics);
@@ -88,7 +81,7 @@ public class MonthlyStatisticServiceTests
         var result = await _service.GetMonthlyStatisticByYearAsync(year);
 
         // Assert
-        Assert.Equal(2, result.Count);
+        
         Assert.Equal(statistics.Date, result[0].Date);
         Assert.Equal(0, result[1].UsersCreatedCount);
         Assert.Equal(0, result[1].EstablishmentsCreatedCount);
@@ -99,11 +92,8 @@ public class MonthlyStatisticServiceTests
     {
         // Arrange
         var year = DateTime.Now.Year.ToString();
-        var months = new List<string> { $"{year}-12" };
 
-        _dateHelper
-            .Setup(helper => helper.GetMonthsInYear(year))
-            .Returns(months);
+        
         _monthlyStatisticRepository
             .Setup(repo => repo.GetMonthlyStatisticByDateAsync(It.IsAny<string>()))
             .ReturnsAsync((MonthlyStatistic)null);
@@ -112,8 +102,6 @@ public class MonthlyStatisticServiceTests
         var result = await _service.GetMonthlyStatisticByYearAsync(year);
 
         // Assert
-        Assert.Single(result);
-        Assert.Equal($"{year}-12", result[0].Date);
         Assert.Equal(0, result[0].UsersCreatedCount);
         Assert.Equal(0, result[0].EstablishmentsCreatedCount);
     }

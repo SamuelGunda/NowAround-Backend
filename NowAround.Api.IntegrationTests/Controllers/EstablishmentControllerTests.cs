@@ -435,7 +435,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
     }
     
     [Fact]
-    public async Task GetEstablishmentMarkersWithFilterAsync_WithInvalidPriceCategory_ShouldReturnInternalServerError()
+    public async Task GetEstablishmentMarkersWithFilterAsync_WithInvalidPriceCategory_ShouldReturnBadRequest()
     {
         // Arrange
         var factory = new NowAroundWebApplicationFactory();
@@ -446,7 +446,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         var response = await client.GetAsync("/api/establishment/search?priceCategory=5");
 
         // Assert
-        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
     
     [Fact]
