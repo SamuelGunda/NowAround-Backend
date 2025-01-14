@@ -13,6 +13,7 @@ namespace NowAround.Api.Services;
 public class EventService : IEventService
 {
     private readonly IEstablishmentService _establishmentService;
+    private readonly IUserService _userService;
     private readonly IMapboxService _mapboxService;
     private readonly IStorageService _storageService;
     private readonly IEventRepository _eventRepository;
@@ -20,6 +21,7 @@ public class EventService : IEventService
 
     public EventService(
         IEstablishmentService establishmentService,
+        IUserService userService,
         IMapboxService mapboxService, 
         IStorageService storageService,
         IEventRepository eventRepository,
@@ -27,6 +29,7 @@ public class EventService : IEventService
         )
     {
         _establishmentService = establishmentService;
+        _userService = userService;
         _mapboxService = mapboxService;
         _storageService = storageService;
         _eventRepository = eventRepository;
@@ -73,6 +76,25 @@ public class EventService : IEventService
         }
 
         return eventEntity.ToDto();
+    }
+    
+    public async Task ReactToEventAsync(int eventId, string auth0Id)
+    {
+        var eventEntity = await _eventRepository.GetAsync(
+            e => e.Id == eventId, 
+            true, 
+            e => e.Include(x => x.InterestedUsers));
+        
+        if (eventEntity.InterestedUsers.Any(iu => iu.Auth0Id == auth0Id))
+        {
+            eventEntity.InterestedUsers.Remove(eventEntity.InterestedUsers.First(iu => iu.Auth0Id == auth0Id));
+        }
+        else
+        {
+            eventEntity.InterestedUsers.Add(await _userService.GetUserByAuth0IdAsync(auth0Id));
+        }
+        
+        await _eventRepository.UpdateAsync(eventEntity);
     }
 
     public async Task DeleteEventAsync(string auth0Id, int eventId)

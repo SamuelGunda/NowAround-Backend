@@ -66,21 +66,21 @@ public class PostService : IPostService
     }
     public async Task ReactToPostAsync(int postId, string auth0Id)
     {
-        var post = await _postRepository.GetAsync(
+        var postEntity = await _postRepository.GetAsync(
             p => p.Id == postId, 
             true, 
             query => query.Include(p => p.Likes));
         
-        if (post.Likes.Any(l => l.Auth0Id == auth0Id))
+        if (postEntity.Likes.Any(l => l.Auth0Id == auth0Id))
         {
-            post.Likes.Remove(post.Likes.First(l => l.Auth0Id == auth0Id));
+            postEntity.Likes.Remove(postEntity.Likes.First(l => l.Auth0Id == auth0Id));
         }
         else
         {
-            post.Likes.Add(await _userService.GetUserByAuth0IdAsync(auth0Id));
+            postEntity.Likes.Add(await _userService.GetUserByAuth0IdAsync(auth0Id));
         }
         
-        await _postRepository.UpdateAsync(post);
+        await _postRepository.UpdateAsync(postEntity);
     }
 
     public Task<PostDto> UpdatePostAsync(int postId, string auth0Id, PostCreateUpdateRequest postCreateUpdateRequest)
