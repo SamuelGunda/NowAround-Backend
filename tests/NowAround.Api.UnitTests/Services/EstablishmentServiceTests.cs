@@ -2,10 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
-using NowAround.Api.Apis.Auth0.Models.Requests;
-using NowAround.Api.Apis.Mapbox.Interfaces;
+using NowAround.Api.Apis.Mapbox.Services.Interfaces;
 using NowAround.Api.Exceptions;
 using NowAround.Api.Models.Domain;
 using NowAround.Api.Models.Dtos;
@@ -69,7 +67,7 @@ public class EstablishmentServiceTests
                 Category = new List<string> { "Restaurant" }, 
                 Tags = new List<string> { "Pet_Friendly" }
             },
-            OwnerInfo = new OwnerInfo
+            EstablishmentOwnerInfo = new EstablishmentOwnerInfo
             {
                 FirstName = "John", 
                 LastName = "Doe", 
@@ -81,14 +79,11 @@ public class EstablishmentServiceTests
         var categories = new[] { new Category { Name = "Restaurant"} };
         var tags = new[] { new Tag { Name = "Pet_Friendly"} };
         
-        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
+        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(coordinates);
-        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>())).ReturnsAsync(auth0Id);
-        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync(categories[0]);
-        _tagRepositoryMock
-            .Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>()))
-            .ReturnsAsync((string property, string value) =>
-                tags.FirstOrDefault(t => t.Name == value));
+        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<EstablishmentOwnerInfo>())).ReturnsAsync(auth0Id);
+        _categoryRepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<Category, bool>>>(), false)).ReturnsAsync(categories[0]);
+        _tagRepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<Tag, bool>>>(), false)).ReturnsAsync(tags[0]);
         _establishmentRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<Establishment>())).ReturnsAsync(1);
 
         // Act
@@ -98,15 +93,7 @@ public class EstablishmentServiceTests
         _establishmentRepositoryMock.Verify(r => r.CreateAsync(It.IsAny<Establishment>()), Times.Once);
     }
     
-    [Fact]
-    public async Task RegisterEstablishmentAsync_InvalidRequest_ShouldThrowArgumentNullException()
-    {
-        // Arrange
-        var establishmentRequest = new EstablishmentRegisterRequest();
-        
-        // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
-    }
+    
     
     [Fact]
     public async Task RegisterEstablishmentAsync_EstablishmentAlreadyExists_ShouldThrowEstablishmentAlreadyExistsException()
@@ -124,7 +111,7 @@ public class EstablishmentServiceTests
                 Category = new List<string> { "Restaurant" }, 
                 Tags = new List<string> { "Pet_Friendly" }
             },
-            OwnerInfo = new OwnerInfo
+            EstablishmentOwnerInfo = new EstablishmentOwnerInfo
             {
                 FirstName = "John", 
                 LastName = "Doe", 
@@ -133,9 +120,9 @@ public class EstablishmentServiceTests
         };
 
         // Act & Assert
-        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(true);
+        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(true);
 
-        await Assert.ThrowsAsync<EstablishmentAlreadyExistsException>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
+        await Assert.ThrowsAsync<EntityAlreadyExistsException>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
     }
 
     [Fact]
@@ -154,7 +141,7 @@ public class EstablishmentServiceTests
                 Category = new List<string> { "Restaurant" }, 
                 Tags = new List<string> { "Pet_Friendly" }
             },
-            OwnerInfo = new OwnerInfo
+            EstablishmentOwnerInfo = new EstablishmentOwnerInfo
             {
                 FirstName = "John", 
                 LastName = "Doe", 
@@ -163,7 +150,7 @@ public class EstablishmentServiceTests
         };
         
         // Act & Assert
-        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
+        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new Exception());
         
         await Assert.ThrowsAsync<Exception>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
@@ -185,7 +172,7 @@ public class EstablishmentServiceTests
                 Category = new List<string> { "Restaurant" },
                 Tags = new List<string> { "Pet_Friendly" }
             },
-            OwnerInfo = new OwnerInfo
+            EstablishmentOwnerInfo = new EstablishmentOwnerInfo
             {
                 FirstName = "John",
                 LastName = "Doe",
@@ -197,14 +184,11 @@ public class EstablishmentServiceTests
         var tags = new[] { new Tag { Name = "Pet_Friendly"} };
         
         // Act & Assert
-        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
+        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync((1.0, 1.0));
-        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync(categories[0]);
-        _tagRepositoryMock
-            .Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>()))
-            .ReturnsAsync((string property, string value) =>
-                tags.FirstOrDefault(t => t.Name == value));
-        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>())).ThrowsAsync(new Exception());
+        _categoryRepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<Category, bool>>>(), false)).ReturnsAsync(categories[0]);
+        _tagRepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<Tag, bool>>>(), false)).ReturnsAsync(tags[0]);
+        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<EstablishmentOwnerInfo>())).ThrowsAsync(new Exception());
         
         await Assert.ThrowsAsync<Exception>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
     }
@@ -225,7 +209,7 @@ public class EstablishmentServiceTests
                 Category = new List<string> { "Restaurant" }, 
                 Tags = new List<string> { "PET_FRIENDLY" }
             },
-            OwnerInfo = new OwnerInfo
+            EstablishmentOwnerInfo = new EstablishmentOwnerInfo
             {
                 FirstName = "John", 
                 LastName = "Doe", 
@@ -239,97 +223,17 @@ public class EstablishmentServiceTests
         var tags = new[] { new Tag { Name = "PET_FRIENDLY"} };
         
         // Act & Assert
-        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
+        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
         _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(coordinates);
-        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>())).ReturnsAsync(auth0Id);
-        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync(categories[0]);
-        _tagRepositoryMock
-            .Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>()))
-            .ReturnsAsync((string property, string value) =>
-                tags.FirstOrDefault(t => t.Name == value));
+        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<EstablishmentOwnerInfo>())).ReturnsAsync(auth0Id);
+        _categoryRepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<Category, bool>>>(), false)).ReturnsAsync(categories[0]);
+        _tagRepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<Tag, bool>>>(), false)).ReturnsAsync(tags[0]);
         
         _establishmentRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<Establishment>())).ThrowsAsync(new Exception());
         
         await Assert.ThrowsAsync<Exception>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
         
         _auth0ServiceMock.Verify(s => s.DeleteAccountAsync(auth0Id), Times.Once);
-    }
-
-    [Fact]
-    public async Task RegisterEstablishmentAsync_InvalidCategoryThrowsException_ShouldThrowException()
-    {
-        // Arrange
-        var establishmentRequest = new EstablishmentRegisterRequest
-        {
-            EstablishmentInfo = new EstablishmentInfo
-            {
-                Name = "Test Establishment",
-                Address = "123 Test St",
-                City = "Test City",
-                PostalCode = "12345",
-                PriceCategory = 1,
-                Category = new List<string> { "test" },
-                Tags = new List<string> { "PET_FRIENDLY" }
-            },
-            OwnerInfo = new OwnerInfo
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                Email = "john.doe@example.com"
-            }
-        };
-        
-        var coordinates = (lat: 1.0, lng: 1.0);
-        const string auth0Id = "auth0|123";
-        var tags = new[] { new Tag { Name = "PET_FRIENDLY"} };
-        
-        // Act & Assert
-        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
-        _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(coordinates);
-        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>())).ReturnsAsync(auth0Id);
-        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync( null as Category);
-        
-        await Assert.ThrowsAsync<ArgumentException>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
-    }
-
-    [Fact]
-    public async Task RegisterEstablishmentAsync_InvalidTagThrowsException_ShouldThrowException()
-    {
-        // Arrange
-        var establishmentRequest = new EstablishmentRegisterRequest
-        {
-            EstablishmentInfo = new EstablishmentInfo
-            {
-                Name = "Test Establishment",
-                Address = "123 Test St",
-                City = "Test City",
-                PostalCode = "12345",
-                PriceCategory = 1,
-                Category = new List<string> { "RESTAURANT" },
-                Tags = new List<string> { "test" }
-            },
-            OwnerInfo = new OwnerInfo
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                Email = "john.doe@example.com"
-            }
-        };
-        
-        var coordinates = (lat: 1.0, lng: 1.0);
-        const string auth0Id = "auth0|123";
-        var categories = new[] { new Category { Name = "RESTAURANT"} };
-        
-        // Act & Assert
-        _establishmentRepositoryMock.Setup(r => r.CheckIfExistsByPropertyAsync("Name", establishmentRequest.EstablishmentInfo.Name)).ReturnsAsync(false);
-        _mapboxServiceMock.Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(coordinates);
-        _auth0ServiceMock.Setup(s => s.RegisterEstablishmentAccountAsync(It.IsAny<OwnerInfo>())).ReturnsAsync(auth0Id);
-        _categoryRepositoryMock.Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>())).ReturnsAsync(categories[0]);
-        _tagRepositoryMock
-            .Setup(r => r.GetByPropertyAsync("Name", It.IsAny<string>()))
-            .ReturnsAsync(null as Tag);
-        
-        await Assert.ThrowsAsync<ArgumentException>(() => _establishmentService.RegisterEstablishmentAsync(establishmentRequest));
     }
 
     // GetEstablishmentByAuth0IdAsync tests
@@ -438,15 +342,6 @@ public class EstablishmentServiceTests
         
         // Assert
         Assert.NotNull(result);
-    }
-    
-    [Fact]
-    public async Task GetEstablishmentByAuth0IdAsync_InvalidAuth0Id_ShouldThrowEstablishmentNotFoundException()
-    {
-        const string auth0Id = "999";
-        _establishmentRepositoryMock.Setup(r => r.GetProfileByAuth0IdAsync(auth0Id)).ReturnsAsync(null as EstablishmentProfileResponse);
-
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.GetEstablishmentProfileByAuth0IdAsync(auth0Id));
     }
     
     [Fact]

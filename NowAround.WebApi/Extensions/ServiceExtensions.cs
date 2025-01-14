@@ -37,8 +37,5 @@ public static class ServiceExtensions
         services.AddScoped<IEventRepository, EventRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-        
-        // Helpers
-        services.AddTransient<IDateHelper, DateHelper>();
     }
 }

@@ -34,7 +34,7 @@ public class ReviewService : IReviewService
         if (user.Reviews.Any(r => r.RatingCollectionId == establishment.RatingStatistic.Id))
         {
             _logger.LogWarning("User {Auth0Id} has already reviewed establishment {EstablishmentAuth0Id}", auth0Id, reviewCreateRequest.EstablishmentAuth0Id);
-            throw new InvalidOperationException("User has already reviewed this establishment");
+            throw new EntityAlreadyExistsException("Review", "User", "User has already reviewed this establishment");        
         }
         
         var reviewEntity = new Review
@@ -47,8 +47,28 @@ public class ReviewService : IReviewService
         
         await _reviewRepository.CreateAsync(reviewEntity);
         
-        await _establishmentService.UpdateRatingStatisticsAsync(reviewCreateRequest.EstablishmentAuth0Id, reviewCreateRequest.Rating);
+        await _establishmentService.UpdateRatingStatisticsAsync(establishment.RatingStatistic.Id, reviewCreateRequest.Rating);
         
         return reviewEntity.ToDto();
+    }
+
+    public async Task DeleteReviewAsync(string auth0Id, int reviewId)
+    {
+        var review = await _reviewRepository.GetAsync(
+            r => r.Id == reviewId, 
+            false, 
+            r => r
+                .Include(x => x.RatingStatistic)
+                .Include(r => r.User));
+
+        if (review.User.Auth0Id != auth0Id)
+        {
+            _logger.LogWarning("User {Auth0Id} tried to delete review {ReviewId} that does not belong to him", auth0Id, reviewId);
+            throw new UnauthorizedAccessException("User is not allowed to delete this review");
+        }
+        
+        await _reviewRepository.DeleteAsync(reviewId);
+        
+        await _establishmentService.UpdateRatingStatisticsAsync(review.RatingStatistic.Id, review.Rating, false);
     }
 }

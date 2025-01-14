@@ -11,20 +11,17 @@ public class MonthlyStatisticService : IMonthlyStatisticService
     private readonly IMonthlyStatisticRepository _monthlyStatisticRepository;
     private readonly IEstablishmentService _establishmentService;
     private readonly IUserService _userService;
-    private readonly IDateHelper _dateHelper;
     private readonly ILogger<MonthlyStatisticService> _logger;
     
     public MonthlyStatisticService(
         IMonthlyStatisticRepository monthlyStatisticRepository, 
         IEstablishmentService establishmentService, 
         IUserService userService, 
-        IDateHelper dateHelper,
         ILogger<MonthlyStatisticService> logger)
     {
         _monthlyStatisticRepository = monthlyStatisticRepository;
         _establishmentService = establishmentService;
         _userService = userService;
-        _dateHelper = dateHelper;
         _logger = logger;
     }
     
@@ -44,7 +41,7 @@ public class MonthlyStatisticService : IMonthlyStatisticService
             return [];
         }
 
-        var months = _dateHelper.GetMonthsInYear(year);
+        var months = GetMonthsInYear(year);
         var yearsStatistics = new List<MonthlyStatistic>();
         
         foreach (var month in months)
@@ -69,7 +66,7 @@ public class MonthlyStatisticService : IMonthlyStatisticService
             }
             else
             {
-               var monthStartAndEnd = _dateHelper.GetMonthStartAndEndDate(month); 
+               var monthStartAndEnd = GetMonthStartAndEndDate(month); 
                
                yearsStatistics.Add(await CreateMonthlyStatistic(month, monthStartAndEnd.StartDate, monthStartAndEnd.EndDate));
             }
@@ -93,5 +90,30 @@ public class MonthlyStatisticService : IMonthlyStatisticService
         await _monthlyStatisticRepository.CreateMonthlyStatisticAsync(newStatistic);
 
         return newStatistic;
+    }
+    
+    private static List<string> GetMonthsInYear(string year)
+    {
+        var start = DateTime.Parse(year + "-01");
+        var end = DateTime.Parse(year + "-12");
+        var months = new List<string>();
+
+        while (start <= end)
+        {
+            months.Add(start.ToString("yyyy-MM"));
+            start = start.AddMonths(1);
+        }
+
+        return months;
+    }
+    
+    private static (DateTime StartDate, DateTime EndDate) GetMonthStartAndEndDate(string date)
+    {
+        var year = date.Split('-').Select(int.Parse).ToArray()[0];
+        var month = date.Split('-').Select(int.Parse).ToArray()[1];
+        
+        var startDate = new DateTime(year, month, 1);
+        var endDate = startDate.AddMonths(1).AddDays(-1);
+        return (startDate, endDate);
     }
 }

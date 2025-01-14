@@ -13,13 +13,20 @@ public class PostService : IPostService
 {
     private readonly ILogger<PostService> _logger;
     private readonly IEstablishmentService _establishmentService;
+    private readonly IUserService _userService;
     private readonly IPostRepository _postRepository;
     private readonly IStorageService _storageService;
     
-    public PostService(ILogger<PostService> logger ,IEstablishmentService establishmentService, IPostRepository postRepository, IStorageService storageService)
+    public PostService(
+        ILogger<PostService> logger, 
+        IEstablishmentService establishmentService,
+        IUserService userService,
+        IPostRepository postRepository, 
+        IStorageService storageService)
     {
         _logger = logger;
         _establishmentService = establishmentService;
+        _userService = userService;
         _postRepository = postRepository;
         _storageService = storageService;
     }
@@ -46,13 +53,6 @@ public class PostService : IPostService
         return postEntity.ToDto();
     }
 
-    private async Task<bool> CheckPostOwnershipByAuth0IdAsync(string auth0Id, int postId)
-    {
-        var post = await GetPostAsync(postId);
-        
-        return auth0Id == post.Establishment.Auth0Id;
-    }
-
     public async Task<Post> GetPostAsync(int postId, bool tracked = false)
     {
         var post = await _postRepository.GetAsync
@@ -63,13 +63,25 @@ public class PostService : IPostService
             query => query.Include(p => p.Likes)
         );
         
-        if (post == null)
+        return post;
+    }
+    public async Task ReactToPostAsync(int postId, string auth0Id)
+    {
+        var postEntity = await _postRepository.GetAsync(
+            p => p.Id == postId, 
+            true, 
+            query => query.Include(p => p.Likes));
+        
+        if (postEntity.Likes.Any(l => l.Auth0Id == auth0Id))
         {
-            _logger.LogWarning("Post with ID: {PostId} not found", postId);
-            throw new EntityNotFoundException("Post", "ID", postId.ToString());
+            postEntity.Likes.Remove(postEntity.Likes.First(l => l.Auth0Id == auth0Id));
+        }
+        else
+        {
+            postEntity.Likes.Add(await _userService.GetUserByAuth0IdAsync(auth0Id));
         }
         
-        return post;
+        await _postRepository.UpdateAsync(postEntity);
     }
 
     public Task<PostDto> UpdatePostAsync(int postId, string auth0Id, PostCreateUpdateRequest postCreateUpdateRequest)
@@ -88,13 +100,19 @@ public class PostService : IPostService
 
     public async Task DeletePostAsync(string auth0Id, int postId)
     {
-        if (!await CheckPostOwnershipByAuth0IdAsync(auth0Id, postId))
+        var post = await GetPostAsync(postId);
+        
+        if (auth0Id != post.Establishment.Auth0Id)
         {
-            throw new UnauthorizedAccessException("You are not the owner of this post");
+            _logger.LogWarning("User {Auth0Id} is not the owner of post {PostId}", auth0Id, postId);
+            throw new UnauthorizedAccessException("User is not the owner of the post");
         }
         
         await _postRepository.DeleteAsync(postId);
         
-        await _storageService.DeleteAsync("Establishment", auth0Id, $"post/{postId}");
+        if (post.PictureUrl is not null)
+        {
+            await _storageService.DeleteAsync("Establishment", auth0Id, $"post/{postId}");
+        }
     }
 }

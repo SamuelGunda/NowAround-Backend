@@ -11,21 +11,13 @@ public class SearchValues
     public List<string>? TagNames { get; set; }
     public required MapBounds MapBounds { get; set; }
     
-    public void ValidateProperties()
+    public bool ValidateProperties()
     {
-        if (PriceCategory.HasValue && !System.Enum.IsDefined(typeof(PriceCategory), PriceCategory.Value))
-        {
-            throw new ArgumentException($"PriceCategory value {PriceCategory} is not valid");
-        }
-        
-        if (!string.IsNullOrWhiteSpace(Name) && Name.Length < 3)
-        {
-            throw new ArgumentException("Name must be at least 3 characters long");
-        }
-        
         if (string.IsNullOrWhiteSpace(Name) && !PriceCategory.HasValue && string.IsNullOrWhiteSpace(CategoryName) && (TagNames == null || TagNames.Count == 0) && !MapBounds.ValidateProperties())
         {
-            throw new InvalidSearchActionException("At least one search value must be provided");
+            return false;
         }
+        
+        return true;
     }
 }

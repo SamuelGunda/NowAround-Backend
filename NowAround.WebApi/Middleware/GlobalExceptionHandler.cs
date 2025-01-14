@@ -24,11 +24,11 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
                 Title = "Email already in use",
                 Detail = emailAlreadyInUseException.Message
             },
-            EstablishmentAlreadyExistsException establishmentAlreadyExistsException => new ProblemDetails
+            EntityAlreadyExistsException entityAlreadyExistsException => new ProblemDetails
             {
                 Status = StatusCodes.Status409Conflict,
-                Title = "Establishment already exists",
-                Detail = establishmentAlreadyExistsException.Message
+                Title = "Entity already exists",
+                Detail = entityAlreadyExistsException.Message
             },
             EntityNotFoundException entityNotFoundException => new ProblemDetails
             {

@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NowAround.Application.Common.Attributes;
@@ -44,10 +45,13 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     
     [HttpGet("search")]
     public async Task<IActionResult> GetEstablishmentsWithFilterAsync(
-        double? northWestLat, double? northWestLong, 
-        double? southEastLat, double? southEastLong, 
-        string? name, int? priceCategory, 
-        string? categoryName, string? tagNames, int? page)
+        [Range(-90, 90)] double? northWestLat, [Range(-180, 180)] double? northWestLong, 
+        [Range(-90, 90)]double? southEastLat, [Range(-180, 180)] double? southEastLong, 
+        [StringLength(32, MinimumLength = 3)] string? name, 
+        [EnumDataType(typeof(PriceCategory))] int? priceCategory, 
+        string? categoryName, 
+        string? tagNames, 
+        int? page)
     {
         var tagNamesList = tagNames?.Split(',').ToList();
         var searchValues = new SearchValues
@@ -85,6 +89,18 @@ public class EstablishmentController(IEstablishmentService establishmentService)
         var genericInfo = await establishmentService.UpdateEstablishmentGenericInfoAsync(auth0Id, establishmentGenericInfoUpdateRequest);
         
         return Ok(genericInfo);
+    }
+    
+    [Authorize(Roles = "Establishment")]
+    [HttpPut("location-info")]
+    public async Task<IActionResult> UpdateEstablishmentLocationInfoAsync(EstablishmentLocationInfoUpdateRequest establishmentLocationInfoUpdateRequest)
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
+                      ?? throw new ArgumentException("Auth0Id not found");
+        
+        var locationInfo = await establishmentService.UpdateEstablishmentLocationInfoAsync(auth0Id, establishmentLocationInfoUpdateRequest);
+        
+        return Ok(locationInfo);
     }
     
     [Authorize(Roles = "Establishment")]

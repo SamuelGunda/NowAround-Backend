@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
-using NowAround.Api.Apis.Auth0.Exceptions;
 using NowAround.Api.Apis.Auth0.Interfaces;
-using NowAround.Api.Apis.Auth0.Models.Requests;
 using NowAround.Api.Apis.Auth0.Services;
+using NowAround.Api.Exceptions;
+using NowAround.Api.Models.Requests;
 using NowAround.Api.Services;
 using NowAround.Api.Services.Interfaces;
 
@@ -41,7 +41,7 @@ public class Auth0ServiceTests
     public async Task RegisterEstablishmentAccountAsync_ShouldReturnAuth0UserId()
     {
         // Arrange
-        var personalInfo = new OwnerInfo
+        var personalInfo = new EstablishmentOwnerInfo
         {
             Email = "test@test.com",
             FirstName = "Test",
@@ -80,7 +80,7 @@ public class Auth0ServiceTests
     public async Task RegisterEstablishmentAccountAsync_WhenEmailIsAlreadyInUse_ShouldThrowEmailAlreadyInUseException()
     {
         // Arrange
-        var personalInfo = new OwnerInfo
+        var personalInfo = new EstablishmentOwnerInfo
         {
             Email = "test@test.com",
             FirstName = "Test",
@@ -111,7 +111,7 @@ public class Auth0ServiceTests
     public async Task RegisterEstablishmentAccountAsync_WhenRequestFails_ShouldThrowHttpRequestException()
     {
         // Arrange
-        var personalInfo = new OwnerInfo
+        var personalInfo = new EstablishmentOwnerInfo
         {
             Email = "test@test.com",
             FirstName = "Test",

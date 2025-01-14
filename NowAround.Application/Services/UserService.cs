@@ -39,7 +39,7 @@ public class UserService : IUserService
 
     public async Task<User> GetUserByAuth0IdAsync(string auth0Id, bool tracked = false, params Func<IQueryable<User>, IQueryable<User>>[] includeProperties)
     {
-        return await _userRepository.GetAsync(u => u.Auth0Id == auth0Id, tracked);
+        return await _userRepository.GetAsync(u => u.Auth0Id == auth0Id, tracked, includeProperties);
     }
     
     public async Task<int> GetUsersCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd)
@@ -55,7 +55,8 @@ public class UserService : IUserService
             throw new ArgumentException("Invalid image context", nameof(pictureContext));
         }
         
-        var user = await GetUserByAuth0IdAsync(auth0Id, true);
+        var user = await _userRepository.GetAsync(u => u.Auth0Id == auth0Id);
+        
         var pictureUrl = await _storageService.UploadPictureAsync(picture, "User", auth0Id, pictureContext);
         
         user.ProfilePictureUrl = pictureUrl.Contains("profile-picture") ? pictureUrl : user.ProfilePictureUrl;

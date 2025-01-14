@@ -20,4 +20,15 @@ public class ReviewController(IReviewService reviewService) : ControllerBase
         
         return Created("", reviewDto);
     }
+    
+    [Authorize(Roles = "User")]
+    [HttpDelete("{reviewId:int}")]
+    public async Task<IActionResult> DeleteReviewAsync(int reviewId)
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        
+        await reviewService.DeleteReviewAsync(auth0Id, reviewId);
+        
+        return NoContent();
+    }
 }

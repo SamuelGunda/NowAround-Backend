@@ -1,4 +1,4 @@
-﻿namespace NowAround.Application.Common.Exceptions;
+namespace NowAround.Application.Common.Exceptions;
 
 public sealed class EmailAlreadyInUseException : Exception
 {
@@ -6,5 +6,4 @@ public sealed class EmailAlreadyInUseException : Exception
         : base($"The email address: {email} is already in use by another existing account")
     {
     }
-
 }

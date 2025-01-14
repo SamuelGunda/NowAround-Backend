@@ -120,6 +120,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
                 Logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
                 throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
             }
+            
             return establishment;
         }
         catch (EntityNotFoundException)

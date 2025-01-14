@@ -20,4 +20,27 @@ public class EventController(IEventService eventService) : ControllerBase
         
         return Created("", eventDto);
     }
+    
+    [Authorize(Roles = "User")]
+    [HttpPut("{eventId:int}/react")]
+    public async Task<IActionResult> ReactToEventAsync(int eventId)
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+
+        await eventService.ReactToEventAsync(eventId, auth0Id);
+        
+        return Ok(new { message = "Reacted to event successfully" });
+    }
+    
+    
+    [Authorize(Roles = "Establishment")]
+    [HttpDelete("{eventId:int}")]
+    public async Task<IActionResult> DeleteEventAsync(int eventId)
+    {
+        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
+        
+        await eventService.DeleteEventAsync(auth0Id, eventId);
+        
+        return NoContent();
+    }
 }

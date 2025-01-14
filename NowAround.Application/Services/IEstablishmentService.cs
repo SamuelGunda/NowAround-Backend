@@ -18,9 +18,10 @@ public interface IEstablishmentService
     Task<List<EstablishmentMarkerResponse>> GetEstablishmentsWithFilterAsync(SearchValues searchValues, int page);
     Task<int> GetEstablishmentsCountCreatedInMonthAsync(DateTime monthStart, DateTime monthEnd);
     Task<GenericInfo> UpdateEstablishmentGenericInfoAsync(string auth0Id, EstablishmentGenericInfoUpdateRequest request);
+    Task<LocationInfo> UpdateEstablishmentLocationInfoAsync(string auth0Id, EstablishmentLocationInfoUpdateRequest request);
     Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus);
     Task<string> UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile picture);
-    Task UpdateRatingStatisticsAsync(string auth0Id, int rating);
+    Task UpdateRatingStatisticsAsync(int id, int rating, bool increment = true);
     Task DeleteEstablishmentAsync(string auth0Id);
     
     // Menu Methods

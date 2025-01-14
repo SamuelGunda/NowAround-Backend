@@ -45,20 +45,17 @@ public class EstablishmentService : IEstablishmentService
     
     public async Task RegisterEstablishmentAsync(EstablishmentRegisterRequest request)
     {
-        request.ValidateProperties();
-        
         var establishmentInfo = request.EstablishmentInfo;
-        var personalInfo = request.OwnerInfo;
+        var personalInfo = request.EstablishmentOwnerInfo;
         
-        if (await _establishmentRepository.CheckIfExistsByPropertyAsync("Name", establishmentInfo.Name))
+        if (await _establishmentRepository.CheckIfExistsAsync("Name", establishmentInfo.Name))
         {
             _logger.LogWarning("An establishment with the name {Name} already exists.", establishmentInfo.Name);
-            throw new EstablishmentAlreadyExistsException(establishmentInfo.Name);
+            throw new EntityAlreadyExistsException("Establishment", "Name", establishmentInfo.Name);
         }
         
         var coordinates = await _mapboxService.GetCoordinatesFromAddressAsync(establishmentInfo.Address, establishmentInfo.PostalCode, establishmentInfo.City);
         
-        // Check if categories and tags exist by their name and get them from the database
         var catsAndTags = await GetCategoriesAndTagsAsync(establishmentInfo.Category, establishmentInfo.Tags);
         
         var auth0Id = await _auth0Service.RegisterEstablishmentAccountAsync(personalInfo);
@@ -139,7 +136,12 @@ public class EstablishmentService : IEstablishmentService
 
     public async Task<List<EstablishmentMarkerResponse>> GetEstablishmentsWithFilterAsync(SearchValues searchValues, int page)
     {
-        searchValues.ValidateProperties();
+        if (!searchValues.ValidateProperties())
+        {
+            _logger.LogWarning("Invalid search values");
+            throw new InvalidSearchActionException("Invalid search values");
+        }
+        
         page = page >= 0 ? page : throw new InvalidSearchActionException("Page must be greater than 0");
 
         var queryBuilder = EstablishmentSearchQueryBuilder.BuildSearchQuery(searchValues);
@@ -168,11 +170,11 @@ public class EstablishmentService : IEstablishmentService
         
         var catsAndTags = await GetCategoriesAndTagsAsync(request.Categories, request.Tags);
         
-        establishment.Name = request.Name ?? establishment.Name;
-        establishment.Description = request.Description ?? establishment.Description;
-        establishment.PriceCategory = request.PriceCategory.HasValue ? (PriceCategory) request.PriceCategory.Value : establishment.PriceCategory;
-        establishment.Categories = catsAndTags.categories.Length > 0 ? catsAndTags.categories.ToList() : establishment.Categories.ToList();
-        establishment.Tags = catsAndTags.tags.Length > 0 ? catsAndTags.tags.ToList() : establishment.Tags.ToList();
+        establishment.Name = request.Name;
+        establishment.Description = request.Description;
+        establishment.PriceCategory = (PriceCategory)request.PriceCategory;
+        establishment.Categories = catsAndTags.categories.ToList();
+        establishment.Tags = catsAndTags.tags.ToList();
         
         await _establishmentRepository.UpdateAsync(establishment);
         
@@ -190,6 +192,59 @@ public class EstablishmentService : IEstablishmentService
         return genericInfo;
     }
 
+    public async Task<LocationInfo> UpdateEstablishmentLocationInfoAsync(string auth0Id, EstablishmentLocationInfoUpdateRequest request)
+    {
+        var establishment = await _establishmentRepository.GetAsync(
+            e => e.Auth0Id == auth0Id,
+            true,
+            query => query.Include(e => e.BusinessHours));
+
+        var addressAndCity = await _mapboxService.GetAddressFromCoordinatesAsync(request.Lat, request.Long);
+        establishment.Latitude = request.Lat;
+        establishment.Longitude = request.Long;
+        establishment.Address = addressAndCity.address;
+        establishment.City = addressAndCity.city;
+
+        var businessHours = request.BusinessHours;
+        establishment.BusinessHours.Monday = businessHours.Monday;
+        establishment.BusinessHours.Tuesday = businessHours.Tuesday;
+        establishment.BusinessHours.Wednesday = businessHours.Wednesday;
+        establishment.BusinessHours.Thursday = businessHours.Thursday;
+        establishment.BusinessHours.Friday = businessHours.Friday;
+        establishment.BusinessHours.Saturday = businessHours.Saturday;
+        establishment.BusinessHours.Sunday = businessHours.Sunday;
+        
+        foreach (var exception in request.BusinessHours.BusinessHoursExceptions)
+        {
+            establishment.BusinessHours.BusinessHoursExceptions.Add(new BusinessHoursException
+            {
+                Date = exception.Date,
+                Status = exception.Status
+            });
+        }
+        
+        await _establishmentRepository.UpdateAsync(establishment);
+        
+        return new LocationInfo(
+            establishment.Address,
+            establishment.City,
+            establishment.Latitude,
+            establishment.Longitude,
+            new BusinessHoursDto(
+                establishment.BusinessHours.Monday,
+                establishment.BusinessHours.Tuesday,
+                establishment.BusinessHours.Wednesday,
+                establishment.BusinessHours.Thursday,
+                establishment.BusinessHours.Friday,
+                establishment.BusinessHours.Saturday,
+                establishment.BusinessHours.Sunday,
+                establishment.BusinessHours.BusinessHoursExceptions
+                    .Select(e => new BusinessHoursExceptionsDto(e.Date, e.Status))
+                    .ToList()
+            )
+        );
+    }
+
     public async Task<string> UpdateEstablishmentPictureAsync(string auth0Id, string pictureContext, IFormFile picture)
     {
         if (pictureContext != "profile-picture" && pictureContext != "background-picture")
@@ -198,7 +253,7 @@ public class EstablishmentService : IEstablishmentService
             throw new ArgumentException("Invalid image context", nameof(pictureContext));
         }
         
-        var establishment = await GetEstablishmentByAuth0IdAsync(auth0Id, true);
+        var establishment = await _establishmentRepository.GetAsync(e => e.Auth0Id == auth0Id);
         var pictureUrl = await _storageService.UploadPictureAsync(picture, "Establishment", auth0Id, pictureContext);
         
         establishment.ProfilePictureUrl = pictureUrl.Contains("profile-picture") ? pictureUrl : establishment.ProfilePictureUrl;
@@ -211,8 +266,8 @@ public class EstablishmentService : IEstablishmentService
 
     public async Task UpdateEstablishmentRegisterRequestAsync(string auth0Id, RequestStatus requestStatus)
     {
-        var establishment = await GetEstablishmentByAuth0IdAsync(
-            auth0Id, 
+        var establishment = await _establishmentRepository.GetAsync(
+            e => e.Auth0Id == auth0Id, 
             true, 
             query => query.IgnoreQueryFilters());
         
@@ -221,26 +276,26 @@ public class EstablishmentService : IEstablishmentService
         await _establishmentRepository.UpdateAsync(establishment);
     }
     
-    public async Task UpdateRatingStatisticsAsync(string auth0Id, int rating)
+    public async Task UpdateRatingStatisticsAsync(int id, int rating, bool increment = true)
     {
-        var establishment = await GetEstablishmentByAuth0IdAsync(
-            auth0Id, 
+        var establishment = await _establishmentRepository.GetAsync(
+            e => e.RatingStatistic.Id == id, 
             true, 
             query => query.Include(e => e.RatingStatistic));
 
         if (establishment.RatingStatistic == null)
         {
-            _logger.LogWarning("RatingStatistic not found for the establishment with Auth0 ID: {Auth0Id}", auth0Id);
+            _logger.LogWarning("RatingStatistic not found for the establishment with Auth0 ID: {establishment.Auth0Id}", establishment.Auth0Id);
             throw new Exception("RatingStatistic not found for the establishment.");
         }
 
         var ratingMap = new Dictionary<int, Action>
         {
-            { 1, () => establishment.RatingStatistic.OneStar++ },
-            { 2, () => establishment.RatingStatistic.TwoStars++ },
-            { 3, () => establishment.RatingStatistic.ThreeStars++ },
-            { 4, () => establishment.RatingStatistic.FourStars++ },
-            { 5, () => establishment.RatingStatistic.FiveStars++ }
+            { 1, () => { if (increment) establishment.RatingStatistic.OneStar++; else establishment.RatingStatistic.OneStar--; } },
+            { 2, () => { if (increment) establishment.RatingStatistic.TwoStars++; else establishment.RatingStatistic.TwoStars--; } },
+            { 3, () => { if (increment) establishment.RatingStatistic.ThreeStars++; else establishment.RatingStatistic.ThreeStars--; } },
+            { 4, () => { if (increment) establishment.RatingStatistic.FourStars++; else establishment.RatingStatistic.FourStars--; } },
+            { 5, () => { if (increment) establishment.RatingStatistic.FiveStars++; else establishment.RatingStatistic.FiveStars--; } }
         };
 
         if (ratingMap.TryGetValue(rating, out var value))
@@ -262,7 +317,6 @@ public class EstablishmentService : IEstablishmentService
         
         await _storageService.DeleteAsync("Establishment", auth0Id);
         
-        //TODO: Get whole establishment object and delete it
         var result = await _establishmentRepository.DeleteByAuth0IdAsync(auth0Id);
         if (!result)
         {
@@ -271,75 +325,58 @@ public class EstablishmentService : IEstablishmentService
         }
     }
 
-    private async Task<(Category[] categories, Tag[] tags)> GetCategoriesAndTagsAsync(ICollection<string>? categoryNames, ICollection<string>? tagNames)
+    private async Task<(Category[] categories, Tag[] tags)> GetCategoriesAndTagsAsync(ICollection<string> categoryNames, ICollection<string> tagNames)
     {
         List<Category> categories = [];
         List<Tag> tags = [];
-
-        if (categoryNames != null)
+        
+        foreach (var categoryName in categoryNames)
         {
-            foreach (var categoryName in categoryNames)
-            {
-                var categoryEntity = await _categoryRepository.GetByPropertyAsync("Name", categoryName);
+            var categoryEntity = await _categoryRepository.GetAsync(c => c.Name == categoryName);
 
-                if (categoryEntity == null)
-                {
-                    _logger.LogWarning("Category {CategoryName} not found", categoryName);
-                    throw new ArgumentException($"Category {categoryName} not found", nameof(Category));
-                }
-
-                categories.Add(categoryEntity);
-            }
+            categories.Add(categoryEntity);
         }
-
-        if (tagNames != null)
+        
+        foreach (var tag in tagNames)
         {
-            foreach (var tag in tagNames)
-            {
-                var tagEntity = await _tagRepository.GetByPropertyAsync("Name", tag);
-
-                if (tagEntity == null)
-                {
-                    _logger.LogWarning("Tag {TagName} not found", tag);
-                    throw new ArgumentException($"Tag {tag} not found", nameof(Tag));
-                }
-                
-                tags.Add(tagEntity);
-            }
+            var tagEntity = await _tagRepository.GetAsync(t => t.Name == tag);
+            
+            tags.Add(tagEntity);
         }
+        
         return (categories.ToArray(), tags.ToArray());
     }
     
     // Menu methods
     
-    public async Task<MenuDto> AddMenuAsync(string auth0Id, MenuCreateRequest menu)
-    {
-        var establishment = await _establishmentRepository.GetAsync
-        (
-            e => e.Auth0Id == auth0Id, 
-            true, 
-            query => query
-                .Include(e => e.Menus)
-        );
-        
-        var menuEntity = new Menu
+        public async Task<MenuDto> AddMenuAsync(string auth0Id, MenuCreateRequest menu)
         {
-            Name = menu.Name,
-            EstablishmentId = establishment.Id,
-            MenuItems = menu.MenuItems.Select(mi => new MenuItem
+            var establishment = await _establishmentRepository.GetAsync
+            (
+                e => e.Auth0Id == auth0Id, 
+                true, 
+                query => query
+                    .Include(e => e.Menus)
+            );
+            
+            var menuEntity = new Menu
             {
-                Name = mi.Name,
-                Description = mi.Description,
-                Price = mi.Price
-            }).ToList()
-        };
-        
-        establishment.Menus.Add(menuEntity);
-        
-        await _establishmentRepository.UpdateAsync(establishment);
-        
-        return menuEntity.ToDto();
-    }
+                Name = menu.Name,
+                EstablishmentId = establishment.Id,
+                MenuItems = menu.MenuItems.Select(mi => new MenuItem
+                {
+                    Name = mi.Name,
+                    Description = mi.Description,
+                    Price = mi.Price
+                }).ToList()
+            };
+            
+            establishment.Menus.Add(menuEntity);
+            
+            await _establishmentRepository.UpdateAsync(establishment);
+            
+            return menuEntity.ToDto();
+        }
 
     public async Task<MenuDto> UpdateMenuAsync(string auth0Id, MenuUpdateRequest updatedMenu)
     {

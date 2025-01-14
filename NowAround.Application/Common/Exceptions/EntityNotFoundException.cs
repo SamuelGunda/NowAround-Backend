@@ -6,4 +6,8 @@ public class EntityNotFoundException : Exception
         : base($"The {entity} with {property}: {value} was not found")
     {
     }
+    public EntityNotFoundException(string entity)
+        : base($"The {entity} was not found")
+    {
+    }
 }

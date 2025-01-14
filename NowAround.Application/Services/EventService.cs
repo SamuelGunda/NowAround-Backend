@@ -11,21 +11,27 @@ namespace NowAround.Application.Services;
 public class EventService : IEventService
 {
     private readonly IEstablishmentService _establishmentService;
+    private readonly IUserService _userService;
     private readonly IMapboxService _mapboxService;
     private readonly IStorageService _storageService;
     private readonly IEventRepository _eventRepository;
+    private readonly ILogger<Event> _logger;
 
     public EventService(
         IEstablishmentService establishmentService,
+        IUserService userService,
         IMapboxService mapboxService, 
         IStorageService storageService,
-        IEventRepository eventRepository
+        IEventRepository eventRepository,
+        ILogger<Event> logger
         )
     {
         _establishmentService = establishmentService;
+        _userService = userService;
         _mapboxService = mapboxService;
         _storageService = storageService;
         _eventRepository = eventRepository;
+        _logger = logger;
     }
     
     public async Task<EventDto> CreateEventAsync(string auth0Id, EventCreateRequest eventCreateRequest)
@@ -35,6 +41,7 @@ public class EventService : IEventService
         var addressParts = eventCreateRequest.Address.Split(',');
         if (addressParts.Length != 2)
         {
+            _logger.LogWarning("Address {Address} does not contain street and postal code separated by a comma", eventCreateRequest.Address);
             throw new ArgumentException("Address must contain street and postal code separated by a comma");
         }
         var street = addressParts[0].Trim();
@@ -68,9 +75,44 @@ public class EventService : IEventService
 
         return eventEntity.ToDto();
     }
-
-    public Task DeleteEventAsync(string auth0Id, int eventId)
+    
+    public async Task ReactToEventAsync(int eventId, string auth0Id)
     {
-        throw new NotImplementedException();
+        var eventEntity = await _eventRepository.GetAsync(
+            e => e.Id == eventId, 
+            true, 
+            e => e.Include(x => x.InterestedUsers));
+        
+        if (eventEntity.InterestedUsers.Any(iu => iu.Auth0Id == auth0Id))
+        {
+            eventEntity.InterestedUsers.Remove(eventEntity.InterestedUsers.First(iu => iu.Auth0Id == auth0Id));
+        }
+        else
+        {
+            eventEntity.InterestedUsers.Add(await _userService.GetUserByAuth0IdAsync(auth0Id));
+        }
+        
+        await _eventRepository.UpdateAsync(eventEntity);
+    }
+
+    public async Task DeleteEventAsync(string auth0Id, int eventId)
+    {
+        var eventEntity = await _eventRepository.GetAsync(
+            e => e.Id == eventId, 
+            false, 
+            e => e.Include(x => x.Establishment));
+
+        if (eventEntity.Establishment.Auth0Id != auth0Id)
+        {
+            _logger.LogWarning("Establishment {Auth0Id} tried to delete event {EventId} that does not belong to them", auth0Id, eventId);
+            throw new UnauthorizedAccessException("Establishment does not own this event");
+        }
+        
+        await _eventRepository.DeleteAsync(eventId);
+        
+        if (eventEntity.PictureUrl is not null)
+        {
+            await _storageService.DeleteAsync("Establishment", auth0Id, $"event/{eventId}");
+        }
     }
 }
