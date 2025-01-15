@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NowAround.Api.Exceptions;
+using NowAround.Application.Common.Exceptions;
 using NowAround.Application.Dtos;
 using NowAround.Application.Mapping;
 using NowAround.Application.Requests;

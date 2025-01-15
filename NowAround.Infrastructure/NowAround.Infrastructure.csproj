@@ -1,9 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+    
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+    </PropertyGroup>
+    
     <ItemGroup>
       <PackageReference Include="Auth0.ManagementApi" />
       <PackageReference Include="Azure.Storage.Blobs" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     </ItemGroup>
 
@@ -12,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Services\Auth0\Models\" />
+      <Folder Include="Migrations\" />
     </ItemGroup>
 
 </Project>

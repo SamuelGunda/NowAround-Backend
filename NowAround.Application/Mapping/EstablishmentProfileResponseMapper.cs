@@ -1,7 +1,6 @@
 ﻿using NowAround.Application.Dtos;
 using NowAround.Application.Responses;
 using NowAround.Domain.Models;
-using NowAround.Domain.Responses;
 
 namespace NowAround.Application.Mapping;
 

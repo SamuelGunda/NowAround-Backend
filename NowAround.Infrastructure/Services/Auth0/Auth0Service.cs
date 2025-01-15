@@ -108,7 +108,7 @@ public class Auth0Service : IAuth0Service
     /// <exception cref="JsonException"> Thrown when the response from Auth0 API cannot be deserialized </exception>
     public async Task<string> GetEstablishmentOwnerFullNameAsync(string auth0Id)
     {
-        if (auth0Id.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(auth0Id))
         {
             _logger.LogWarning("auth0Id is null");
             throw new ArgumentNullException(nameof(auth0Id));
@@ -142,7 +142,7 @@ public class Auth0Service : IAuth0Service
     /// <exception cref="HttpRequestException"> Thrown when the request to Auth0 API fails </exception>
     public async Task DeleteAccountAsync(string auth0Id)
     {
-        if (auth0Id.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(auth0Id))
         {
             _logger.LogWarning("auth0Id is null");
             throw new ArgumentNullException(nameof(auth0Id));
@@ -170,7 +170,7 @@ public class Auth0Service : IAuth0Service
     /// <param name="role"> The role to assign to the account </param>
     public async Task AssignRoleAsync(string auth0Id, string role)
     {
-        if (auth0Id.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(auth0Id))
         {
             _logger.LogWarning("auth0Id is null");
             throw new ArgumentNullException(nameof(auth0Id));

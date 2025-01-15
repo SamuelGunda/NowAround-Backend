@@ -1,6 +1,4 @@
-﻿using NowAround.Domain.Responses;
-
-namespace NowAround.Application.Responses;
+﻿namespace NowAround.Application.Responses;
 
 public sealed record RatingStatisticResponse
 (

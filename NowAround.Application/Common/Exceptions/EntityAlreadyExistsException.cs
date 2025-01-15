@@ -1,4 +1,4 @@
-﻿namespace NowAround.Api.Exceptions;
+﻿namespace NowAround.Application.Common.Exceptions;
 
 public class EntityAlreadyExistsException : Exception
 {

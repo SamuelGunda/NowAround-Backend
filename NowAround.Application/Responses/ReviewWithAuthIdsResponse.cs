@@ -1,4 +1,4 @@
-﻿namespace NowAround.Domain.Responses;
+﻿namespace NowAround.Application.Responses;
 
 public sealed record ReviewWithAuthIdsResponse
 (

@@ -1,7 +1,4 @@
-﻿using NowAround.Application.Common.Exceptions;
-using NowAround.Domain.Enum;
-
-namespace NowAround.Application.Dtos;
+﻿namespace NowAround.Application.Dtos;
 
 public class SearchValues
 {
@@ -10,14 +7,4 @@ public class SearchValues
     public string? CategoryName { get; set; }
     public List<string>? TagNames { get; set; }
     public required MapBounds MapBounds { get; set; }
-    
-    public bool ValidateProperties()
-    {
-        if (string.IsNullOrWhiteSpace(Name) && !PriceCategory.HasValue && string.IsNullOrWhiteSpace(CategoryName) && (TagNames == null || TagNames.Count == 0) && !MapBounds.ValidateProperties())
-        {
-            return false;
-        }
-        
-        return true;
-    }
 }

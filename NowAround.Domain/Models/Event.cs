@@ -33,5 +33,5 @@ public class Event : BaseEntity
 
     public ICollection<User> InterestedUsers { get; init; } = new List<User>();
     public int EstablishmentId { get; init; }
-    public Establishment Establishment { get; init; }
+    public virtual Establishment Establishment { get; init; }
 }

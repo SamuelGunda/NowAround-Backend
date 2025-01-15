@@ -85,6 +85,10 @@ public class MapboxService : IMapboxService
             var (address, city) = ParsePlaceName(placeName);
             return (address, city);
         }
+        catch (InvalidOperationException ex)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while retrieving the address from Mapbox.");
@@ -104,10 +108,8 @@ public class MapboxService : IMapboxService
 
             return (address, city);
         }
-        else
-        {
-            _logger.LogError("The place name format is unexpected.");
-            throw new InvalidOperationException("Unable to parse the place name.");
-        }
+
+        _logger.LogError("The place name format is unexpected.");
+        throw new InvalidOperationException("Unable to parse the place name.");
     }
 }

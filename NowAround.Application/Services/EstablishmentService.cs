@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NowAround.Api.Exceptions;
 using NowAround.Application.Common.Exceptions;
 using NowAround.Application.Dtos;
 using NowAround.Application.Interfaces;
@@ -137,7 +136,7 @@ public class EstablishmentService : IEstablishmentService
 
     public async Task<List<EstablishmentMarkerResponse>> GetEstablishmentsWithFilterAsync(SearchValues searchValues, int page)
     {
-        if (!searchValues.ValidateProperties())
+        if (!SearchValueValidator.Validate(searchValues))
         {
             _logger.LogWarning("Invalid search values");
             throw new InvalidSearchActionException("Invalid search values");

@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <DocumentationFile>bin\Debug\net9.0\NowAround.WebApi.xml</DocumentationFile>
     </PropertyGroup>
@@ -9,7 +10,7 @@
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
         <PackageReference Include="Swashbuckle.AspNetCore" />
     </ItemGroup>
 
@@ -18,4 +19,8 @@
       <ProjectReference Include="..\NowAround.Infrastructure\NowAround.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="NowAround.IntegrationTests">
+        </InternalsVisibleTo>
+    </ItemGroup>
 </Project>

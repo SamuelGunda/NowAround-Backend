@@ -32,5 +32,13 @@
     <ItemGroup>
         <Using Include="Xunit"/>
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageVersion Update="xunit" Version="2.9.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Services\" />
+    </ItemGroup>
     
 </Project>

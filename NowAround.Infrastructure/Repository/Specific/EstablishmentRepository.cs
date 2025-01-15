@@ -6,7 +6,6 @@ using NowAround.Application.Responses;
 using NowAround.Domain.Enum;
 using NowAround.Domain.Interfaces.Specific;
 using NowAround.Domain.Models;
-using NowAround.Domain.Responses;
 using NowAround.Infrastructure.Context;
 using NowAround.Infrastructure.Repository.Base;
 
