@@ -37,6 +37,7 @@ jobs:
         Auth0.Roles.User: ${{ secrets.AUTH0_ROLES_USER }}
         Auth0.Role.Admin: ${{ secrets.AUTH0_ROLES_ADMIN }}
         Mapbox.AccessToken: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+        Email.Password: ${{ secrets.MAIL_SECRET }}
 
     - name: Set up dependency caching for faster builds
       uses: actions/cache@v4
