@@ -23,6 +23,7 @@ public class EstablishmentService : IEstablishmentService
     private readonly IBaseRepository<Category> _categoryRepository;
     private readonly IBaseRepository<Tag> _tagRepository;
     private readonly IStorageService _storageService;
+    private readonly IMailService _mailService;
     private readonly ILogger<EstablishmentService> _logger;
 
     public EstablishmentService(
@@ -32,6 +33,7 @@ public class EstablishmentService : IEstablishmentService
         IBaseRepository<Category> categoryRepository,
         IBaseRepository<Tag> tagRepository,
         IStorageService storageService,
+        IMailService mailService,
         ILogger<EstablishmentService> logger)
     {
         _auth0Service = auth0Service;
@@ -40,6 +42,7 @@ public class EstablishmentService : IEstablishmentService
         _categoryRepository = categoryRepository;
         _tagRepository = tagRepository;
         _storageService = storageService;
+        _mailService = mailService;
         _logger = logger;
     }
     
@@ -76,6 +79,7 @@ public class EstablishmentService : IEstablishmentService
         try
         {
             await _establishmentRepository.CreateAsync(establishmentEntity);
+            await _mailService.SendWelcomeEmailAsync($"{personalInfo.FirstName} {personalInfo.LastName}", establishmentInfo.Name ,personalInfo.Email);
         }
         catch (Exception)
         {
@@ -129,7 +133,7 @@ public class EstablishmentService : IEstablishmentService
         
         var pendingEstablishments = 
             establishments.Select(e => new PendingEstablishmentResponse
-                (e.Auth0Id, e.Name, _auth0Service.GetEstablishmentOwnerFullNameAsync(e.Auth0Id).Result)).ToList();
+                (e.Auth0Id, e.Name, _auth0Service.GetEstablishmentOwnerFullNameAndEmailAsync(e.Auth0Id).Result.fullName)).ToList();
         
         return pendingEstablishments;
     }
@@ -272,6 +276,16 @@ public class EstablishmentService : IEstablishmentService
             query => query.IgnoreQueryFilters());
         
         establishment.RequestStatus = requestStatus;
+        
+        if (requestStatus == RequestStatus.Accepted)
+        {
+            var password = PasswordUtils.Generate();
+            var nameAndEmail = await _auth0Service.GetEstablishmentOwnerFullNameAndEmailAsync(auth0Id);
+            
+            await _auth0Service.ChangeAccountPasswordAsync(auth0Id, password);
+            
+            await _mailService.SendAccountAcceptedEmailAsync(nameAndEmail.fullName, establishment.Name, nameAndEmail.email, password);
+        }
         
         await _establishmentRepository.UpdateAsync(establishment);
     }

@@ -22,6 +22,8 @@ public class Auth0ServiceTests
     public Auth0ServiceTests()
     {
         Mock<IConfiguration> mockConfiguration = new();
+        mockConfiguration.Setup(c => c["Auth0:ClientSecret"]).Returns("test-client-secret");
+        mockConfiguration.Setup(c => c["Auth0:ClientId"]).Returns("test-client-id");
         mockConfiguration.Setup(c => c["Auth0:Domain"]).Returns("test-domain.auth0.com");
         mockConfiguration.Setup(c => c["Auth0:Roles:Establishment"]).Returns("establishment-role-id");
         mockConfiguration.Setup(c => c["Auth0:Roles:User"]).Returns("user-role-id");
@@ -161,15 +163,16 @@ public class Auth0ServiceTests
                 Content = new StringContent(JsonConvert.SerializeObject(new
                 {
                     given_name = "Test",
-                    family_name = "User"
+                    family_name = "User",
+                    email = "Test@test.sk"
                 }))
             });
         
         // Act
-        var fullName = await _auth0Service.GetEstablishmentOwnerFullNameAsync(auth0Id);
+        var fullName = await _auth0Service.GetEstablishmentOwnerFullNameAndEmailAsync(auth0Id);
 
         // Assert
-        Assert.Equal("Test User", fullName);
+        Assert.Equal(("Test User", "Test@test.sk"), fullName);        
     }
 
     [Fact]
@@ -193,7 +196,7 @@ public class Auth0ServiceTests
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound));
         
         // Act & Assert
-        await Assert.ThrowsAsync<HttpRequestException>(() => _auth0Service.GetEstablishmentOwnerFullNameAsync(auth0Id));
+        await Assert.ThrowsAsync<HttpRequestException>(() => _auth0Service.GetEstablishmentOwnerFullNameAndEmailAsync(auth0Id));
     }
 
     [Fact]
@@ -220,7 +223,7 @@ public class Auth0ServiceTests
             });
 
         // Act & Assert
-        await Assert.ThrowsAsync<JsonReaderException>(() => _auth0Service.GetEstablishmentOwnerFullNameAsync(auth0Id));
+        await Assert.ThrowsAsync<JsonReaderException>(() => _auth0Service.GetEstablishmentOwnerFullNameAndEmailAsync(auth0Id));
     }
 
     [Fact]
@@ -228,8 +231,94 @@ public class Auth0ServiceTests
     {
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _auth0Service.GetEstablishmentOwnerFullNameAsync(null));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _auth0Service.GetEstablishmentOwnerFullNameAndEmailAsync(null));
     }
+    
+    // ChangeAccountPasswordAsync tests
+    
+    [Fact]
+    public async Task ChangeAccountPasswordAsync_ShouldChangePasswordSuccessfully()
+    {
+        // Arrange
+        var auth0Id = "auth0|12345";
+        var newPassword = "new_secure_password";
+        var mockToken = "mock_access_token";
+
+        _mockTokenService
+            .Setup(service => service.GetManagementAccessTokenAsync())
+            .ReturnsAsync(mockToken);
+
+        _mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.Method == HttpMethod.Patch &&
+                    req.RequestUri.ToString() == $"https://test-domain.auth0.com/api/v2/users/{auth0Id}"),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+        // Act
+        await _auth0Service.ChangeAccountPasswordAsync(auth0Id, newPassword);
+
+        // Assert
+        _mockHttpMessageHandler
+            .Protected()
+            .Verify("SendAsync", Times.Once(), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ChangeAccountPasswordAsync_WhenRequestFails_ShouldThrowHttpRequestException()
+    {
+        // Arrange
+        const string auth0Id = "auth0|12345";
+        const string newPassword = "new_secure_password";
+        const string mockToken = "mock_access_token";
+
+        _mockTokenService
+            .Setup(service => service.GetManagementAccessTokenAsync())
+            .ReturnsAsync(mockToken);
+
+        _mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.Method == HttpMethod.Patch &&
+                    req.RequestUri.ToString() == $"https://test-domain.auth0.com/api/v2/users/{auth0Id}"),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<HttpRequestException>(() => _auth0Service.ChangeAccountPasswordAsync(auth0Id, newPassword));
+    }
+    
+    // VerifyOldPasswordAsync tests
+
+    [Fact]
+    public async Task VerifyOldPasswordAsync_WhenLoginFails_ShouldReturnFalse()
+    {
+        // Arrange
+        var auth0Id = "auth0|12345";
+        var oldPassword = "wrong_password";
+
+        _mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.Method == HttpMethod.Post &&
+                    req.RequestUri.ToString() == $"https://test-domain.auth0.com/oauth/token"),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Unauthorized));
+
+        // Act
+        var isValid = await _auth0Service.VerifyOldPasswordAsync(auth0Id, oldPassword);
+
+        // Assert
+        Assert.False(isValid);
+    }
+
     
     // DeleteAccountAsync tests
 

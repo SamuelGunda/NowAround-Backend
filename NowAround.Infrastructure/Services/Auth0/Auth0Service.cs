@@ -21,6 +21,8 @@ public class Auth0Service : IAuth0Service
     private readonly IMailService _mailService;
     private readonly ILogger<Auth0Service> _logger;
     
+    private readonly string _clientSecret;
+    private readonly string _clientId;
     private readonly string _domain;
     private readonly string _establishmentRoleId;
     private readonly string _userRoleId;
@@ -37,6 +39,8 @@ public class Auth0Service : IAuth0Service
         _mailService = mailService;
         _logger = logger;
         
+        _clientSecret = configuration["Auth0:ClientSecret"] ?? throw new ArgumentNullException(configuration["Auth0:ClientSecret"]);
+        _clientId = configuration["Auth0:ClientId"] ?? throw new ArgumentNullException(configuration["Auth0:ClientId"]);
         _domain = configuration["Auth0:Domain"] ?? throw new ArgumentNullException(configuration["Auth0:Domain"]);
         _establishmentRoleId = configuration["Auth0:Roles:Establishment"] ?? throw new ArgumentNullException(configuration["Auth0:Roles:Establishment"]);
         _userRoleId = configuration["Auth0:Roles:User"] ?? throw new ArgumentNullException(configuration["Auth0:Roles:User"]);
@@ -94,8 +98,6 @@ public class Auth0Service : IAuth0Service
         
         await AssignRoleAsync(user.UserId, "establishment");
         
-        await _mailService.SendWelcomeEmailAsync($"{establishmentOwnerInfo.FirstName} {establishmentOwnerInfo.LastName}", establishmentOwnerInfo.Email);
-        
         return user.UserId;
     }
 
@@ -106,7 +108,7 @@ public class Auth0Service : IAuth0Service
     /// <returns> The full name of the establishment owner </returns>
     /// <exception cref="HttpRequestException"> Thrown when the request to Auth0 API fails </exception>
     /// <exception cref="JsonException"> Thrown when the response from Auth0 API cannot be deserialized </exception>
-    public async Task<string> GetEstablishmentOwnerFullNameAsync(string auth0Id)
+    public async Task<(string fullName, string email)> GetEstablishmentOwnerFullNameAndEmailAsync(string auth0Id)
     {
         if (string.IsNullOrEmpty(auth0Id))
         {
@@ -131,7 +133,70 @@ public class Auth0Service : IAuth0Service
         var user = JsonConvert.DeserializeObject<User>(responseBody) 
                    ?? throw new JsonException("Failed to deserialize Auth0 response");
         
-        return $"{user.FirstName} {user.LastName}";
+        return ($"{user.FirstName} {user.LastName}", user.Email);
+    }
+
+   public async Task ChangeAccountPasswordAsync(string auth0Id, string newPassword)
+{
+    /*var isOldPasswordValid = await VerifyOldPasswordAsync(auth0Id, oldPassword);
+    if (!isOldPasswordValid)
+    {
+        _logger.LogWarning("Old password is incorrect for user {auth0Id}", auth0Id);
+        throw new UnauthorizedAccessException("The old password is incorrect.");
+    }*/
+
+    var accessToken = await _tokenService.GetManagementAccessTokenAsync();
+
+    var requestBody = new
+    {
+        password = newPassword,
+        connection = "Username-Password-Authentication"
+    };
+
+    using var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+    using var request = new HttpRequestMessage(HttpMethod.Patch, $"https://{_domain}/api/v2/users/{auth0Id}");
+    request.Headers.Add("Authorization", $"Bearer {accessToken}");
+    request.Content = content;
+
+    var response = await _httpClient.SendAsync(request);
+    var responseBody = await response.Content.ReadAsStringAsync();
+
+    if (!response.IsSuccessStatusCode)
+    {
+        _logger.LogError("Failed to change account password. Status Code: {StatusCode}, Response: {Response}", response.StatusCode, responseBody);
+        throw new HttpRequestException($"Failed to change account password. Status Code: {response.StatusCode}, Response: {responseBody}");
+    }
+
+    _logger.LogInformation("Password successfully changed for user {auth0Id}", auth0Id);
+}
+
+    public async Task<bool> VerifyOldPasswordAsync(string auth0Id, string oldPassword)
+    {
+        var client = new HttpClient();
+
+        var loginRequest = new
+        {
+            client_id = _clientId,
+            client_secret = _clientSecret,
+            grant_type = "password",
+            username = auth0Id,
+            password = oldPassword,
+            scope = "openid"
+        };
+
+        var loginContent = new StringContent(JsonConvert.SerializeObject(loginRequest), Encoding.UTF8, "application/json");
+
+        var loginResponse = await client.PostAsync($"https://{_domain}/oauth/token", loginContent);
+        var loginResponseBody = await loginResponse.Content.ReadAsStringAsync();
+
+        if (!loginResponse.IsSuccessStatusCode)
+        {
+            _logger.LogWarning("Login attempt failed for user {auth0Id}. Status Code: {StatusCode}, Response: {Response}",
+                auth0Id, loginResponse.StatusCode, loginResponseBody);
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>

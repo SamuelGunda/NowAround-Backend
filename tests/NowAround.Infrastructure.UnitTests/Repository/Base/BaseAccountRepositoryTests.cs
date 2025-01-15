@@ -5,8 +5,9 @@ using Moq;
 using NowAround.Domain.Common;
 using NowAround.Infrastructure.Context;
 using NowAround.Infrastructure.Repository.Base;
+using NowAround.IntegrationTests;
 
-namespace NowAround.IntegrationTests.Repositories;
+namespace NowAround.Infrastructure.UnitTests.Repository.Base;
 
 public class TestAccountEntity : BaseAccountEntity
 {

@@ -8,7 +8,6 @@ using NowAround.Infrastructure.Context;
 
 namespace NowAround.Infrastructure.Repository.Base;
 
-//TODO: Change Base Repository from abstract to normal class
 public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
 {
     protected AppDbContext Context { get; }

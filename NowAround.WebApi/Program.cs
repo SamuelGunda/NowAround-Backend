@@ -25,24 +25,9 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddCustomServices();
 builder.Services.AddAuthentication(builder.Configuration);
-/*
 builder.Services.AddDatabase(builder.Configuration);
-*/
 builder.Services.AddCustomCors();
 builder.Services.AddApplicationInsightsTelemetry();
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Database"), sqlOptions =>
-    {
-        sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(30),
-            errorNumbersToAdd: null
-        );
-        sqlOptions.MigrationsAssembly("NowAround.Infrastructure");
-    });
-});
 
 var app = builder.Build();
 

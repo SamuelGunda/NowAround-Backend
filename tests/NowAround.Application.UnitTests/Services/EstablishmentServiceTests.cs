@@ -23,6 +23,7 @@ public class EstablishmentServiceTests
     private readonly Mock<IBaseRepository<Category>> _categoryRepositoryMock;
     private readonly Mock<IBaseRepository<Tag>> _tagRepositoryMock;
     private readonly Mock<IStorageService> _storageServiceMock;
+    private readonly Mock<IMailService> _mailServiceMock;
 
     private readonly EstablishmentService _establishmentService;
     
@@ -34,6 +35,7 @@ public class EstablishmentServiceTests
         _categoryRepositoryMock = new Mock<IBaseRepository<Category>>();
         _tagRepositoryMock = new Mock<IBaseRepository<Tag>>();
         _storageServiceMock = new Mock<IStorageService>();
+        _mailServiceMock = new Mock<IMailService>();
         Mock<ILogger<EstablishmentService>> loggerMock = new();
         
         _establishmentService = new EstablishmentService(
@@ -43,6 +45,7 @@ public class EstablishmentServiceTests
             _categoryRepositoryMock.Object,
             _tagRepositoryMock.Object,
             _storageServiceMock.Object,
+            _mailServiceMock.Object,
             loggerMock.Object);
     }
     

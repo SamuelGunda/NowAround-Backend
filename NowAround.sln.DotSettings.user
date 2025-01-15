@@ -14,6 +14,7 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AJsonPropertyAttribute_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FSourcesCache_003F15f9da733c88dd854d1e5488f1fd410fef95b8c1cd76ec6784d25e82d2d1d12_003FJsonPropertyAttribute_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AMemoryCacheExtensions_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FSourcesCache_003F24f2bc2f34acd2f18a58dc387a794496d3e71d543498db8da419e3bd3028f5b4_003FMemoryCacheExtensions_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ANamingStrategy_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FSourcesCache_003Fbfe6d7ebbed9d3d854a76aee4fdb9ee59579753e7230885a72fcd7521c3bde_003FNamingStrategy_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ANullReferenceException_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003Fc73b3c6c598640c592fd3c6fa226c286e90908_003Fdf_003F670ee149_003FNullReferenceException_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ASearchValues_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003Fbbdc8f44584a4dbfac704c73c87ef3d187567f729e19dbe8e6e3bc4284baf93_003FSearchValues_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AString_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003Fde3edec1170e48a0a2478d8743508635c8e910_003Ff7_003F8dc29466_003FString_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AUser_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F9cfb19641b1a4a0fa1a4138f38ca327636600_003Fe4_003Fe2ca45d2_003FUser_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
@@ -22,6 +23,9 @@
   &lt;Assembly Path="C:\Users\samue\.nuget\packages\microsoft.identitymodel.tokens\8.0.1\lib\net9.0\Microsoft.IdentityModel.Tokens.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:String x:Key="/Default/Environment/Highlighting/HighlightingSourceSnapshotLocation/@EntryValue">C:\Users\samue\AppData\Local\JetBrains\Rider2024.2\resharper-host\temp\Rider\vAny\CoverageData\_NowAround.-609521307\Snapshot\snapshot.utdcvr</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=03f3c256_002D0d05_002D4082_002D869e_002Df1c6238ec268/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetProfileByAuth0IdAsync_ShouldThrowEntityNotFoundException_WhenNotFound" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2ea5d019_002Db155_002D4e96_002Da162_002Db4ef180103f1/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="EventServiceTests #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::01BB7EAB-0B3C-4BAA-9639-9F8AAE9B7163::net9.0::NowAround.Application.UnitTests.Services.EventServiceTests&lt;/TestId&gt;&#xD;
@@ -30,6 +34,24 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=833edd9c_002D88da_002D4e12_002D958a_002D7bd83251b092/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=93279df5_002De0e3_002D4bdc_002Da2cd_002D4d924d9bd673/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CreateEventAsync_ShouldCreateEvent_WhenValidRequest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::01BB7EAB-0B3C-4BAA-9639-9F8AAE9B7163::net9.0::NowAround.Application.UnitTests.Services.EventServiceTests.CreateEventAsync_ShouldCreateEvent_WhenValidRequest&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=b36ca79f_002Db2b0_002D4479_002Db32a_002Df3b7308c467e/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;And&gt;&#xD;
+    &lt;Project Location="C:\Users\samue\Desktop\NowAround-Backend" Presentation="&amp;lt;tests&amp;gt;" /&gt;&#xD;
+    &lt;Or&gt;&#xD;
+      &lt;Project Location="C:\Users\samue\Desktop\NowAround-Backend\tests\NowAround.Application.UnitTests" Presentation="&amp;lt;tests&amp;gt;\&amp;lt;NowAround.Application.UnitTests&amp;gt;" /&gt;&#xD;
+      &lt;Project Location="C:\Users\samue\Desktop\NowAround-Backend\tests\NowAround.Infrastructure.UnitTests" Presentation="&amp;lt;tests&amp;gt;\&amp;lt;NowAround.Infrastructure.UnitTests&amp;gt;" /&gt;&#xD;
+      &lt;Nothing /&gt;&#xD;
+    &lt;/Or&gt;&#xD;
+  &lt;/And&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	
+	
+	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fbc4783a_002D64a2_002D4dc7_002Db1f7_002D3c7000be2099/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="EventServiceTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::01BB7EAB-0B3C-4BAA-9639-9F8AAE9B7163::net9.0::NowAround.Application.UnitTests.Services.EventServiceTests&lt;/TestId&gt;&#xD;

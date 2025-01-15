@@ -28,4 +28,8 @@
       <ProjectReference Include="..\..\NowAround.WebApi\NowAround.WebApi.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Repositories\" />
+    </ItemGroup>
+
 </Project>

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using NowAround.Application.Interfaces;
+using NowAround.Application.Mapping;
 using NowAround.Application.Requests;
 using NowAround.Application.Services;
 using NowAround.Domain.Enum;
@@ -70,14 +71,31 @@ public class EventServiceTests
             Latitude = 1.0,
             Longitude = 1.0,
             PriceCategory = PriceCategory.Moderate,
-            RequestStatus = RequestStatus.Pending,
+            RequestStatus = RequestStatus.Accepted,
             Categories = new List<Category>(),
             Tags = new List<Tag>()
         };
         
-        _establishmentServiceMock.Setup(es => es.GetEstablishmentByAuth0IdAsync(auth0Id, true)).ReturnsAsync(establishment);
+        var eventEntity = new Event
+        {
+            Title = eventCreateRequest.Title,
+            Body = eventCreateRequest.Body,
+            Price = eventCreateRequest.Price,
+            EventPriceCategory = eventCreateRequest.EventPriceCategory,
+            Latitude = coordinates.lat,
+            Longitude = coordinates.lng,
+            Address = eventCreateRequest.Address,
+            City = eventCreateRequest.City,
+            MaxParticipants = eventCreateRequest.MaxParticipants,
+            Start = eventCreateRequest.Start,
+            End = eventCreateRequest.End,
+            EventCategory = EventCategory.Music,
+            EstablishmentId = establishment.Id
+        };
+        
+        _establishmentServiceMock.Setup(es => es.GetEstablishmentByAuth0IdAsync(It.IsAny<string>(), false)).ReturnsAsync(establishment);
         _mapboxServiceMock.Setup(ms => ms.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(coordinates);
-        _eventRepositoryMock.Setup(er => er.CreateAsync(It.IsAny<Event>())).ReturnsAsync(1);
+        _eventRepositoryMock.Setup(er => er.CreateAsync(eventEntity)).ReturnsAsync(1);
 
         // Act
         var result = await _eventService.CreateEventAsync(auth0Id, eventCreateRequest);
@@ -122,6 +140,7 @@ public class EventServiceTests
         // Arrange
         const int eventId = 1;
         const string auth0Id = "auth0|123";
+        var user = new User { Auth0Id = auth0Id, FullName = "Test User" };
         var eventEntity = new Event
         {
             Id = eventId,
@@ -136,14 +155,13 @@ public class EventServiceTests
             EventCategory = EventCategory.Other,
             InterestedUsers = new List<User>()
         };
-        var user = new User { Auth0Id = auth0Id, FullName = "Test User" };
 
         _eventRepositoryMock.Setup(er => er.GetAsync(
                 It.IsAny<Expression<Func<Event, bool>>>(), 
                 It.IsAny<bool>(), 
                 It.IsAny<Func<IQueryable<Event>, IQueryable<Event>>>()))
             .ReturnsAsync(eventEntity);
-        _userServiceMock.Setup(us => us.GetUserByAuth0IdAsync(auth0Id, true)).ReturnsAsync(user);
+        _userServiceMock.Setup(us => us.GetUserByAuth0IdAsync(auth0Id, false)).ReturnsAsync(user);
 
         // Act
         await _eventService.ReactToEventAsync(eventId, auth0Id);
@@ -159,7 +177,6 @@ public class EventServiceTests
         const int eventId = 1;
         const string auth0Id = "auth0|123";
         var user = new User { Auth0Id = auth0Id, FullName = "Test User" };
-
         var eventEntity = new Event
         {
             Id = eventId,
@@ -263,7 +280,7 @@ public class EventServiceTests
         var eventEntity = new Event
         {
             Id = eventId,
-            EstablishmentId = 2,
+            EstablishmentId = 1,
             Title = "Test Event",
             Body = "Test Body",
             City = "Test City",
@@ -273,7 +290,8 @@ public class EventServiceTests
             Start = DateTime.UtcNow,
             End = DateTime.UtcNow.AddHours(2),
             EventCategory = EventCategory.Other,
-            InterestedUsers = new List<User>()
+            InterestedUsers = new List<User>(),
+            Establishment = establishment
         };
 
         _eventRepositoryMock.Setup(er => er.GetAsync(
@@ -284,7 +302,7 @@ public class EventServiceTests
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(
-            async () => await _eventService.DeleteEventAsync(auth0Id, eventId));
+            async () => await _eventService.DeleteEventAsync("auth0|456", eventId));
 
         Assert.Equal("Establishment does not own this event", exception.Message);
     }

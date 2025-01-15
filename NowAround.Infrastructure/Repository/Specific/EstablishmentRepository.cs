@@ -18,122 +18,6 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
     {
     }
 
-    /*
-    public async Task<EstablishmentProfileResponse> GetProfileByAuth0IdAsync(string auth0Id)
-    {
-        try
-        {
-            var establishment = await DbSet
-                .Where(e => e.Auth0Id == auth0Id)
-                .Select(e => new EstablishmentProfileResponse(
-                    e.Auth0Id,
-                new GenericInfo(
-                    e.Name,
-                    e.ProfilePictureUrl,
-                    e.BackgroundPictureUrl,
-                    e.Description,
-                    e.PriceCategory.ToString(),
-                    e.Tags.Select(et => et.Name).ToList(),
-                    e.Categories.Select(ec => ec.Name).ToList(),
-                    e.SocialLinks.Select(sl => new SocialLinkDto(sl.Name, sl.Url)).ToList()
-                ),
-                new LocationInfo(
-                    e.Address,
-                    e.City,
-                    e.Longitude,
-                    e.Latitude,
-                    new BusinessHoursDto(
-                        e.BusinessHours.Monday,
-                        e.BusinessHours.Tuesday,
-                        e.BusinessHours.Wednesday,
-                        e.BusinessHours.Thursday,
-                        e.BusinessHours.Friday,
-                        e.BusinessHours.Saturday,
-                        e.BusinessHours.Sunday,
-                        e.BusinessHours.BusinessHoursExceptions
-                            .Select(bhe => new BusinessHoursExceptionsDto(bhe.Date, bhe.Status))
-                            .ToList()
-                    )
-                ),
-                new List<PostDto>(
-                    e.Posts.Select(p => new PostDto(
-                        p.Id,
-                        null,
-                        p.Headline,
-                        p.Body,
-                        p.PictureUrl,
-                        p.CreatedAt,
-                        p.Likes.Select(l => l.Auth0Id).ToList()
-                    )).ToList()
-                    ),
-                e.Menus.Select(m => new MenuDto(
-                    m.Id,
-                    m.Name,
-                    m.MenuItems.Select(mi => new MenuItemDto(
-                        mi.Id,
-                        mi.Name,
-                        mi.PictureUrl,
-                        mi.Description,
-                        mi.Price
-                    )).ToList()
-                )).ToList(),
-                    e.Events.Select(ev => new EventDto(
-                        ev.Id,
-                        null,
-                        ev.Title,
-                        ev.Body,
-                        ev.Price,
-                        ev.EventPriceCategory,
-                        ev.City,
-                        ev.Address,
-                        ev.Latitude,
-                        ev.Longitude,
-                        ev.MaxParticipants,
-                        ev.PictureUrl,
-                        ev.Start,
-                        ev.End,
-                        ev.EventCategory.ToString(),
-                        ev.CreatedAt,
-                        ev.InterestedUsers.Select(iu => iu.Auth0Id).ToList()
-                    )).ToList(),
-                new RatingStatisticResponse(
-                    e.RatingStatistic.OneStar,
-                    e.RatingStatistic.TwoStars,
-                    e.RatingStatistic.ThreeStars,
-                    e.RatingStatistic.FourStars,
-                    e.RatingStatistic.FiveStars,
-                    e.RatingStatistic.Reviews.Select(r => new ReviewWithAuthIdsResponse(
-                        r.User.Auth0Id,
-                        null,
-                        r.User.FullName,
-                        r.Body,
-                        r.Rating,
-                        r.CreatedAt
-                    )).ToList()
-                )
-            ))
-            .FirstOrDefaultAsync();
-            
-            if (establishment == null)
-            {
-                Logger.LogWarning("Establishment with Auth0 ID {Auth0Id} not found", auth0Id);
-                throw new EntityNotFoundException("Establishment", "Auth0 ID", auth0Id);
-            }
-            
-            return establishment;
-        }
-        catch (EntityNotFoundException)
-        {
-            throw;
-        }
-        catch (Exception e)
-        {
-            Logger.LogError("Failed to get establishment by Auth0 ID: {Message}", e.Message);
-            throw new Exception("Failed to get establishment by Auth0 ID", e);
-        }
-    }
-    */
-
     public async Task<Establishment> GetProfileByAuth0IdAsync(string auth0Id)
     {
         try
@@ -218,7 +102,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
             if (establishments.Count == 0)
             {
                 Logger.LogInformation("No establishments were found with the given filter values");
-                return new List<Establishment>();
+                return [];
             }
 
             return establishments;

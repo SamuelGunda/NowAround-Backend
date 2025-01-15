@@ -2,5 +2,6 @@
 
 public interface IMailService
 {
-    Task SendWelcomeEmailAsync(string name, string receiver);
+    Task SendWelcomeEmailAsync(string name, string establishmentName, string receiver);
+    Task SendAccountAcceptedEmailAsync(string name, string establishmentName, string receiver, string password);
 }

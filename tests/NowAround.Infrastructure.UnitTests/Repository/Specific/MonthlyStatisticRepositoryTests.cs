@@ -5,8 +5,9 @@ using Moq;
 using NowAround.Domain.Models;
 using NowAround.Infrastructure.Context;
 using NowAround.Infrastructure.Repository.Specific;
+using NowAround.IntegrationTests;
 
-namespace NowAround.IntegrationTests.Repositories;
+namespace NowAround.Infrastructure.UnitTests.Repository.Specific;
 
 public class MonthlyStatisticRepositoryTests
 {
@@ -95,5 +96,16 @@ public class MonthlyStatisticRepositoryTests
         
         // Assert
         Assert.Null(result);
+    }
+    
+    [Fact]
+    public async Task GetMonthlyStatisticByDateAsync_IfSomethingGoesWrong_ThrowsException()
+    {
+        // Arrange
+        await _context.DisposeAsync();
+        
+        // Act & Assert
+        async Task Act() => await _repository.GetMonthlyStatisticByDateAsync("2022-01");
+        await Assert.ThrowsAsync<Exception>(Act);
     }
 }

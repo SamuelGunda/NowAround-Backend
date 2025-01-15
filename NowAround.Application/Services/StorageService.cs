@@ -26,12 +26,10 @@ public class StorageService : IStorageService
         
         await containerClient.CreateIfNotExistsAsync();
 
-        string blobPath;
-        
         var contentType = file.ContentType;
         var fileFormat = contentType.Split("/")[1];
         
-        blobPath = $"{sanitizedAuth0Id}/{imageContext}";
+        var blobPath = $"{sanitizedAuth0Id}/{imageContext}";
         
         blobPath += "." + fileFormat;
         
