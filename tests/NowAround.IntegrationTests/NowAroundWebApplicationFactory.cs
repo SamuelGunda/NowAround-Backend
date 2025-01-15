@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using NowAround.Application.Interfaces;
+using NowAround.Application.Services;
 using NowAround.Domain.Enum;
 using NowAround.Domain.Models;
 using NowAround.Infrastructure.Context;
@@ -18,13 +19,16 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly Mock<IAuth0Service>? _auth0ServiceMock;
     private readonly Mock<IMapboxService>? _mapboxServiceMock;
+    private readonly Mock<IMailService>? _mailServiceMock;
 
     public NowAroundWebApplicationFactory(
         Mock<IAuth0Service>? auth0ServiceMock = null,
-        Mock<IMapboxService>? mapboxServiceMock = null)
+        Mock<IMapboxService>? mapboxServiceMock = null,
+        Mock<IMailService>? mailServiceMock = null)
     {
         _auth0ServiceMock = auth0ServiceMock;
         _mapboxServiceMock = mapboxServiceMock;
+        _mailServiceMock = mailServiceMock;
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -66,6 +70,12 @@ internal class NowAroundWebApplicationFactory : WebApplicationFactory<Program>
             {
                 services.RemoveAll<IMapboxService>();
                 services.AddSingleton(_mapboxServiceMock.Object);
+            }
+            
+            if (_mailServiceMock != null)
+            {
+                services.RemoveAll<IMailService>();
+                services.AddSingleton(_mailServiceMock.Object);
             }
 
             // Authentication

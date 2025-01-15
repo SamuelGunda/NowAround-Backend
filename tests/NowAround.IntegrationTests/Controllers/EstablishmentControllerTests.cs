@@ -9,6 +9,7 @@ using NowAround.Application.Common.Exceptions;
 using NowAround.Application.Interfaces;
 using NowAround.Application.Requests;
 using NowAround.Application.Responses;
+using NowAround.Application.Services;
 using NowAround.Domain.Enum;
 using NowAround.Domain.Models;
 using NowAround.Infrastructure.Context;
@@ -19,6 +20,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
 {
     private readonly Mock<IAuth0Service> _auth0ServiceMock;
     private readonly Mock<IMapboxService> _mapboxServiceMock;
+    private readonly Mock<IMailService> _mailServiceMock;
 
     private readonly BlobServiceClient _blobServiceClient;
     private string? _containerName;
@@ -28,6 +30,7 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
     {
         _auth0ServiceMock = new Mock<IAuth0Service>();
         _mapboxServiceMock = new Mock<IMapboxService>();
+        _mailServiceMock = new Mock<IMailService>();
         
         _blobServiceClient = fixture.StorageContext.BlobServiceClient;
     }
@@ -54,6 +57,11 @@ public class EstablishmentControllerTests  : IClassFixture<StorageContextFixture
         _mapboxServiceMock
             .Setup(s => s.GetCoordinatesFromAddressAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync((0.0, 0.0));
+        
+        _mailServiceMock
+            .Setup(s => s.SendWelcomeEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+        
                 
         // Arrange
         var factory = new NowAroundWebApplicationFactory(_auth0ServiceMock, _mapboxServiceMock);
