@@ -24,7 +24,7 @@ jobs:
     - name: App Settings Variable Substitution
       uses: microsoft/variable-substitution@v1
       with:
-        files: 'NowAround.Api/appsettings.json'
+        files: 'NowAround/Presentation/NowAround.WebApi/appsettings.json'
       env:
         ConnectionStrings.StorageAccount: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
         ConnectionStrings.StorageKey: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
