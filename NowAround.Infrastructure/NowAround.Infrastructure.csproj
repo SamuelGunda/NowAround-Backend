@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    
+    <ItemGroup>
+      <PackageReference Include="Auth0.ManagementApi" />
+      <PackageReference Include="Azure.Storage.Blobs" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NowAround.Application\NowAround.Application.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Migrations\" />
+    </ItemGroup>
+
+</Project>

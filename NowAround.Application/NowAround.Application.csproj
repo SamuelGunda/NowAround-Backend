@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    
+    <ItemGroup>
+      <ProjectReference Include="..\NowAround.Domain\NowAround.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Azure.Storage.Blobs" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" />
+      <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+      <PackageReference Include="Newtonsoft.Json" />
+    </ItemGroup>
+
+</Project>
