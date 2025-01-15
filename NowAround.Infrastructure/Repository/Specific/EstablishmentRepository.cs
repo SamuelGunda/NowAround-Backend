@@ -84,7 +84,7 @@ public class EstablishmentRepository : BaseAccountRepository<Establishment>, IEs
         {
             var query = DbSet.AsQueryable();
 
-            query = queryBuilder(query);
+            query = queryBuilder(query).Include(e => e.Tags);;
 
             List<Establishment> establishments;
 

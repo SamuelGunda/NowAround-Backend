@@ -28,12 +28,23 @@
   &lt;Assembly Path="C:\Users\samue\.nuget\packages\microsoft.identitymodel.tokens\8.0.1\lib\net9.0\Microsoft.IdentityModel.Tokens.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:String x:Key="/Default/Environment/Highlighting/HighlightingSourceSnapshotLocation/@EntryValue">C:\Users\samue\AppData\Local\JetBrains\Rider2024.2\resharper-host\temp\Rider\vAny\CoverageData\_NowAround.-609521307\Snapshot\snapshot.utdcvr</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=19d41ee5_002D436a_002D4021_002Dabfe_002Daa21c00f1e2a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;And&gt;&#xD;
+    &lt;Project Location="C:\Users\samue\Desktop\NowAround" Presentation="&amp;lt;tests&amp;gt;" /&gt;&#xD;
+    &lt;Or&gt;&#xD;
+      &lt;Project Location="C:\Users\samue\Desktop\NowAround\tests\NowAround.Application.UnitTests" Presentation="&amp;lt;tests&amp;gt;\&amp;lt;NowAround.Application.UnitTests&amp;gt;" /&gt;&#xD;
+      &lt;Project Location="C:\Users\samue\Desktop\NowAround\tests\NowAround.Infrastructure.UnitTests" Presentation="&amp;lt;tests&amp;gt;\&amp;lt;NowAround.Infrastructure.UnitTests&amp;gt;" /&gt;&#xD;
+      &lt;Nothing /&gt;&#xD;
+    &lt;/Or&gt;&#xD;
+  &lt;/And&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2ea5d019_002Db155_002D4e96_002Da162_002Db4ef180103f1/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="EventServiceTests #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::01BB7EAB-0B3C-4BAA-9639-9F8AAE9B7163::net9.0::NowAround.Application.UnitTests.Services.EventServiceTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=833edd9c_002D88da_002D4e12_002D958a_002D7bd83251b092/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>

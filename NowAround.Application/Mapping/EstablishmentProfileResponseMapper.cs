@@ -40,7 +40,15 @@ public static class EstablishmentProfileResponseMapper
                         .ToList()
                 )
             ),
-            establishment.Posts.Select(p => p.ToDto()).ToList(),
+            establishment.Posts.Select(p => new PostDto(
+                p.Id,
+                null,
+                p.Headline,
+                p.Body,
+                p.PictureUrl,
+                p.CreatedAt,
+                p.Likes.Select(iu => iu.Auth0Id).ToList()
+            )).ToList(),
             establishment.Menus.Select(m => new MenuDto(
                 m.Id,
                 m.Name,
