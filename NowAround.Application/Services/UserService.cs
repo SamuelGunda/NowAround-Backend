@@ -30,13 +30,6 @@ public class UserService : IUserService
         await _auth0Service.AssignRoleAsync(auth0Id, "user");
     }
 
-    /*
-    public Task<bool> CheckIfUserExistsAsync(string auth0Id)
-    {
-        return _userRepository.CheckIfExistsByPropertyAsync("Auth0Id", auth0Id);
-    }
-    */
-
     public async Task<User> GetUserByAuth0IdAsync(string auth0Id, bool tracked = false, params Func<IQueryable<User>, IQueryable<User>>[] includeProperties)
     {
         return await _userRepository.GetAsync(u => u.Auth0Id == auth0Id, tracked, includeProperties);
@@ -52,7 +45,7 @@ public class UserService : IUserService
         if (pictureContext != "profile-picture" && pictureContext != "background-picture")
         {
             _logger.LogWarning("Invalid image context: {ImageContext}", pictureContext);
-            throw new ArgumentException("Invalid image context", nameof(pictureContext));
+            throw new ArgumentException("Invalid image context");
         }
         
         var user = await _userRepository.GetAsync(u => u.Auth0Id == auth0Id);

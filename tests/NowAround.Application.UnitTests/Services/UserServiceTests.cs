@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
+using NowAround.Application.Common.Exceptions;
 using NowAround.Application.Interfaces;
 using NowAround.Application.Services;
 using NowAround.Domain.Interfaces.Specific;
@@ -134,6 +136,111 @@ public class UserServiceTests
                 _userService.GetUsersCountCreatedInMonthAsync(startDate, endDate));
         Assert.Equal("Invalid date range", exception.Message);
     }
+    
+    // UpdateUserPictureAsync tests
+    
+    [Fact]
+    public async Task UpdateUserPictureAsync_ThrowsArgumentException_WhenInvalidPictureContext()
+    {
+        // Arrange
+        const string auth0Id = "auth0|valid";
+        const string invalidPictureContext = "invalid-context";
+        var pictureMock = new Mock<IFormFile>();
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+            _userService.UpdateUserPictureAsync(auth0Id, invalidPictureContext, pictureMock.Object));
+
+        Assert.Equal("Invalid image context", exception.Message);
+    }
+
+    [Fact]
+    public async Task UpdateUserPictureAsync_UpdatesProfilePictureUrl_WhenContextIsProfilePicture()
+    {
+        // Arrange
+        const string auth0Id = "auth0|valid";
+        const string pictureContext = "profile-picture";
+        var pictureMock = new Mock<IFormFile>();
+        const string pictureUrl = "http://storage.com/user/auth0|valid/profile-picture/xyz.jpg";
+
+        var user = new User { Auth0Id = auth0Id, FullName = "Samuel Pačút" };
+
+        _userRepositoryMock.Setup(r => r.GetAsync(u => u.Auth0Id == auth0Id, true))
+            .ReturnsAsync(user);
+
+        _storageServiceMock.Setup(s => s.UploadPictureAsync(It.IsAny<IFormFile>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(pictureUrl);
+
+        // Act
+        var result = await _userService.UpdateUserPictureAsync(auth0Id, pictureContext, pictureMock.Object);
+
+        // Assert
+        Assert.Equal(pictureUrl, result);
+        Assert.Equal(pictureUrl, user.ProfilePictureUrl);
+        _userRepositoryMock.Verify(r => r.UpdateAsync(user), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateUserPictureAsync_UpdatesBackgroundPictureUrl_WhenContextIsBackgroundPicture()
+    {
+        // Arrange
+        const string auth0Id = "auth0|valid";
+        const string pictureContext = "background-picture";
+        var pictureMock = new Mock<IFormFile>();
+        const string pictureUrl = "http://storage.com/user/auth0|valid/background-picture/xyz.jpg";
+
+        var user = new User { Auth0Id = auth0Id, FullName = "Samuel Pačút" };
+
+        _userRepositoryMock.Setup(r => r.GetAsync(u => u.Auth0Id == auth0Id, true))
+            .ReturnsAsync(user);
+
+        _storageServiceMock.Setup(s => s.UploadPictureAsync(It.IsAny<IFormFile>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(pictureUrl);
+
+        // Act
+        var result = await _userService.UpdateUserPictureAsync(auth0Id, pictureContext, pictureMock.Object);
+
+        // Assert
+        Assert.Equal(pictureUrl, result);
+        Assert.Equal(pictureUrl, user.BackgroundPictureUrl);
+        _userRepositoryMock.Verify(r => r.UpdateAsync(user), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateUserPictureAsync_LogsWarning_WhenInvalidContext()
+    {
+        // Arrange
+        const string auth0Id = "auth0|valid";
+        const string invalidPictureContext = "invalid-context";
+        var pictureMock = new Mock<IFormFile>();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            _userService.UpdateUserPictureAsync(auth0Id, invalidPictureContext, pictureMock.Object));
+    }
+
+    [Fact]
+    public async Task UpdateUserPictureAsync_CallsUpdateAsync_WhenValidContextAndPictureUploaded()
+    {
+        // Arrange
+        const string auth0Id = "auth0|valid";
+        const string pictureContext = "profile-picture";
+        var pictureMock = new Mock<IFormFile>();
+        const string pictureUrl = "http://storage.com/user/auth0|valid/profile-picture/xyz.jpg";
+
+        var user = new User { Auth0Id = auth0Id, FullName = "Samuel Pačút", ProfilePictureUrl = "old-url" };
+
+        _userRepositoryMock.Setup(r => r.GetAsync(u => u.Auth0Id == auth0Id, true))
+            .ReturnsAsync(user);
+        _storageServiceMock.Setup(s => s.UploadPictureAsync(It.IsAny<IFormFile>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(pictureUrl);
+
+        // Act
+        await _userService.UpdateUserPictureAsync(auth0Id, pictureContext, pictureMock.Object);
+
+        // Assert
+        _userRepositoryMock.Verify(r => r.UpdateAsync(user), Times.Once);
+    }
 
     // GetUserAsync tests
 
@@ -151,5 +258,69 @@ public class UserServiceTests
 
         // Assert
         Assert.Equal(user, result);
+    }
+    
+    // DeleteUserAsync tests
+
+    [Fact]
+    public async Task DeleteUserAsync_DeletesUserSuccessfully_WhenValidAuth0Id()
+    {
+        // Arrange
+        const string auth0Id = "auth0|valid";
+
+        _auth0ServiceMock.Setup(a => a.DeleteAccountAsync(auth0Id)).Returns(Task.CompletedTask);
+        _storageServiceMock.Setup(s => s.DeleteAsync("User", auth0Id, "")).Returns(Task.CompletedTask);
+        _userRepositoryMock.Setup(r => r.DeleteByAuth0IdAsync(auth0Id)).ReturnsAsync(true);
+
+        // Act
+        await _userService.DeleteUserAsync(auth0Id);
+
+        // Assert
+        _auth0ServiceMock.Verify(a => a.DeleteAccountAsync(auth0Id), Times.Once);
+        _storageServiceMock.Verify(s => s.DeleteAsync("User", auth0Id, ""), Times.Once);
+        _userRepositoryMock.Verify(r => r.DeleteByAuth0IdAsync(auth0Id), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteUserAsync_ThrowsEntityNotFoundException_WhenUserDeletionFails()
+    {
+        // Arrange
+        const string auth0Id = "auth0|valid";
+
+        _auth0ServiceMock.Setup(a => a.DeleteAccountAsync(auth0Id)).Returns(Task.CompletedTask);
+        _storageServiceMock.Setup(s => s.DeleteAsync("User", auth0Id, "")).Returns(Task.CompletedTask);
+        _userRepositoryMock.Setup(r => r.DeleteByAuth0IdAsync(auth0Id)).ReturnsAsync(false);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<EntityNotFoundException>(() => _userService.DeleteUserAsync(auth0Id));
+        Assert.Equal($"The User with Auth0 ID: {auth0Id} was not found", exception.Message);}
+
+    [Fact]
+    public async Task DeleteUserAsync_LogsErrorAndThrowsException_WhenAuth0DeleteFails()
+    {
+        // Arrange
+        const string auth0Id = "auth0|valid";
+
+        _auth0ServiceMock.Setup(a => a.DeleteAccountAsync(auth0Id)).ThrowsAsync(new Exception("Auth0 delete failed"));
+        
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<Exception>(() => _userService.DeleteUserAsync(auth0Id));
+        Assert.Equal("Auth0 delete failed", exception.Message);
+        _auth0ServiceMock.Verify(a => a.DeleteAccountAsync(auth0Id), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteUserAsync_LogsErrorAndThrowsException_WhenStorageDeleteFails()
+    {
+        // Arrange
+        const string auth0Id = "auth0|valid";
+
+        _auth0ServiceMock.Setup(a => a.DeleteAccountAsync(auth0Id)).Returns(Task.CompletedTask);
+        _storageServiceMock.Setup(s => s.DeleteAsync("User", auth0Id, "")).ThrowsAsync(new Exception("Storage delete failed"));
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<Exception>(() => _userService.DeleteUserAsync(auth0Id));
+        Assert.Equal("Storage delete failed", exception.Message);
+        _storageServiceMock.Verify(s => s.DeleteAsync("User", auth0Id, ""), Times.Once);
     }
 }

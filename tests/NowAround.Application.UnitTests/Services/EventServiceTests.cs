@@ -133,6 +133,8 @@ public class EventServiceTests
         
         Assert.Equal("Address must contain street and postal code separated by a comma", exception.Message);
     }
+    
+    // ReactToEventAsync tests
 
     [Fact]
     public async Task ReactToEventAsync_ShouldAddUser_WhenNotAlreadyInterested()
