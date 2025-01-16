@@ -2,7 +2,7 @@
 
 nowAround is a web application designed to bring together people and establishments on an interactive, map-based platform. The app provides users with a comprehensive view of nearby venues, including restaurants, cafes, museums, cinemas, nightclubs, and more. With planned features like event planning and social functionalities, nowAround aims to be a go-to app for people looking to explore and connect with local establishments in real-time.
 
-This repository contains the back-end code for nowAround, developed using **.NET Core 8** and deployed on **Azure**. It utilizes **Mapbox** for interactive mapping and **Auth0** for secure authentication.
+This repository contains the back-end code for nowAround, developed using **.NET Core 9** and deployed on **Azure**. It utilizes **Mapbox** for interactive mapping and **Auth0** for secure authentication.
 
 ## Features
 
@@ -14,11 +14,11 @@ This repository contains the back-end code for nowAround, developed using **.NET
 
 ## Tech Stack
 
-- **.NET Core 8**
+- **.NET Core 9**
 - **Mapbox** for map-based visualization of establishments.
 - **Auth0** for secure authentication and authorization.
 - **MS SQL Server** for the database.
-- **Azure** for deployment, with fully configured CI/CD pipelines.
+- **Azure** for deployment, with fully configured CI/CD pipelines, Database Deploy and Storage
 
 ## Getting Started
 
@@ -26,10 +26,11 @@ This repository contains the back-end code for nowAround, developed using **.NET
 
 To run the back-end locally, ensure you have:
 
-- .NET Core 8 SDK
+- .NET Core 9 SDK
 - MS SQL Server
 - Auth0 account (for authentication)
 - Mapbox account (for map integration)
+- Gmail Account (For mailing service)
 
 ### Setting Up the Project
 
@@ -56,23 +57,27 @@ To run the back-end locally, ensure you have:
     Example JSON:
     ```json
     "ConnectionStrings": {
-      "DefaultConnection": "Your-SQL-Server-Connection-String"
+    "Default": "default",
+    "StorageAccount": "default",
+    "StorageKey": "default"
     },
     "Auth0": {
-      "Audience": "Your-Auth0-Audience",
-      "ClientId": "Your-Auth0-ClientId",
-      "ClientSecret": "Your-Auth0-ClientSecret",
-      "Domain": "Your-Auth0-Domain",
-      "ManagementScopes": "Your-Auth0-ManagementScopes",
+      "Audience": "default",
+      "ClientId": "default",
+      "ClientSecret": "default",
+      "Domain": "default",
+      "ManagementScopes": "default",
       "Roles": {
-        "Establishment": "Your-Auth0-EstablishmentId",
-        "User": "Your-Auth0-UserId",
-        "Admin": "Your-Auth0-AdminId"
-      },
-      "M2MSecretKey": "Random-Secret-Known-Only-By-You"
+        "Establishment": "default",
+        "User": "default",
+        "Admin": "default"
+      }
     },
     "Mapbox": {
-      "AccessToken": "Your-Mapbox-AccessToken"
+      "AccessToken": "default"
+    },
+    "Email": {
+      "Password": "default"
     }
     ```
     
@@ -81,7 +86,7 @@ To run the back-end locally, ensure you have:
    Run the following command to apply migrations and set up the database schema:
 
    ```bash
-   dotnet ef database update
+   dotnet ef database update --project NowAround.Infrastructure --startup-project NowAround.WebApi
 
 5. **Configure the Auth0**
 
@@ -121,40 +126,35 @@ To run the back-end locally, ensure you have:
         <summary>JS Script</summary>
         
           exports.onExecutePostLogin = async (event, api) => {
-            const axios = require('axios');
+          const axios = require('axios');
+        
+          const userId = event.user.user_id;
           
-            const serverAuthToken = event.secrets.M2M_SECRET_KEY;
+          const givenName = event.user.given_name || '';
+          const familyName = event.user.family_name || '';
+          const fullName = `${givenName} ${familyName}`.trim();
           
-            const userId = event.user.user_id;
-            if (event.user.app_metadata.registeredInApi !== true)
-            {
-              const backendUrl = "https://{your-back-end-url}/api/User?auth0Id=" + userId;
-          
-              let attempts = 0;
-              const maxAttempts = 3;
-          
-              const registerUser = async () => {
-                try {
-          
-                  const response = await axios.post(backendUrl, {}, {
-                      headers: {
-                          'Auth0-Server-Token': serverAuthToken
-                      }
-                  });
-          
-                  api.user.setAppMetadata("registeredInApi", true)
-                } catch (error) {
-                  attempts++;
-                  if (attempts < maxAttempts) {
-                    await registerUser();
-                  } else {
-                    console.error('Failed to create user after multiple attempts', error);
-                  }    
+          if (event.user.app_metadata.registeredInApi !== true) {
+            const backendUrl = `https://app-nowaround-prod.azurewebsites.net/api/User?auth0Id=${encodeURIComponent(userId)}&fullName=${encodeURIComponent(fullName)}`;
+        
+            let attempts = 0;
+            const maxAttempts = 1;
+        
+            const registerUser = async () => {
+              try {
+                await axios.post(backendUrl, {}, {});
+              } catch (error) {
+                attempts++;
+                if (attempts < maxAttempts) {
+                  await registerUser();
+                } else {
+                  console.error('Failed to create user after multiple attempts', error);
                 }
               }
-              await registerUser();
-            }
-          };
+            };
+            await registerUser();
+          }
+        };
       
       </details>
 
