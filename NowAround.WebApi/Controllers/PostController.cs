@@ -31,17 +31,6 @@ public class PostController(IPostService postService) : ControllerBase
         return Ok(post.ToDto());
     }
     
-    [Authorize(Roles = "Establishment")]
-    [HttpPut("{postId:int}")]
-    public async Task<IActionResult> UpdatePostAsync(int postId, [FromForm] PostCreateUpdateRequest postUpdateRequest)
-    {
-        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Auth0Id not found");
-
-        var postDto = await postService.UpdatePostAsync(postId, auth0Id, postUpdateRequest);
-        
-        return Ok(postDto);
-    }
-    
     [Authorize(Roles = "User")]
     [HttpPut("{postId:int}/react")]
     public async Task<IActionResult> ReactToPostAsync(int postId)

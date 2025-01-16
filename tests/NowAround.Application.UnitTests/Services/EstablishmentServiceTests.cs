@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NowAround.Application.Common.Exceptions;
@@ -92,8 +93,6 @@ public class EstablishmentServiceTests
         // Assert
         _establishmentRepositoryMock.Verify(r => r.CreateAsync(It.IsAny<Establishment>()), Times.Once);
     }
-    
-    
     
     [Fact]
     public async Task RegisterEstablishmentAsync_EstablishmentAlreadyExists_ShouldThrowEstablishmentAlreadyExistsException()
@@ -298,43 +297,6 @@ public class EstablishmentServiceTests
             Tags = new List<Tag>()
         };
         
-        var establishmentProfile = new EstablishmentProfileResponse(
-            establishment.Auth0Id,
-            new GenericInfo(
-                establishment.Name,
-                "Default",
-                "Default",
-                establishment.Description,
-                "Moderate",
-                [],
-                [],
-                []
-            ),
-            new LocationInfo(
-                establishment.Address,
-                establishment.City,
-                establishment.Longitude,
-                establishment.Latitude,
-                new BusinessHoursDto(
-                    "08:00 - 17:00",
-                    "08:00 - 17:00",
-                    "08:00 - 17:00",
-                    "08:00 - 17:00",
-                    "08:00 - 17:00",
-                    "08:00 - 17:00",
-                    "08:00 - 14:00",
-                    new List<BusinessHoursExceptionsDto>()
-                )
-            ),
-            [],
-            [],
-            [],
-            new RatingStatisticResponse(
-                0, 0, 0, 0, 0,
-                new List<ReviewWithAuthIdsResponse>()
-            )
-        );
-        
         _establishmentRepositoryMock.Setup(r => r.GetProfileByAuth0IdAsync(auth0Id)).ReturnsAsync(establishment);
         
         // Act
@@ -388,10 +350,10 @@ public class EstablishmentServiceTests
         Assert.Equal(establishments.Count, result.Count);
     }
     
-    // GetEstablishmentWithFilterAsync
+    // GetEstablishmentWithFilterAsync tests
 
     [Fact]
-    public async Task GetEstablishmentsWithFilterAsync_ShouldReturnEstablishments_WhenSearchValuesAreValid()
+    public async Task GetEstablishmentsWithFilterAsync_WhenSearchValuesAreValid_ShouldReturnEstablishments()
     {
         // Arrange
         var searchValues = new SearchValues
@@ -402,7 +364,7 @@ public class EstablishmentServiceTests
             TagNames = ["Pet_Friendly"],
             MapBounds = new MapBounds { NwLat = 10, NwLong = 20, SeLat = 5, SeLong = 25 }
         };
-        var page = 1;
+        const int page = 1;
         var establishments = new List<Establishment>
         {
             new()
@@ -450,16 +412,16 @@ public class EstablishmentServiceTests
     }
 
     [Fact]
-    public void GetEstablishmentsWithFilterAsync_ShouldThrowException_WhenSearchValuesAreInvalid()
+    public void GetEstablishmentsWithFilterAsync_WhenSearchValuesAreInvalid_ShouldThrowException()
     {
         // Arrange
         var searchValues = new SearchValues
         {
-            Name = null, // Invalid SearchValues: No Name, PriceCategory, or CategoryName set
+            Name = null,
             PriceCategory = null,
             CategoryName = null,
             TagNames = null,
-            MapBounds = new MapBounds { NwLat = 0, NwLong = 0, SeLat = 0, SeLong = 0 } // Invalid MapBounds
+            MapBounds = new MapBounds { NwLat = 0, NwLong = 0, SeLat = 0, SeLong = 0 }
         };
         var page = 1;
 
@@ -471,7 +433,7 @@ public class EstablishmentServiceTests
     }
 
     [Fact]
-    public void GetEstablishmentsWithFilterAsync_ShouldThrowException_WhenPageIsInvalid()
+    public void GetEstablishmentsWithFilterAsync_WhenPageIsInvalid_ShouldThrowException()
     {
         // Arrange
         var searchValues = new SearchValues
@@ -479,10 +441,10 @@ public class EstablishmentServiceTests
             Name = "Test Establishment",
             PriceCategory = 1,
             CategoryName = "Restaurant",
-            TagNames = new List<string> { "Pet_Friendly" },
+            TagNames = ["Pet_Friendly"],
             MapBounds = new MapBounds { NwLat = 10, NwLong = 20, SeLat = 5, SeLong = 25 }
         };
-        var page = -1;
+        const int page = -1;
 
         // Act & Assert
         var exception = Assert.ThrowsAsync<InvalidSearchActionException>(
@@ -492,7 +454,7 @@ public class EstablishmentServiceTests
     }
 
     [Fact]
-    public async Task GetEstablishmentsWithFilterAsync_ShouldReturnEmptyList_WhenNoResultsFromRepository()
+    public async Task GetEstablishmentsWithFilterAsync_WhenNoResultsFromRepository_ShouldReturnEmptyList()
     {
         // Arrange
         var searchValues = new SearchValues
@@ -500,25 +462,25 @@ public class EstablishmentServiceTests
             Name = "Test Establishment",
             PriceCategory = 1,
             CategoryName = "Restaurant",
-            TagNames = new List<string> { "Pet_Friendly" },
+            TagNames = ["Pet_Friendly"],
             MapBounds = new MapBounds { NwLat = 10, NwLong = 20, SeLat = 5, SeLong = 25 }
         };
-        var page = 1;
+        const int page = 1;
         
         _establishmentRepositoryMock.Setup(r => r.GetRangeWithFilterAsync(It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>>(), page))
-            .ReturnsAsync(new List<Establishment>()); // Return empty list
+            .ReturnsAsync([]);
 
         // Act
         var result = await _establishmentService.GetEstablishmentsWithFilterAsync(searchValues, page);
 
         // Assert
-        Assert.Empty(result); // Ensure the result is empty
+        Assert.Empty(result);
     }
     
     // GetEstablishmentsCountCreatedInMonthAsync tests
     
     [Fact]
-    public async Task GetEstablishmentsCountCreatedInMonthAsync_ShouldReturnCorrectCount_WhenEstablishmentsExist()
+    public async Task GetEstablishmentsCountCreatedInMonthAsync_WhenEstablishmentsExist_ShouldReturnCorrectCount()
     {
         
         // Arrange
@@ -533,6 +495,466 @@ public class EstablishmentServiceTests
         // Assert
         Assert.Equal(expectedCount, result);
     }
+
+    // UpdateEstablishmentGenericInfoAsync tests
+    
+    [Fact]
+    public async Task UpdateEstablishmentGenericInfoAsync_ValidRequest_ShouldUpdateAndReturnGenericInfo()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        var request = new EstablishmentGenericInfoUpdateRequest
+        {
+            Name = "Updated Name",
+            Description = "Updated Description",
+            PriceCategory = 2,
+            Categories = new List<string> { "Cafe" },
+            Tags = new List<string> { "Outdoor_Seating" }
+        };
+        
+        var establishment = new Establishment
+        {
+            Auth0Id = auth0Id,
+            Name = "Old Name",
+            Description = "Old Description",
+            Address = "Test Address",
+            City = "Test City",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            Categories = new List<Category> { new() { Name = "Restaurant" } },
+            Tags = new List<Tag> { new() { Name = "Pet_Friendly" } },
+            SocialLinks = new List<SocialLink> { new() { Name = "Facebook", Url = "http://facebook.com/old" } }
+        };
+        
+        var categories = new[] { new Category { Name = "Cafe" } };
+        var tags = new[] { new Tag { Name = "Outdoor_Seating" } };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+        _categoryRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Category, bool>>>(), true))
+            .ReturnsAsync(categories[0]);
+        _tagRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Tag, bool>>>(), true))
+            .ReturnsAsync(tags[0]);
+        _establishmentRepositoryMock
+            .Setup(r => r.UpdateAsync(It.IsAny<Establishment>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _establishmentService.UpdateEstablishmentGenericInfoAsync(auth0Id, request);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(request.Name, result.Name);
+        Assert.Equal(request.Description, result.Description);
+        Assert.Equal("Expensive", result.PriceRange);
+        Assert.Contains("Cafe", result.Categories);
+        Assert.Contains("Outdoor_Seating", result.Tags);
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Once);
+    }
+    
+    [Fact]
+    public async Task UpdateEstablishmentGenericInfoAsync_EstablishmentNotFound_ThrowsEntityNotFoundException()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        var request = new EstablishmentGenericInfoUpdateRequest
+        {
+            Name = "Updated Name",
+            Description = "Updated Description",
+            PriceCategory = 2,
+            Categories = new List<string> { "Category1" },
+            Tags = new List<string> { "Tag1" }
+        };
+
+        _establishmentRepositoryMock.Setup(r => r.GetAsync(e => e.Auth0Id == auth0Id, true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ThrowsAsync(new EntityNotFoundException("Establishment not found"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            _establishmentService.UpdateEstablishmentGenericInfoAsync(auth0Id, request));
+    }
+
+    [Fact]
+    public async Task UpdateEstablishmentGenericInfoAsync_UpdateFails_ShouldThrowException()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        var request = new EstablishmentGenericInfoUpdateRequest
+        {
+            Name = "Updated Name",
+            Description = "Updated Description",
+            PriceCategory = 2,
+            Categories = new List<string> { "Category1", "Category2" },
+            Tags = new List<string> { "Tag1", "Tag2" }
+        };
+
+        var establishment = new Establishment
+        {
+            Id = 1,
+            Auth0Id = auth0Id,
+            Name = "Old Name",
+            Description = "Old Description",
+            Address = "Test Address",
+            City = "Test City",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            SocialLinks = new List<SocialLink>()
+        };
+
+        _establishmentRepositoryMock.Setup(r => r.GetAsync(e => e.Auth0Id == auth0Id, true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        _establishmentRepositoryMock.Setup(r => r.UpdateAsync(establishment))
+            .ThrowsAsync(new Exception("Database update failed"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<Exception>(() =>
+            _establishmentService.UpdateEstablishmentGenericInfoAsync(auth0Id, request));
+    }
+    
+    // UpdateEstablishmentLocationInfoAsync tests
+    
+    [Fact]
+    public async Task UpdateEstablishmentLocationInfoAsync_ValidRequest_ShouldUpdateAndReturnLocationInfo()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        var request = new EstablishmentLocationInfoUpdateRequest
+        {
+            Lat = 40.7128,
+            Long = -74.0060,
+            BusinessHours = new BusinessHoursDto(
+            
+                Monday: "9:00 AM - 5:00 PM",
+                Tuesday: "9:00 AM - 5:00 PM",
+                Wednesday: "9:00 AM - 5:00 PM",
+                Thursday: "9:00 AM - 5:00 PM",
+                Friday: "9:00 AM - 5:00 PM",
+                Saturday: "Closed",
+                Sunday: "Closed",
+                BusinessHoursExceptions: new List<BusinessHoursExceptionsDto>
+                {
+                    new(new DateOnly(2025, 1, 1), "Closed"),
+                    new(new DateOnly(2025, 12, 25), "Closed")
+                }
+            )
+        };
+
+        var addressAndCity = (address: "123 Main St", city: "New York");
+        var establishment = new Establishment
+        {
+            Name = "Default Name",
+            Auth0Id = auth0Id,
+            Latitude = 0,
+            Longitude = 0,
+            Address = "",
+            City = "",
+            PriceCategory = PriceCategory.Moderate,
+            BusinessHours = new BusinessHours
+            {
+                Monday = "",
+                Tuesday = "",
+                Wednesday = "",
+                Thursday = "",
+                Friday = "",
+                Saturday = "",
+                Sunday = "",
+                BusinessHoursExceptions = new List<BusinessHoursException>()
+            }
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        _mapboxServiceMock
+            .Setup(s => s.GetAddressFromCoordinatesAsync(request.Lat, request.Long))
+            .ReturnsAsync(addressAndCity);
+
+        _establishmentRepositoryMock
+            .Setup(r => r.UpdateAsync(It.IsAny<Establishment>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _establishmentService.UpdateEstablishmentLocationInfoAsync(auth0Id, request);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(addressAndCity.address, result.Address);
+        Assert.Equal(addressAndCity.city, result.City);
+        Assert.Equal(request.BusinessHours.Monday, result.BusinessHours.Monday);
+        Assert.Equal(request.BusinessHours.Tuesday, result.BusinessHours.Tuesday);
+        Assert.Equal(request.BusinessHours.Wednesday, result.BusinessHours.Wednesday);
+        Assert.Equal(request.BusinessHours.Thursday, result.BusinessHours.Thursday);
+        Assert.Equal(request.BusinessHours.Friday, result.BusinessHours.Friday);
+        Assert.Equal(request.BusinessHours.Saturday, result.BusinessHours.Saturday);
+        Assert.Equal(request.BusinessHours.Sunday, result.BusinessHours.Sunday);
+        Assert.Equal(
+            request.BusinessHours.BusinessHoursExceptions.Count,
+            result.BusinessHours.BusinessHoursExceptions.Count
+        );
+
+        foreach (var exception in request.BusinessHours.BusinessHoursExceptions)
+        {
+            Assert.Contains(result.BusinessHours.BusinessHoursExceptions, e =>
+                e.Date == exception.Date && e.Status == exception.Status);
+        }
+
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Once);
+        _mapboxServiceMock.Verify(s => s.GetAddressFromCoordinatesAsync(request.Lat, request.Long), Times.Once);
+    }
+
+    // UpdateEstablishmentPicturesAsync tests
+    
+    [Fact]
+    public async Task UpdateEstablishmentPictureAsync_ValidRequest_ShouldUpdatePictureAndReturnUrl()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        const string pictureContext = "profile-picture";
+        var pictureMock = new Mock<IFormFile>();
+        var pictureUrl = "https://storage.example.com/establishment/auth0|123/profile-picture.jpg";
+
+        var establishment = new Establishment
+        {
+            Id = 1,
+            Auth0Id = auth0Id,
+            ProfilePictureUrl = "",
+            BackgroundPictureUrl = "",
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>()
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true))
+            .ReturnsAsync(establishment);
+
+        _storageServiceMock
+            .Setup(s => s.UploadPictureAsync(It.IsAny<IFormFile>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(pictureUrl);
+
+        _establishmentRepositoryMock
+            .Setup(r => r.UpdateAsync(It.IsAny<Establishment>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _establishmentService.UpdateEstablishmentPictureAsync(auth0Id, pictureContext, pictureMock.Object);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(pictureUrl, result);
+        Assert.Equal(pictureUrl, establishment.ProfilePictureUrl);
+        Assert.Equal("", establishment.BackgroundPictureUrl);
+
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Once);
+        _storageServiceMock.Verify(s => s.UploadPictureAsync(It.IsAny<IFormFile>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateEstablishmentPictureAsync_InvalidPictureContext_ShouldThrowArgumentException()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        const string pictureContext = "invalid-context";
+        var pictureMock = new Mock<IFormFile>();
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+            _establishmentService.UpdateEstablishmentPictureAsync(auth0Id, pictureContext, pictureMock.Object));
+
+        Assert.Equal("Invalid image context (Parameter 'pictureContext')", exception.Message);
+    }
+    
+    // UpdateRatingStatisticAsync tests
+    
+    [Fact]
+    public async Task UpdateRatingStatisticsAsync_ValidRequest_ShouldUpdateRatingStatistics()
+    {
+        // Arrange
+        const int id = 1;
+        const int rating = 4;
+        const bool increment = true;
+        var establishment = new Establishment
+        {
+            Auth0Id = "auth0|123",
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            RatingStatistic = new RatingStatistic
+            {
+                Id = id,
+                OneStar = 1,
+                TwoStars = 2,
+                ThreeStars = 3,
+                FourStars = 4,
+                FiveStars = 5
+            }
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        _establishmentRepositoryMock
+            .Setup(r => r.UpdateAsync(It.IsAny<Establishment>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await _establishmentService.UpdateRatingStatisticsAsync(id, rating);
+
+        // Assert
+        Assert.Equal(5, establishment.RatingStatistic.FourStars);
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateRatingStatisticsAsync_DecrementRating_ShouldUpdateRatingStatistics()
+    {
+        // Arrange
+        const int id = 1;
+        const int rating = 4;
+        const bool increment = false;
+        var establishment = new Establishment
+        {
+            Auth0Id = "auth0|123",
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            RatingStatistic = new RatingStatistic
+            {
+                Id = id,
+                OneStar = 1,
+                TwoStars = 2,
+                ThreeStars = 3,
+                FourStars = 4,
+                FiveStars = 5
+            }
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        _establishmentRepositoryMock
+            .Setup(r => r.UpdateAsync(It.IsAny<Establishment>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await _establishmentService.UpdateRatingStatisticsAsync(id, rating, increment);
+
+        // Assert
+        Assert.Equal(3, establishment.RatingStatistic.FourStars);
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateRatingStatisticsAsync_RatingStatisticNotFound_ShouldThrowException()
+    {
+        // Arrange
+        const int id = 1;
+        const int rating = 4;
+        var increment = true;
+        var establishment = new Establishment
+        {
+            Auth0Id = "auth0|123",
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            RatingStatistic = null 
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<Exception>(() =>
+            _establishmentService.UpdateRatingStatisticsAsync(id, rating, increment));
+
+        Assert.Equal("RatingStatistic not found for the establishment.", exception.Message);
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task UpdateRatingStatisticsAsync_InvalidRating_ShouldThrowArgumentException()
+    {
+        // Arrange
+        const int id = 1;
+        const int rating = 6; 
+        const bool increment = true;
+        var establishment = new Establishment
+        {
+            Auth0Id = "auth0|123",
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            RatingStatistic = new RatingStatistic
+            {
+                Id = id,
+                OneStar = 1,
+                TwoStars = 2,
+                ThreeStars = 3,
+                FourStars = 4,
+                FiveStars = 5
+            }
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+            _establishmentService.UpdateRatingStatisticsAsync(id, rating));
+
+        Assert.Equal("Invalid rating value (Parameter 'rating')", exception.Message);
+        Assert.Equal("rating", exception.ParamName);
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Never);
+    }
+
     
     // UpdateEstablishmentRegisterRequestAsync tests
 
@@ -631,5 +1053,541 @@ public class EstablishmentServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<EntityNotFoundException>(() => _establishmentService.DeleteEstablishmentAsync(auth0Id));
+    }
+    
+    // AddMenuAsync tests
+    
+    [Fact]
+    public async Task AddMenuAsync_ValidRequest_ShouldAddMenuToEstablishmentAndReturnMenuDto()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        var menuRequest = new MenuCreateRequest
+        {
+            Name = "Test Menu",
+            MenuItems = new List<MenuItemCreateRequest>
+            {
+                new() { Name = "Pizza", Description = "Delicious pizza", Price = 9.99 },
+                new() { Name = "Pasta", Description = "Tasty pasta", Price = 12.99 }
+            }
+        };
+
+        var establishment = new Establishment
+        {
+            Auth0Id = auth0Id,
+            Id = 1,
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            Menus = new List<Menu>()
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        _establishmentRepositoryMock
+            .Setup(r => r.UpdateAsync(It.IsAny<Establishment>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _establishmentService.AddMenuAsync(auth0Id, menuRequest);
+
+        // Assert
+        Assert.NotNull(result); 
+        Assert.Equal(menuRequest.Name, result.Name); 
+        Assert.Equal(menuRequest.MenuItems.Count, result.MenuItems.Count); 
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task AddMenuAsync_EstablishmentNotFound_ShouldThrowException()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        var menuRequest = new MenuCreateRequest
+        {
+            Name = "Test Menu",
+            MenuItems = new List<MenuItemCreateRequest>
+            {
+                new() { Name = "Pizza", Description = "Delicious pizza", Price = 9.99 }
+            }
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ThrowsAsync(new EntityNotFoundException("Establishment not found"));
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            _establishmentService.AddMenuAsync(auth0Id, menuRequest));
+
+        Assert.Equal("The Establishment not found was not found", exception.Message);
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Never);
+    }
+
+    // UpdateMenuAsync tests
+    
+    [Fact]
+    public async Task UpdateMenuAsync_ValidRequest_ShouldUpdateMenuAndReturnMenuDto()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        var menuUpdateRequest = new MenuUpdateRequest
+        {
+            Id = 1,
+            Name = "Test Menu",
+            MenuItems = new List<MenuItemUpdateRequest>
+            {
+                new() { Id = 1, Name = "Updated Pizza", Description = "Updated Description", Price = 10.99 },
+                new() { Id = null, Name = "New Item", Description = "New Item Description", Price = 8.99 }
+            }
+        };
+
+        var existingMenuItem = new MenuItem
+        {
+            Id = 1,
+            Name = "Pizza",
+            Description = "Delicious pizza",
+            Price = 9.99
+        };
+
+        var menu = new Menu
+        {
+            Id = 1,
+            Name = "Test Menu",
+            MenuItems = new List<MenuItem> { existingMenuItem }
+        };
+
+        var establishment = new Establishment
+        {
+            Id = 1,
+            Auth0Id = auth0Id,
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            Menus = new List<Menu> { menu }
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        _establishmentRepositoryMock
+            .Setup(r => r.UpdateAsync(It.IsAny<Establishment>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _establishmentService.UpdateMenuAsync(auth0Id, menuUpdateRequest);
+
+        // Assert
+        Assert.NotNull(result); 
+        Assert.Equal(menuUpdateRequest.MenuItems.Count, result.MenuItems.Count);
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateMenuAsync_MenuNotFound_ShouldThrowEntityNotFoundException()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        var menuUpdateRequest = new MenuUpdateRequest
+        {
+            Id = 1,
+            Name = "Test Menu",
+            MenuItems = new List<MenuItemUpdateRequest>
+            {
+                new() { Id = 1, Name = "Updated Pizza", Description = "Updated Description", Price = 10.99 }
+            }
+        };
+
+        var establishment = new Establishment
+        {
+            Id = 1,
+            Auth0Id = auth0Id,
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            Menus = new List<Menu>() 
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            _establishmentService.UpdateMenuAsync(auth0Id, menuUpdateRequest));
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task UpdateMenuAsync_MenuItemNotFound_ShouldThrowEntityNotFoundException()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        var menuUpdateRequest = new MenuUpdateRequest
+        {
+            Id = 1,
+            Name = "Test Menu",
+            MenuItems = new List<MenuItemUpdateRequest>
+            {
+                new() { Id = 99, Name = "Non-existent Item", Description = "Item doesn't exist", Price = 10.99 }
+            }
+        };
+
+        var existingMenuItem = new MenuItem
+        {
+            Id = 1,
+            Name = "Pizza",
+            Description = "Delicious pizza",
+            Price = 9.99
+        };
+
+        var menu = new Menu
+        {
+            Id = 1,
+            Name = "Test Menu",
+            MenuItems = new List<MenuItem> { existingMenuItem }
+        };
+
+        var establishment = new Establishment
+        {
+            Id = 1,
+            Auth0Id = auth0Id,
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            Menus = new List<Menu> { menu }
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            _establishmentService.UpdateMenuAsync(auth0Id, menuUpdateRequest));
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Never);
+    }
+
+    // UpdateMenuItemPictureAsync tests
+    
+    [Fact]
+    public async Task UpdateMenuItemPictureAsync_ValidRequest_ShouldUpdatePictureAndReturnUrl()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        const int menuItemId = 1;
+        var picture = new Mock<IFormFile>();
+        picture.Setup(p => p.ContentType).Returns("image/jpeg");
+
+        var establishment = new Establishment
+        {
+            Auth0Id = auth0Id,
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            Menus = new List<Menu>
+            {
+                new()
+                {
+                    Id = 1,
+                    Name = "Test Menu",
+                    MenuItems = new List<MenuItem>
+                    {
+                        new()
+                        {
+                            Id = menuItemId,
+                            Name = "Pizza",
+                            Description = "Delicious pizza",
+                            Price = 9.99,
+                            PictureUrl = null,
+                            Menu = new Menu { Id = 1, Name = "Test Menu"}
+                        }
+                    }
+                }
+            }
+        };
+
+        var pictureUrl = "https://storage.url/menu/1/1/picture.jpg";
+
+        _storageServiceMock
+            .Setup(s => s.CheckPictureType(It.IsAny<string>()))
+            .Verifiable();
+        
+        _storageServiceMock
+            .Setup(s => s.UploadPictureAsync(It.IsAny<IFormFile>(), "Establishment", auth0Id, It.IsAny<string>()))
+            .ReturnsAsync(pictureUrl);
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        _establishmentRepositoryMock
+            .Setup(r => r.UpdateAsync(It.IsAny<Establishment>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _establishmentService.UpdateMenuItemPictureAsync(auth0Id, menuItemId, picture.Object);
+
+        // Assert
+        Assert.Equal(pictureUrl, result);
+        _storageServiceMock.Verify(s => s.CheckPictureType(It.IsAny<string>()), Times.Once); 
+        _storageServiceMock.Verify(s => s.UploadPictureAsync(It.IsAny<IFormFile>(), "Establishment", auth0Id, It.IsAny<string>()), Times.Once); 
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Once); 
+    }
+
+    [Fact]
+    public async Task UpdateMenuItemPictureAsync_MenuItemNotFound_ShouldThrowEntityNotFoundException()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        const int menuItemId = 99;
+        var picture = new Mock<IFormFile>();
+        picture.Setup(p => p.ContentType).Returns("image/jpeg");
+
+        var establishment = new Establishment
+        {
+            Auth0Id = auth0Id,
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            Menus = new List<Menu>
+            {
+                new()
+                {
+                    Id = 1,
+                    Name = "Test Menu",
+                    MenuItems = new List<MenuItem>()
+                }
+            }
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            _establishmentService.UpdateMenuItemPictureAsync(auth0Id, menuItemId, picture.Object));
+
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Never);
+    }
+    
+    // DeleteMenuItemAsync tests
+    
+    [Fact]
+    public async Task DeleteMenuAsync_ValidMenuId_ShouldDeleteMenu()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        const int menuId = 1;
+
+        var establishment = new Establishment
+        {
+            Auth0Id = auth0Id,
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            Menus = new List<Menu>
+            {
+                new() { Id = menuId, Name = "Test Menu" }
+            }
+        };
+
+        _storageServiceMock
+            .Setup(s => s.DeleteAsync("Establishment", auth0Id, $"menu/{menuId}"))
+            .Returns(Task.CompletedTask);
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        _establishmentRepositoryMock
+            .Setup(r => r.UpdateAsync(It.IsAny<Establishment>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await _establishmentService.DeleteMenuAsync(auth0Id, menuId);
+
+        // Assert
+        Assert.DoesNotContain(establishment.Menus, m => m.Id == menuId); 
+        _storageServiceMock.Verify(s => s.DeleteAsync("Establishment", auth0Id, $"menu/{menuId}"), Times.Once);
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(establishment), Times.Once); 
+    }
+
+    [Fact]
+    public async Task DeleteMenuAsync_MenuNotFound_ShouldThrowEntityNotFoundException()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        const int menuId = 99;
+
+        var establishment = new Establishment
+        {
+            Auth0Id = auth0Id,
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            Menus = new List<Menu>()
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            _establishmentService.DeleteMenuAsync(auth0Id, menuId));
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteMenuItemAsync_ValidMenuItemId_ShouldDeleteMenuItem()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        const int menuItemId = 1;
+
+        var establishment = new Establishment
+        {
+            Auth0Id = auth0Id,
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            Menus = new List<Menu>
+            {
+                new()
+                {
+                    Id = 1,
+                    Name = "Test Menu",
+                    MenuItems = new List<MenuItem>
+                    {
+                        new() { Id = menuItemId, Name = "Pizza", Description = "Delicious pizza", Price = 9.99 }
+                    }
+                }
+            }
+        };
+
+        _storageServiceMock
+            .Setup(s => s.DeleteAsync("Establishment", auth0Id, $"menu/1/{menuItemId}"))
+            .Returns(Task.CompletedTask);
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        _establishmentRepositoryMock
+            .Setup(r => r.UpdateAsync(It.IsAny<Establishment>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await _establishmentService.DeleteMenuItemAsync(auth0Id, menuItemId);
+
+        // Assert
+        var menu = establishment.Menus.First();
+        Assert.DoesNotContain(menu.MenuItems, mi => mi.Id == menuItemId);
+        _storageServiceMock.Verify(s => s.DeleteAsync("Establishment", auth0Id, $"menu/1/{menuItemId}"), Times.Once); 
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(establishment), Times.Once); 
+    }
+
+    [Fact]
+    public async Task DeleteMenuItemAsync_MenuItemNotFound_ShouldThrowEntityNotFoundException()
+    {
+        // Arrange
+        const string auth0Id = "auth0|123";
+        const int menuItemId = 99;
+
+        var establishment = new Establishment
+        {
+            Auth0Id = auth0Id,
+            Name = "test-name",
+            Description = "test-description",
+            City = "test-city",
+            Address = "test-address",
+            Latitude = 1.0,
+            Longitude = 1.0,
+            PriceCategory = PriceCategory.Moderate,
+            RequestStatus = RequestStatus.Pending,
+            Categories = new List<Category>(),
+            Tags = new List<Tag>(),
+            Menus = new List<Menu>
+            {
+                new() { Id = 1, Name = "Test Name",MenuItems = new List<MenuItem>() } 
+            }
+        };
+
+        _establishmentRepositoryMock
+            .Setup(r => r.GetAsync(It.IsAny<Expression<Func<Establishment, bool>>>(), true, It.IsAny<Func<IQueryable<Establishment>, IQueryable<Establishment>>[]>()))
+            .ReturnsAsync(establishment);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            _establishmentService.DeleteMenuItemAsync(auth0Id, menuItemId));
+        _establishmentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Establishment>()), Times.Never); // Ensure UpdateAsync is not called
     }
 }

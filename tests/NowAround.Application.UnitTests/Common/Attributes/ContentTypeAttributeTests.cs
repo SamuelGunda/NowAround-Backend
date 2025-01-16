@@ -8,7 +8,6 @@ namespace NowAround.Application.UnitTests.Common.Attributes;
 
 public class ContentTypeAttributeTests
 {
-    // Valid IFormFile with allowed content type returns Success
     [Fact]
     public void ValidContentType_ReturnsSuccess()
     {

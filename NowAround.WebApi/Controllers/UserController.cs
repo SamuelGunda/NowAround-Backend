@@ -34,7 +34,6 @@ public class UserController(IUserService userService) : ControllerBase
 
         var pictureUrl = await userService.UpdateUserPictureAsync(auth0Id, pictureContext, picture);
         
-        //TODO: Change to NoContent()
         return Created("", new { message = "Picture updated successfully" });
     }
     

@@ -119,7 +119,7 @@ public class EventServiceTests
             Body = "Test Body",
             Price = "Free",
             EventPriceCategory = "Free",
-            Address = "123 Test St", // Invalid address format
+            Address = "123 Test St",
             City = "Test City",
             MaxParticipants = "100",
             Start = DateTime.UtcNow,

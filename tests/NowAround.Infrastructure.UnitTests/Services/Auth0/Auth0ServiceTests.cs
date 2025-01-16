@@ -15,7 +15,6 @@ namespace NowAround.Infrastructure.UnitTests.Services.Auth0;
 public class Auth0ServiceTests
 {
     private readonly Mock<ITokenService> _mockTokenService;
-    private readonly Mock<IMailService> _mockMailService;
     private readonly Mock<HttpMessageHandler> _mockHttpMessageHandler;
     private readonly Auth0Service _auth0Service;
     
@@ -29,11 +28,11 @@ public class Auth0ServiceTests
         mockConfiguration.Setup(c => c["Auth0:Roles:User"]).Returns("user-role-id");
         
         _mockTokenService = new Mock<ITokenService>();
-        _mockMailService = new Mock<IMailService>();
+        Mock<IMailService> mockMailService = new();
         
         _mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         
-        _auth0Service = new Auth0Service(new HttpClient(_mockHttpMessageHandler.Object), _mockTokenService.Object, _mockMailService.Object, mockConfiguration.Object, Mock.Of<ILogger<Auth0Service>>());
+        _auth0Service = new Auth0Service(new HttpClient(_mockHttpMessageHandler.Object), _mockTokenService.Object, mockMailService.Object, mockConfiguration.Object, Mock.Of<ILogger<Auth0Service>>());
     }
     
     // RegisterEstablishmentAccountAsync tests
@@ -88,7 +87,7 @@ public class Auth0ServiceTests
             LastName = "User"
         };
         
-        var mockToken = "mock_access_token";
+        const string mockToken = "mock_access_token";
         
         _mockTokenService
             .Setup(service => service.GetManagementAccessTokenAsync())
@@ -240,9 +239,9 @@ public class Auth0ServiceTests
     public async Task ChangeAccountPasswordAsync_ShouldChangePasswordSuccessfully()
     {
         // Arrange
-        var auth0Id = "auth0|12345";
-        var newPassword = "new_secure_password";
-        var mockToken = "mock_access_token";
+        const string auth0Id = "auth0|12345";
+        const string newPassword = "new_secure_password";
+        const string mockToken = "mock_access_token";
 
         _mockTokenService
             .Setup(service => service.GetManagementAccessTokenAsync())
@@ -299,8 +298,8 @@ public class Auth0ServiceTests
     public async Task VerifyOldPasswordAsync_WhenLoginFails_ShouldReturnFalse()
     {
         // Arrange
-        var auth0Id = "auth0|12345";
-        var oldPassword = "wrong_password";
+        const string auth0Id = "auth0|12345";
+        const string oldPassword = "wrong_password";
 
         _mockHttpMessageHandler
             .Protected()
@@ -326,8 +325,8 @@ public class Auth0ServiceTests
     public async Task DeleteAccountAsync_ShouldDeleteAccount()
     {
         // Arrange
-        var auth0Id = "auth0|12345";
-        var mockToken = "mock_access_token";
+        const string auth0Id = "auth0|12345";
+        const string mockToken = "mock_access_token";
         
         _mockTokenService
             .Setup(service => service.GetManagementAccessTokenAsync())

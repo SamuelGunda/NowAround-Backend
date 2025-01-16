@@ -105,6 +105,7 @@ public class EstablishmentController(IEstablishmentService establishmentService)
     
     [Authorize(Roles = "Establishment")]
     [HttpPut ("picture/{pictureContext}")]
+    
     public async Task<IActionResult> UpdateEstablishmentPictureAsync([FromRoute] string pictureContext, [ContentType([ "image/jpeg", "image/png", "image/gif", "image/webp"])] IFormFile picture)
     {
         var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 

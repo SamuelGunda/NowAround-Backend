@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NowAround.Infrastructure.Context;
 using NowAround.Infrastructure.UnitTests.Repository.Base;
-using NowAround.IntegrationTests.Repositories;
 
 namespace NowAround.IntegrationTests;
 

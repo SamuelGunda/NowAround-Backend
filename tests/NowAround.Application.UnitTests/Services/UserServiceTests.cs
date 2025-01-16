@@ -108,7 +108,7 @@ public class UserServiceTests
         // Arrange
         var startDate = new DateTime(2023, 1, 1);
         var endDate = new DateTime(2023, 1, 31);
-        var expectedCount = 0;
+        const int expectedCount = 0;
 
         _userRepositoryMock.Setup(r => r.GetCountByCreatedAtBetweenDatesAsync(startDate, endDate))
             .ReturnsAsync(expectedCount);
@@ -155,7 +155,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task UpdateUserPictureAsync_UpdatesProfilePictureUrl_WhenContextIsProfilePicture()
+    public async Task UpdateUserPictureAsync_WhenContextIsProfilePicture_ShouldUpdateProfilePictureUrl()
     {
         // Arrange
         const string auth0Id = "auth0|valid";

@@ -92,26 +92,6 @@ public class EstablishmentService : IEstablishmentService
             throw new Exception("Failed to create establishment in the database");
         }
     }
-
-    /*
-    public Task<bool> CheckIfEstablishmentExistsAsync(string auth0Id)
-    {
-        return _establishmentRepository.CheckIfExistsByPropertyAsync("Auth0Id", auth0Id);
-    }
-    */
-
-    /*
-    public async Task<EstablishmentResponse> GetEstablishmentByIdAsync(int id)
-    {
-        var establishment = await _establishmentRepository.GetByIdAsync(id);
-        if (establishment == null)
-        {
-            throw new EntityNotFoundException("Establishment","ID", id.ToString());
-        }
-
-        return establishment.ToDetailedResponse();
-    }
-    */
     
     public async Task<Establishment> GetEstablishmentByAuth0IdAsync(string auth0Id, bool tracked = false, params Func<IQueryable<Establishment>, IQueryable<Establishment>>[] includeProperties)
     {
@@ -190,8 +170,8 @@ public class EstablishmentService : IEstablishmentService
             establishment.BackgroundPictureUrl,
             establishment.Description,
             establishment.PriceCategory.ToString(),
-            establishment.Categories.Select(c => c.Name).ToList(),
             establishment.Tags.Select(t => t.Name).ToList(),
+            establishment.Categories.Select(c => c.Name).ToList(),
             establishment.SocialLinks.Select(sl => new SocialLinkDto(sl.Name, sl.Url)).ToList()
         );
         
@@ -365,34 +345,34 @@ public class EstablishmentService : IEstablishmentService
     
     // Menu methods
     
-        public async Task<MenuDto> AddMenuAsync(string auth0Id, MenuCreateRequest menu)
+    public async Task<MenuDto> AddMenuAsync(string auth0Id, MenuCreateRequest menu)
+    {
+        var establishment = await _establishmentRepository.GetAsync
+        (
+            e => e.Auth0Id == auth0Id, 
+            true, 
+            query => query
+                .Include(e => e.Menus)
+        );
+        
+        var menuEntity = new Menu
         {
-            var establishment = await _establishmentRepository.GetAsync
-            (
-                e => e.Auth0Id == auth0Id, 
-                true, 
-                query => query
-                    .Include(e => e.Menus)
-            );
-            
-            var menuEntity = new Menu
+            Name = menu.Name,
+            EstablishmentId = establishment.Id,
+            MenuItems = menu.MenuItems.Select(mi => new MenuItem
             {
-                Name = menu.Name,
-                EstablishmentId = establishment.Id,
-                MenuItems = menu.MenuItems.Select(mi => new MenuItem
-                {
-                    Name = mi.Name,
-                    Description = mi.Description,
-                    Price = mi.Price
-                }).ToList()
-            };
-            
-            establishment.Menus.Add(menuEntity);
-            
-            await _establishmentRepository.UpdateAsync(establishment);
-            
-            return menuEntity.ToDto();
-        }
+                Name = mi.Name,
+                Description = mi.Description,
+                Price = mi.Price
+            }).ToList()
+        };
+        
+        establishment.Menus.Add(menuEntity);
+        
+        await _establishmentRepository.UpdateAsync(establishment);
+        
+        return menuEntity.ToDto();
+    }
 
     public async Task<MenuDto> UpdateMenuAsync(string auth0Id, MenuUpdateRequest updatedMenu)
     {

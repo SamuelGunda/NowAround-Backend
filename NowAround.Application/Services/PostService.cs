@@ -84,20 +84,6 @@ public class PostService : IPostService
         await _postRepository.UpdateAsync(postEntity);
     }
 
-    public Task<PostDto> UpdatePostAsync(int postId, string auth0Id, PostCreateUpdateRequest postCreateUpdateRequest)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task UpdatePictureAsync(int postId, string pictureUrl)
-    {
-        var post = await GetPostAsync(postId, true);
-        
-        post.PictureUrl = pictureUrl;
-        
-        await _postRepository.UpdateAsync(post);
-    }
-
     public async Task DeletePostAsync(string auth0Id, int postId)
     {
         var post = await GetPostAsync(postId);

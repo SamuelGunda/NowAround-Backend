@@ -21,5 +21,7 @@
     <ItemGroup>
         <InternalsVisibleTo Include="NowAround.IntegrationTests">
         </InternalsVisibleTo>
+        <InternalsVisibleTo Include="NowAround.WebApi.UnitTests">
+        </InternalsVisibleTo>
     </ItemGroup>
 </Project>

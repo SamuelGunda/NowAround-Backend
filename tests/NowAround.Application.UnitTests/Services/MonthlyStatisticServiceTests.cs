@@ -60,7 +60,6 @@ public class MonthlyStatisticServiceTests
     {
         // Arrange
         const string year = "2024";
-        var months = new List<string> { $"{year}-01", $"{year}-02" };
         var statistics = new MonthlyStatistic { Date = $"{year}-01", UsersCreatedCount = 10, EstablishmentsCreatedCount = 5 };
         
         _monthlyStatisticRepository

@@ -241,10 +241,12 @@ public class BaseRepositoryTests
         var entities = await _repository.GetAllAsync();
 
         // Assert
+        var testEntities = entities as TestEntity[] ?? entities.ToArray();
+
         Assert.NotNull(entities);
-        Assert.Equal(2, entities.Count());
-        Assert.Contains(entities, e => e.Name == "Test Name 1");
-        Assert.Contains(entities, e => e.Name == "Test Name 2");
+        Assert.Equal(2, testEntities.Length);
+        Assert.Contains(testEntities, e => e.Name == "Test Name 1");
+        Assert.Contains(testEntities, e => e.Name == "Test Name 2");
     }
     
     [Fact]

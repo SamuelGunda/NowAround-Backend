@@ -16,15 +16,14 @@ public class EstablishmentRepositoryTests
 
     private readonly TestAppDbContext _context;
     private readonly EstablishmentRepository _repository;
-    private readonly SqliteConnection _connection;
-    
+
     public EstablishmentRepositoryTests()
     {
-        _connection = new SqliteConnection("DataSource=:memory:");
-        _connection.Open();
+        var connection = new SqliteConnection("DataSource=:memory:");
+        connection.Open();
         
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite(_connection)
+            .UseSqlite(connection)
             .Options;
         
         _context = new TestAppDbContext(options);

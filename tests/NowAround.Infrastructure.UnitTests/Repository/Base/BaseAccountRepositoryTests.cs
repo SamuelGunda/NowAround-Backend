@@ -26,15 +26,14 @@ public class BaseAccountRepositoryTests
 {
     private readonly TestAppDbContext _context;
     private readonly TestAccountRepository _repository;
-    private readonly SqliteConnection _connection;
 
     public BaseAccountRepositoryTests()
     {
-        _connection = new SqliteConnection("DataSource=:memory:");
-        _connection.Open();
+        var connection = new SqliteConnection("DataSource=:memory:");
+        connection.Open();
 
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite(_connection)
+            .UseSqlite(connection)
             .Options;
 
         _context = new TestAppDbContext(options);
@@ -43,12 +42,6 @@ public class BaseAccountRepositoryTests
         _context.Database.EnsureCreated();
     }
 
-    public void Dispose()
-    {
-        _context.Dispose();
-        _connection.Dispose();
-    }
-    
     // GetByAuth0IdAsync tests
     
     [Fact]
