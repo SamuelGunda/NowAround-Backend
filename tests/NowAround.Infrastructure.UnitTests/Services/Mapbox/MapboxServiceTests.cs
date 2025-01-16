@@ -139,7 +139,7 @@ public class MapboxServiceTests
             {
                 new
                 {
-                    place_name = "Some Street 123, Some City"
+                    place_name = "Jilemnického 563/9, 965 01 Žiar nad Hronom, Banská Bystrica, Slovakia"
                 }
             }
         };
@@ -161,8 +161,8 @@ public class MapboxServiceTests
         var (address, city) = await _mapboxService.GetAddressFromCoordinatesAsync(lat, lng);
 
         // Assert
-        Assert.Equal("Some Street 123", address);
-        Assert.Equal("Some City", city);
+        Assert.Equal("Jilemnického 563/9, 965 01", address);
+        Assert.Equal("Žiar nad Hronom", city);
     }
 
     [Fact]

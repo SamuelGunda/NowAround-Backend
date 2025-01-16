@@ -100,15 +100,16 @@ public class MapboxService : IMapboxService
     {
         var parts = placeName.Split(',');
 
-        if (parts.Length >= 2)
+        if (parts.Length >= 3)
         {
             var address = parts[0].Trim();
 
-            var city = parts[1].Trim();
-            
-            var cityParts = city.Split(' ');
+            var postalAndCity = parts[1].Trim();
+            var postalParts = postalAndCity.Split(' ');
+            var postal = postalParts[0] + " " + postalParts[1];
+            var city = string.Join(" ", postalParts.Skip(2));
 
-            return ($"{address}, {cityParts[0]}", cityParts[1]);
+            return ($"{address}, {postal}", city);
         }
 
         _logger.LogError("The place name format is unexpected.");
