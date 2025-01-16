@@ -105,8 +105,10 @@ public class MapboxService : IMapboxService
             var address = parts[0].Trim();
 
             var city = parts[1].Trim();
+            
+            var cityParts = city.Split(' ');
 
-            return (address, city);
+            return ($"{address}, {cityParts[0]}", cityParts[1]);
         }
 
         _logger.LogError("The place name format is unexpected.");

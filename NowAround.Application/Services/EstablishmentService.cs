@@ -79,7 +79,9 @@ public class EstablishmentService : IEstablishmentService
         try
         {
             await _establishmentRepository.CreateAsync(establishmentEntity);
+            /*
             await _mailService.SendWelcomeEmailAsync($"{personalInfo.FirstName} {personalInfo.LastName}", establishmentInfo.Name ,personalInfo.Email);
+        */
         }
         catch (Exception)
         {
